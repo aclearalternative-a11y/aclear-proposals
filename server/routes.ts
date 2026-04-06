@@ -414,6 +414,15 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Health check — confirms server is running and env vars are loaded
+  app.get("/api/health", (_req, res) => {
+    res.json({
+      status: "ok",
+      emailMode: process.env.GMAIL_USER ? "smtp" : "external-tool",
+      gmailUser: process.env.GMAIL_USER ? process.env.GMAIL_USER : "NOT SET",
+    });
+  });
+
   // Create proposal
   app.post("/api/proposals", async (req, res) => {
     try {
