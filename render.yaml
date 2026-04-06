@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: aclear-proposals
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
