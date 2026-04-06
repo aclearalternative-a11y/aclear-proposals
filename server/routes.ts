@@ -413,6 +413,7 @@ export async function registerRoutes(
     res.json({
       status: "ok",
       emailMode: process.env.GMAIL_USER ? "smtp" : "external-tool",
+      buildCommit: "c53a19c",
       gmailUser: process.env.GMAIL_USER ? process.env.GMAIL_USER : "NOT SET",
     });
   });
