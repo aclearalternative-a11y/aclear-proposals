@@ -2,11 +2,12 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { nanoid } from "nanoid";
-import { execSync, spawnSync } from "child_process";
+import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import nodemailer from "nodemailer";
+import puppeteer from "puppeteer";
 
 // ---------------------------------------------------------------------------
 // Email transport — nodemailer (Gmail SMTP) when env vars are set,
@@ -368,22 +369,28 @@ ${allPackagesHtml}
 </body></html>`;
 }
 
-function generatePdfFromHtml(html: string): string {
-  const tmpDir = os.tmpdir();
-  const ts = Date.now();
-  const htmlFile = path.join(tmpDir, `proposal_${ts}.html`);
-  const pdfFile = path.join(tmpDir, `proposal_${ts}.pdf`);
-  fs.writeFileSync(htmlFile, html, "utf8");
-  const result = spawnSync("python3", ["-c", `
-import sys
-from weasyprint import HTML
-HTML(filename=sys.argv[1]).write_pdf(sys.argv[2])
-`, htmlFile, pdfFile], { timeout: 60000 });
-  try { fs.unlinkSync(htmlFile); } catch {}
-  if (result.status !== 0) {
-    throw new Error("PDF generation failed: " + (result.stderr?.toString() || "unknown error"));
+async function generatePdfFromHtml(html: string): Promise<Buffer> {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+    ],
+  });
+  try {
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: "networkidle0" });
+    const pdfBuffer = await page.pdf({
+      format: "Letter",
+      margin: { top: "0.6in", bottom: "0.6in", left: "0.65in", right: "0.65in" },
+      printBackground: true,
+    });
+    return Buffer.from(pdfBuffer);
+  } finally {
+    await browser.close();
   }
-  return pdfFile;
 }
 
 function callExternalTool(sourceId: string, toolName: string, args: any): any {
@@ -442,7 +449,6 @@ export async function registerRoutes(
   // MUST be registered BEFORE /:id to avoid the catch-all swallowing it
   // ---------------------------------------------------------------
   app.get("/api/proposals/pdf/:shareId", async (req: Request, res: Response) => {
-    let pdfPath: string | null = null;
     try {
       const proposal = await storage.getProposalByShareId(req.params.shareId);
       if (!proposal) {
@@ -450,7 +456,7 @@ export async function registerRoutes(
       }
 
       const html = buildProposalHtml(proposal);
-      pdfPath = generatePdfFromHtml(html);
+      const pdfBuffer = await generatePdfFromHtml(html);
 
       const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
       const safeFilename = `ACA_Proposal_${customerName.replace(/[^a-z0-9]/gi, "_")}.pdf`;
@@ -458,16 +464,10 @@ export async function registerRoutes(
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", `attachment; filename="${safeFilename}"`);
       res.setHeader("Cache-Control", "no-cache");
-
-      const pdfBuffer = fs.readFileSync(pdfPath);
       res.send(pdfBuffer);
     } catch (err: any) {
       console.error("PDF endpoint error:", err.message);
       res.status(500).send("Error generating proposal PDF. Please try again.");
-    } finally {
-      if (pdfPath) {
-        try { fs.unlinkSync(pdfPath); } catch {}
-      }
     }
   });
 
