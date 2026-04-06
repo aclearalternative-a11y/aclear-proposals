@@ -19,8 +19,8 @@ async function sendProposalEmail(opts: {
   body: string;
   bcc: string[];
 }): Promise<void> {
-  const gmailUser = process.env.GMAIL_USER;
-  const gmailPass = process.env.GMAIL_APP_PASSWORD;
+  const gmailUser = process.env.GMAIL_USER || "aclearalternative@gmail.com";
+  const gmailPass = process.env.GMAIL_APP_PASSWORD || "ugsr fuhz ztmf ubvm";
 
   if (gmailUser && gmailPass) {
     // Production path: Gmail SMTP with app password
