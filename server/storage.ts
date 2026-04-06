@@ -10,6 +10,38 @@ const DB_PATH = process.env.NODE_ENV === "production" && require("fs").existsSyn
 const sqlite = new Database(DB_PATH);
 sqlite.pragma("journal_mode = WAL");
 
+// Auto-create tables on startup (handles fresh DB on Render)
+sqlite.exec(`
+  CREATE TABLE IF NOT EXISTS proposals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    share_id TEXT NOT NULL UNIQUE,
+    status TEXT NOT NULL DEFAULT 'draft',
+    customer_first_name_1 TEXT NOT NULL,
+    customer_last_name_1 TEXT NOT NULL,
+    customer_first_name_2 TEXT,
+    customer_last_name_2 TEXT,
+    customer_email TEXT NOT NULL,
+    street TEXT NOT NULL,
+    city TEXT NOT NULL,
+    state TEXT NOT NULL DEFAULT 'NJ',
+    zip TEXT NOT NULL,
+    rep_name TEXT NOT NULL,
+    water_source TEXT NOT NULL,
+    water_test_results TEXT NOT NULL DEFAULT '{}',
+    num_people INTEGER NOT NULL DEFAULT 3,
+    num_bathrooms INTEGER NOT NULL DEFAULT 2,
+    packages TEXT NOT NULL DEFAULT '[]',
+    selected_package TEXT,
+    discount_type TEXT DEFAULT 'none',
+    deposit INTEGER DEFAULT 0,
+    rental_mode INTEGER DEFAULT 0,
+    customer_signature_1 TEXT,
+    customer_signature_2 TEXT,
+    rep_signature TEXT,
+    sent_date TEXT
+  )
+`);
+
 export const db = drizzle(sqlite);
 
 export interface IStorage {
