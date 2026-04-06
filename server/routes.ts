@@ -7,8 +7,6 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import nodemailer from "nodemailer";
-import puppeteer from "puppeteer-core";
-import chromium from "@sparticuz/chromium";
 
 // ---------------------------------------------------------------------------
 // Email transport — nodemailer (Gmail SMTP) when env vars are set,
@@ -370,45 +368,22 @@ ${allPackagesHtml}
 </body></html>`;
 }
 
-async function generatePdfFromHtml(html: string): Promise<Buffer> {
-  // @sparticuz/chromium provides a bundled Chromium for cloud environments.
-  // In local dev it returns undefined, so we fall back to the system Chromium
-  // that ships with the full `puppeteer` package.
-  let executablePath: string | undefined = await chromium.executablePath();
-  let launchArgs = chromium.args;
-
-  if (!executablePath) {
-    // Local dev: find Chrome from puppeteer cache or common system paths
-    const candidates = [
-      process.env.PUPPETEER_EXECUTABLE_PATH,
-      // puppeteer default cache location
-      `${process.env.HOME}/.cache/puppeteer/chrome/linux-146.0.7680.153/chrome-linux64/chrome`,
-      `${process.env.HOME}/.cache/puppeteer/chrome/linux-134.0.6998.165/chrome-linux64/chrome`,
-      "/usr/bin/google-chrome-stable",
-      "/usr/bin/chromium-browser",
-      "/usr/bin/chromium",
-    ].filter(Boolean) as string[];
-    executablePath = candidates.find(p => { try { return require("fs").existsSync(p); } catch { return false; } });
-    launchArgs = ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu"];
-  }
-
-  const browser = await puppeteer.launch({
-    args: launchArgs,
-    defaultViewport: { width: 1280, height: 900 },
-    executablePath,
-    headless: true,
-  });
+function generatePdfFromHtml(html: string): Buffer {
+  const tmpDir = os.tmpdir();
+  const ts = Date.now();
+  const htmlFile = path.join(tmpDir, `proposal_${ts}.html`);
+  const pdfFile = path.join(tmpDir, `proposal_${ts}.pdf`);
+  fs.writeFileSync(htmlFile, html, "utf8");
   try {
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
-    const pdfBuffer = await page.pdf({
-      format: "Letter",
-      margin: { top: "0.6in", bottom: "0.6in", left: "0.65in", right: "0.65in" },
-      printBackground: true,
-    });
-    return Buffer.from(pdfBuffer);
+    execSync(
+      `python3 -c "from weasyprint import HTML; HTML(filename='${htmlFile}').write_pdf('${pdfFile}')"`,
+      { timeout: 60000 }
+    );
+    const buf = fs.readFileSync(pdfFile);
+    return buf;
   } finally {
-    await browser.close();
+    try { fs.unlinkSync(htmlFile); } catch {}
+    try { fs.unlinkSync(pdfFile); } catch {}
   }
 }
 
@@ -484,7 +459,7 @@ export async function registerRoutes(
       }
 
       const html = buildProposalHtml(proposal);
-      const pdfBuffer = await generatePdfFromHtml(html);
+      const pdfBuffer = generatePdfFromHtml(html);
 
       const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
       const safeFilename = `ACA_Proposal_${customerName.replace(/[^a-z0-9]/gi, "_")}.pdf`;

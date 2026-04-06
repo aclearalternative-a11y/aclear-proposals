@@ -19,9 +19,7 @@ const allowlist = [
   "multer",
   "nanoid",
   "nodemailer",
-  "puppeteer",
-  "puppeteer-core",
-  "@sparticuz/chromium",
+
   "openai",
   "passport",
   "passport-local",

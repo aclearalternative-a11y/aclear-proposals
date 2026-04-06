@@ -2,7 +2,7 @@ services:
   - type: web
     name: aclear-proposals
     runtime: node
-    buildCommand: npm install --include=dev && npm run build
+    buildCommand: pip install weasyprint && npm install --include=dev && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
