@@ -7,7 +7,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import nodemailer from "nodemailer";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 
 // ---------------------------------------------------------------------------
 // Email transport — nodemailer (Gmail SMTP) when env vars are set,
@@ -370,14 +371,32 @@ ${allPackagesHtml}
 }
 
 async function generatePdfFromHtml(html: string): Promise<Buffer> {
+  // @sparticuz/chromium provides a bundled Chromium for cloud environments.
+  // In local dev it returns undefined, so we fall back to the system Chromium
+  // that ships with the full `puppeteer` package.
+  let executablePath: string | undefined = await chromium.executablePath();
+  let launchArgs = chromium.args;
+
+  if (!executablePath) {
+    // Local dev: find Chrome from puppeteer cache or common system paths
+    const candidates = [
+      process.env.PUPPETEER_EXECUTABLE_PATH,
+      // puppeteer default cache location
+      `${process.env.HOME}/.cache/puppeteer/chrome/linux-146.0.7680.153/chrome-linux64/chrome`,
+      `${process.env.HOME}/.cache/puppeteer/chrome/linux-134.0.6998.165/chrome-linux64/chrome`,
+      "/usr/bin/google-chrome-stable",
+      "/usr/bin/chromium-browser",
+      "/usr/bin/chromium",
+    ].filter(Boolean) as string[];
+    executablePath = candidates.find(p => { try { return require("fs").existsSync(p); } catch { return false; } });
+    launchArgs = ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--disable-gpu"];
+  }
+
   const browser = await puppeteer.launch({
+    args: launchArgs,
+    defaultViewport: { width: 1280, height: 900 },
+    executablePath,
     headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-dev-shm-usage",
-      "--disable-gpu",
-    ],
   });
   try {
     const page = await browser.newPage();
