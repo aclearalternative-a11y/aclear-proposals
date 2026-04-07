@@ -507,7 +507,7 @@ A Clear Alternative
     res.json({
       status: "ok",
       emailMode: process.env.GMAIL_USER ? "smtp" : "gmail-embedded",
-      database: process.env.TURSO_DATABASE_URL ? "turso-cloud" : "local-sqlite",
+      database: "turso-cloud",
       gmailUser: "aclearalternative@gmail.com",
     });
   });
