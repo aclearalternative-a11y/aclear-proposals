@@ -158,15 +158,22 @@ export default function ProposalView() {
             <FileText className="h-4 w-4" />
             <span className="text-sm font-medium">Your personalized proposal is ready to download</span>
           </div>
-          <a
-            href={`/api/proposals/pdf/${shareId}`}
-            download
+          <button
+            onClick={() => {
+              const printUrl = `/api/proposals/print/${shareId}`;
+              const win = window.open(printUrl, "_blank");
+              if (win) {
+                win.onload = () => {
+                  setTimeout(() => win.print(), 500);
+                };
+              }
+            }}
             className="inline-flex items-center gap-1.5 bg-teal-700 hover:bg-teal-800 text-white text-sm font-medium px-3 py-1.5 rounded-md transition-colors"
             data-testid="button-download-pdf"
           >
             <Download className="h-3.5 w-3.5" />
             Download PDF
-          </a>
+          </button>
         </div>
 
         {/* Customer Info */}

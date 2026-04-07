@@ -645,23 +645,48 @@ A Clear Alternative
   });
 
   // ---------------------------------------------------------------
-  // PDF DOWNLOAD — serves the proposal as a downloadable PDF
-  // URL pattern: /api/proposals/pdf/:shareId
-  // MUST be registered BEFORE /:id to avoid the catch-all swallowing it
+  // PRINT VIEW — returns print-ready HTML for browser print-to-PDF
+  // Opens in new tab, browser print dialog fires automatically
+  // Works on all devices with zero server dependencies
+  // ---------------------------------------------------------------
+  app.get("/api/proposals/print/:shareId", async (req: Request, res: Response) => {
+    try {
+      const proposal = await storage.getProposalByShareId(req.params.shareId);
+      if (!proposal) return res.status(404).send("Proposal not found.");
+      const html = buildProposalHtml(proposal);
+      // Inject print auto-trigger and print-specific styles
+      const printHtml = html.replace(
+        "</head>",
+        `<style>
+          @media screen { body { background: #f4f4f4; padding: 20px; } }
+          @media print { body { background: #fff; padding: 0; } .no-print { display: none !important; } }
+        </style>
+        <script>
+          window.onload = function() {
+            setTimeout(function() { window.print(); }, 600);
+          };
+        </script>
+        </head>`
+      );
+      res.setHeader("Content-Type", "text/html");
+      res.send(printHtml);
+    } catch (err: any) {
+      console.error("Print endpoint error:", err.message);
+      res.status(500).send("Error loading proposal. Please try again.");
+    }
+  });
+
+  // ---------------------------------------------------------------
+  // PDF DOWNLOAD — WeasyPrint fallback (works locally, may fail on Render free tier)
   // ---------------------------------------------------------------
   app.get("/api/proposals/pdf/:shareId", async (req: Request, res: Response) => {
     try {
       const proposal = await storage.getProposalByShareId(req.params.shareId);
-      if (!proposal) {
-        return res.status(404).send("Proposal not found.");
-      }
-
+      if (!proposal) return res.status(404).send("Proposal not found.");
       const html = buildProposalHtml(proposal);
       const pdfBuffer = generatePdfFromHtml(html);
-
       const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
       const safeFilename = `ACA_Proposal_${customerName.replace(/[^a-z0-9]/gi, "_")}.pdf`;
-
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", `attachment; filename="${safeFilename}"`);
       res.setHeader("Cache-Control", "no-cache");
