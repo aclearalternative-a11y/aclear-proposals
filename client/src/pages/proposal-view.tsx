@@ -129,7 +129,7 @@ export default function ProposalView() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-gradient-to-r from-teal-700 to-teal-600 text-white">
+      <header className="bg-gradient-to-r from-[#1d8fc4] to-[#2a9fd4] text-white">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center gap-3 mb-3">
             <svg width="48" height="48" viewBox="0 0 44 44" fill="none" aria-label="A Clear Alternative logo">
@@ -139,10 +139,10 @@ export default function ProposalView() {
             </svg>
             <div>
               <h1 className="text-xl font-bold">A Clear Alternative</h1>
-              <p className="text-teal-100 text-sm">Water Treatment Proposal</p>
+              <p className="text-[#d0eaf7] text-sm">Water Treatment Proposal</p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-4 text-sm text-teal-100">
+          <div className="flex flex-wrap gap-4 text-sm text-[#d0eaf7]">
             <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> 9230 Collins Ave, Pennsauken, NJ 08110</span>
             <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> (856) 663-8088</span>
             <span className="flex items-center gap-1"><Mail className="h-3.5 w-3.5" /> info@aclear.com</span>
@@ -153,8 +153,8 @@ export default function ProposalView() {
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
 
         {/* PDF Download Banner */}
-        <div className="flex items-center justify-between bg-teal-50 border border-teal-200 rounded-lg px-4 py-3">
-          <div className="flex items-center gap-2 text-teal-800">
+        <div className="flex items-center justify-between bg-[#eaf5fb] border border-[#a8d8f0] rounded-lg px-4 py-3">
+          <div className="flex items-center gap-2 text-[#1d8fc4]">
             <FileText className="h-4 w-4" />
             <span className="text-sm font-medium">Your personalized proposal is ready to download</span>
           </div>
@@ -168,7 +168,7 @@ export default function ProposalView() {
                 };
               }
             }}
-            className="inline-flex items-center gap-1.5 bg-teal-700 hover:bg-teal-800 text-white text-sm font-medium px-3 py-1.5 rounded-md transition-colors"
+            className="inline-flex items-center gap-1.5 bg-[#1d8fc4] hover:bg-[#1778a8] text-white text-sm font-medium px-3 py-1.5 rounded-md transition-colors"
             data-testid="button-download-pdf"
           >
             <Download className="h-3.5 w-3.5" />
@@ -233,7 +233,7 @@ export default function ProposalView() {
                                 href={brochureUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs text-teal-700 border border-teal-300 rounded-full px-2 py-0.5 hover:bg-teal-50 transition-colors whitespace-nowrap"
+                                className="text-xs text-[#1d8fc4] border border-[#1d8fc4] rounded-full px-2 py-0.5 hover:bg-[#eaf5fb] transition-colors whitespace-nowrap"
                               >
                                 View Brochure
                               </a>
