@@ -127,7 +127,9 @@ function buildProposalHtml(proposal: any): string {
   function buildPackageBlock(pkg: any): string {
     const isSelected = pkg.tier === proposal.selectedPackage;
     const pricing = calcPackagePricing(pkg);
-    const headerClass = isSelected ? "pkg-header-teal" : "pkg-header-gray";
+    const headerClass = isSelected ? "pkg-header-teal" 
+      : pkg.tier === "best" ? "pkg-header-best" 
+      : "pkg-header-good";
     const badge = isSelected
       ? `<span class="pkg-badge">&#9733; RECOMMENDED</span>`
       : "";
@@ -219,9 +221,9 @@ function buildProposalHtml(proposal: any): string {
   body { margin: 0; padding: 0; background: #ffffff; font-family: Arial, Helvetica, sans-serif; color: #333; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .section { background-color: #ffffff; margin-bottom: 14px; }
   .teal-header { background-color: #1d8fc4 !important; padding: 18px 20px; }
-  .teal-header h1 { margin: 0; color: #ffffff; font-size: 26px; font-weight: 700; letter-spacing: 0.3px; }
-  .teal-header .subtitle { color: #a8d8f0; font-size: 11px; margin-top: 2px; }
-  .teal-header .contact { color: #a8d8f0; font-size: 10px; line-height: 1.7; text-align: right; }
+  .teal-header h1 { margin: 0; color: #ffffff; font-size: 28px; font-weight: 800; letter-spacing: 0.3px; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+  .teal-header .subtitle { color: #ffffff; font-size: 12px; margin-top: 3px; font-weight: 600; opacity: 0.9; }
+  .teal-header .contact { color: #ffffff; font-size: 11px; line-height: 1.8; text-align: right; font-weight: 500; opacity: 0.92; }
   .prepared-box { background-color: #eaf5fb; border-left: 4px solid #1d8fc4; padding: 12px 14px; margin-bottom: 14px; }
   .prepared-box .label { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
   .prepared-box .name { font-size: 16px; font-weight: 700; color: #111; }
@@ -235,7 +237,8 @@ function buildProposalHtml(proposal: any): string {
   .water-table td.val-flagged { color: #c0392b; font-weight: 700; }
   .pkg-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; border: 1px solid #ddd; }
   .pkg-table .pkg-header-teal { background-color: #1d8fc4 !important; padding: 9px 12px; }
-  .pkg-table .pkg-header-gray { background-color: #4a4a4a !important; padding: 9px 12px; }
+  .pkg-table .pkg-header-good { background-color: #5d7a8a !important; padding: 9px 12px; }
+  .pkg-table .pkg-header-best { background-color: #1a3a5c !important; padding: 9px 12px; }
   .pkg-table .pkg-title { color: #ffffff; font-size: 13px; font-weight: 700; }
   .pkg-table .pkg-badge { background-color: #ffffff; color: #1d8fc4; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 8px; margin-left: 8px; }
   .pkg-table td.equip-name { padding: 6px 10px; font-size: 12px; color: #333; border-bottom: 1px solid #f0f0f0; background-color: #ffffff; }
@@ -264,8 +267,8 @@ function buildProposalHtml(proposal: any): string {
   .sig-line { border-bottom: 1px solid #999; height: 36px; }
   .sig-name { font-size: 9px; color: #aaa; margin-top: 2px; }
   .footer-bar { background-color: #1d8fc4 !important; padding: 14px 20px; margin-top: 14px; }
-  .footer-bar p { margin: 0; color: #a8d8f0; font-size: 11px; line-height: 1.7; }
-  .footer-bar .rep-name { color: #ffffff; font-size: 12px; font-weight: 700; margin-top: 5px; }
+  .footer-bar p { margin: 0; color: #ffffff; font-size: 12px; line-height: 1.8; font-weight: 500; opacity: 0.92; }
+  .footer-bar .rep-name { color: #ffffff; font-size: 14px; font-weight: 800; margin-top: 6px; }
   .accept-note { margin-top: 12px; font-size: 11px; color: #444; font-style: italic; }
 </style>
 </head>
@@ -293,6 +296,7 @@ function buildProposalHtml(proposal: any): string {
   <div class="label">Prepared For</div>
   <div class="name">${customerName}${proposal.customerFirstName2 ? " &amp; " + proposal.customerFirstName2 + " " + proposal.customerLastName2 : ""}</div>
   <div class="addr">${fullAddress}</div>
+  <div class="addr" style="margin-top:2px;">${proposal.numPeople || 3} people &bull; ${proposal.numBathrooms || 2} bathroom${(proposal.numBathrooms || 2) !== 1 ? 's' : ''}</div>
   <div class="meta">Date: ${today} &nbsp;&nbsp;|&nbsp;&nbsp; Representative: ${proposal.repName} &mdash; ${repPhone}</div>
 </div>
 

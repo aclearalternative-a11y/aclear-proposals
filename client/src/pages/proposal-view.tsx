@@ -180,6 +180,9 @@ export default function ProposalView() {
         <Card>
           <CardContent className="p-4">
             <h2 className="font-semibold text-sm text-muted-foreground mb-2">PREPARED FOR</h2>
+            {proposal.numPeople && (
+              <p className="text-xs text-muted-foreground mb-2">{proposal.numPeople} people &bull; {proposal.numBathrooms} bathroom{proposal.numBathrooms !== 1 ? 's' : ''}</p>
+            )}
             <p className="font-semibold">{customerName}{hasSecond ? ` & ${proposal.customerFirstName2} ${proposal.customerLastName2}` : ""}</p>
             <p className="text-sm text-muted-foreground">{proposal.street}, {proposal.city}, {proposal.state} {proposal.zip}</p>
             <p className="text-sm text-muted-foreground mt-1">Representative: {proposal.repName} — {repPhone}</p>
