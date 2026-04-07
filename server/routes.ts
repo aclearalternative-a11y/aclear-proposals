@@ -408,6 +408,100 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // ---------------------------------------------------------------
+  // FOLLOW-UP CRON — called daily by Perplexity scheduler
+  // Sends reminder emails to unsigned proposals older than 3 days
+  // ---------------------------------------------------------------
+  app.post("/api/followup/run", async (req: Request, res: Response) => {
+    const GHL_API_KEY = process.env.GHL_API_KEY || "pit-24e8e4ec-6172-44e0-b0d7-6a621b9b4bc7";
+    const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
+    const results: any[] = [];
+
+    try {
+      const overdue = await storage.getProposalsNeedingFollowUp(3);
+      console.log(`Follow-up run: found ${overdue.length} proposals needing follow-up`);
+
+      for (const proposal of overdue) {
+        try {
+          const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
+          const repPhone = REPS[proposal.repName] || "(856) 663-8088";
+          const packages = JSON.parse(proposal.packages);
+          const selectedPkg = packages.find((p: any) => p.tier === proposal.selectedPackage);
+          const selectedLabel = selectedPkg ? selectedPkg.label : "Selected";
+          const APP_URL = process.env.APP_URL || "https://proposals.aclear.com";
+          const proposalLink = `${APP_URL}/#/proposal/${proposal.shareId}`;
+
+          const followUpBody = `Dear ${customerName},
+
+I wanted to follow up on the water treatment proposal I sent you a few days ago.
+
+Your proposal is still available to view at the link below — it includes your water analysis results, all three treatment packages, and pricing:
+
+  ${proposalLink}
+
+If you have any questions or would like to discuss your options, please don't hesitate to call or text me directly:
+
+  ${repPhone}
+
+I look forward to helping you and your family enjoy the highest quality water.
+
+${proposal.repName}
+A Clear Alternative
+(856) 663-8088  |  info@aclear.com  |  www.aclear.com`;
+
+          // Send follow-up email
+          await sendProposalEmail({
+            to: proposal.customerEmail,
+            subject: `Following Up — Your Water Treatment Proposal (${customerName})`,
+            body: followUpBody,
+            bcc: ["aclearalternative@gmail.com", "asmith@aclear.com", "water325@aol.com"],
+          });
+
+          // Move GHL opportunity to "Contacted" stage (follow-up)
+          try {
+            // Find the opportunity for this contact
+            const searchRes = execSync(
+              `curl -s "https://services.leadconnectorhq.com/opportunities/search?location_id=${GHL_LOCATION_ID}&pipeline_id=gyFJalG38xXKkAlmUHBo&contact_id_or_email=${encodeURIComponent(proposal.customerEmail)}" \
+                -H "Authorization: Bearer ${GHL_API_KEY}" \
+                -H "Version: 2021-07-28"`,
+              { timeout: 10000 }
+            ).toString();
+            const searchData = JSON.parse(searchRes);
+            const opp = searchData?.opportunities?.[0];
+            if (opp?.id) {
+              execSync(
+                `curl -s -X PUT "https://services.leadconnectorhq.com/opportunities/${opp.id}" \
+                  -H "Authorization: Bearer ${GHL_API_KEY}" \
+                  -H "Version: 2021-07-28" \
+                  -H "Content-Type: application/json" \
+                  -d '{"pipelineStageId": "652fede7-697a-4592-bd81-080e524727b7"}'`,
+                { timeout: 10000 }
+              );
+              console.log(`GHL opportunity moved to Contacted for ${customerName}`);
+            }
+          } catch (ghlErr: any) {
+            console.error(`GHL stage update failed for ${customerName}:`, ghlErr.message);
+          }
+
+          // Mark proposal as follow_up_sent so it doesn't fire again
+          await storage.updateProposal(proposal.id, { status: "follow_up_sent" } as any);
+
+          results.push({ customer: customerName, email: proposal.customerEmail, status: "sent" });
+          console.log(`Follow-up sent to ${customerName} (${proposal.customerEmail})`);
+
+        } catch (err: any) {
+          results.push({ customer: `${proposal.customerFirstName1} ${proposal.customerLastName1}`, error: err.message });
+          console.error(`Follow-up failed:`, err.message);
+        }
+      }
+
+      res.json({ ran: true, processed: overdue.length, results });
+    } catch (err: any) {
+      console.error("Follow-up run error:", err.message);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // Health check — confirms server is running and env vars are loaded
   app.get("/api/health", (_req, res) => {
     res.json({

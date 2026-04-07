@@ -50,6 +50,7 @@ export interface IStorage {
   getProposalByShareId(shareId: string): Promise<Proposal | undefined>;
   updateProposal(id: number, data: Partial<InsertProposal>): Promise<Proposal | undefined>;
   getAllProposals(): Promise<Proposal[]>;
+  getProposalsNeedingFollowUp(daysOld: number): Promise<Proposal[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -71,6 +72,19 @@ export class DatabaseStorage implements IStorage {
 
   async getAllProposals(): Promise<Proposal[]> {
     return db.select().from(proposals).all();
+  }
+
+  // Returns proposals that were sent 3+ days ago, not yet signed or followed up
+  async getProposalsNeedingFollowUp(daysOld: number): Promise<Proposal[]> {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - daysOld);
+    const all = await this.getAllProposals();
+    return all.filter(p => {
+      if (p.status !== "sent") return false;
+      if (!p.sentDate) return false;
+      const sent = new Date(p.sentDate);
+      return sent <= cutoff;
+    });
   }
 }
 
