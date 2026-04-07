@@ -219,7 +219,7 @@ function buildProposalHtml(proposal: any): string {
   body { margin: 0; padding: 0; background: #ffffff; font-family: Arial, Helvetica, sans-serif; color: #333; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .section { background-color: #ffffff; margin-bottom: 14px; }
   .teal-header { background-color: #0d7a6e !important; padding: 18px 20px; }
-  .teal-header h1 { margin: 0; color: #ffffff; font-size: 20px; font-weight: 700; }
+  .teal-header h1 { margin: 0; color: #ffffff; font-size: 26px; font-weight: 700; letter-spacing: 0.3px; }
   .teal-header .subtitle { color: #a8e6df; font-size: 11px; margin-top: 2px; }
   .teal-header .contact { color: #a8e6df; font-size: 10px; line-height: 1.7; text-align: right; }
   .prepared-box { background-color: #f0fcfb; border-left: 4px solid #0d7a6e; padding: 12px 14px; margin-bottom: 14px; }
@@ -247,7 +247,7 @@ function buildProposalHtml(proposal: any): string {
   .pkg-table td.monthly-val { padding: 7px 10px; font-size: 13px; font-weight: 700; text-align: right; background-color: #e8f8f6; color: #0d7a6e; }
   .pkg-table td.discount-label { padding: 4px 10px; font-size: 11px; color: #888; background-color: #ffffff; }
   .pkg-table td.discount-val { padding: 4px 10px; font-size: 11px; color: #888; text-align: right; background-color: #ffffff; }
-  a.brochure-link { font-size: 10px; color: #0d7a6e; text-decoration: none; border: 1px solid #0d7a6e; padding: 1px 6px; border-radius: 8px; white-space: nowrap; }
+  a.brochure-link { font-size: 10px; color: #2471a3; text-decoration: none; border: 1px solid #2471a3; padding: 1px 6px; border-radius: 8px; white-space: nowrap; }
   .acceptance-box { border: 2px solid #0d7a6e; }
   .acceptance-header { background-color: #0d7a6e !important; padding: 9px 14px; }
   .acceptance-header span { color: #ffffff; font-size: 13px; font-weight: 700; }
