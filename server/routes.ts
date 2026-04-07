@@ -528,7 +528,7 @@ A Clear Alternative
     }
   });
 
-  // Get proposal by share ID
+  // Get proposal by share ID — also fires "viewed" tracking on first open
   app.get("/api/proposals/share/:shareId", async (req, res) => {
     try {
       const proposal = await storage.getProposalByShareId(req.params.shareId);
@@ -536,6 +536,109 @@ A Clear Alternative
         return res.status(404).json({ error: "Proposal not found" });
       }
       res.json(proposal);
+
+      // Fire viewed tracking async (don't block the response)
+      if (proposal.status === "sent") {
+        setImmediate(async () => {
+          try {
+            const GHL_API_KEY = process.env.GHL_API_KEY || "pit-24e8e4ec-6172-44e0-b0d7-6a621b9b4bc7";
+            const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
+            const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
+            const repPhone = REPS[proposal.repName];
+            const proposalLink = `https://proposals.aclear.com/#/proposal/${proposal.shareId}`;
+
+            // Mark as viewed
+            await storage.updateProposal(proposal.id, { status: "viewed" } as any);
+
+            // SMS the rep via GHL
+            if (repPhone) {
+              try {
+                // Format phone for GHL: +1XXXXXXXXXX
+                const ghlPhone = "+1" + repPhone.replace(/\D/g, "");
+
+                // Find or create the rep as a GHL contact to get contactId
+                const repContactRes = execSync(
+                  `curl -s "https://services.leadconnectorhq.com/contacts/search/duplicate?locationId=${GHL_LOCATION_ID}&number=${encodeURIComponent(ghlPhone)}" \
+                    -H "Authorization: Bearer ${GHL_API_KEY}" \
+                    -H "Version: 2021-07-28"`,
+                  { timeout: 10000 }
+                ).toString();
+                let repContactId = JSON.parse(repContactRes)?.contact?.id;
+
+                // If rep not found, create them
+                if (!repContactId) {
+                  const createRepTmp = require("os").tmpdir() + "/rep_contact_" + Date.now() + ".json";
+                  require("fs").writeFileSync(createRepTmp, JSON.stringify({
+                    locationId: GHL_LOCATION_ID,
+                    firstName: proposal.repName.split(" ")[0],
+                    lastName: proposal.repName.split(" ").slice(1).join(" "),
+                    phone: ghlPhone,
+                    tags: ["Rep", "A Clear Alternative Staff"],
+                  }));
+                  const createRes = execSync(
+                    `curl -s -X POST "https://services.leadconnectorhq.com/contacts/" \
+                      -H "Authorization: Bearer ${GHL_API_KEY}" \
+                      -H "Version: 2021-07-28" \
+                      -H "Content-Type: application/json" \
+                      -d @${createRepTmp}`,
+                    { timeout: 10000 }
+                  ).toString();
+                  require("fs").unlinkSync(createRepTmp);
+                  repContactId = JSON.parse(createRes)?.contact?.id;
+                }
+
+                if (repContactId) {
+                  const smsTmp = require("os").tmpdir() + "/ghl_sms_" + Date.now() + ".json";
+                  require("fs").writeFileSync(smsTmp, JSON.stringify({
+                    type: "SMS",
+                    contactId: repContactId,
+                    message: `A Clear Alt: ${customerName} just viewed their proposal! Call or text them now.\n${proposalLink}`,
+                  }));
+                  execSync(
+                    `curl -s -X POST "https://services.leadconnectorhq.com/conversations/messages" \
+                      -H "Authorization: Bearer ${GHL_API_KEY}" \
+                      -H "Version: 2021-07-28" \
+                      -H "Content-Type: application/json" \
+                      -d @${smsTmp}`,
+                    { timeout: 10000 }
+                  );
+                  require("fs").unlinkSync(smsTmp);
+                  console.log(`SMS sent to ${proposal.repName} (${repPhone}) — ${customerName} viewed proposal`);
+                }
+              } catch (smsErr: any) {
+                console.error("SMS send error:", smsErr.message);
+              }
+            }
+
+            // Move GHL opportunity to Viewed stage
+            try {
+              const searchRes = execSync(
+                `curl -s "https://services.leadconnectorhq.com/opportunities/search?location_id=${GHL_LOCATION_ID}&pipeline_id=gyFJalG38xXKkAlmUHBo" \
+                  -H "Authorization: Bearer ${GHL_API_KEY}" \
+                  -H "Version: 2021-07-28"`,
+                { timeout: 10000 }
+              ).toString();
+              const opps = JSON.parse(searchRes)?.opportunities || [];
+              const opp = opps.find((o: any) => o.contact?.email === proposal.customerEmail);
+              if (opp?.id) {
+                execSync(
+                  `curl -s -X PUT "https://services.leadconnectorhq.com/opportunities/${opp.id}" \
+                    -H "Authorization: Bearer ${GHL_API_KEY}" \
+                    -H "Version: 2021-07-28" \
+                    -H "Content-Type: application/json" \
+                    -d '{"pipelineStageId": "4291a04f-0ea0-4823-bca3-d99e21e2b1f2"}'`,
+                  { timeout: 10000 }
+                );
+                console.log(`GHL opportunity moved to Viewed for ${customerName}`);
+              }
+            } catch (e: any) {
+              console.error("GHL viewed stage update failed:", e.message);
+            }
+          } catch (e: any) {
+            console.error("Viewed tracking error:", e.message);
+          }
+        });
+      }
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
