@@ -19,7 +19,7 @@ async function sendProposalEmail(opts: {
   bcc: string[];
 }): Promise<void> {
   const gmailUser = process.env.GMAIL_USER || "aclearalternative@gmail.com";
-  const gmailPass = process.env.GMAIL_APP_PASSWORD || "ugsr fuhz ztmf ubvm";
+  const gmailPass = process.env.GMAIL_APP_PASSWORD || "kcjswmfawaaugwqo";
 
   if (gmailUser && gmailPass) {
     // Production path: Gmail SMTP with app password
@@ -585,6 +585,75 @@ A Clear Alternative
         "Sent Date": new Date().toLocaleDateString(),
         "Equipment": equipmentList,
       });
+
+      // Create/update contact in GoHighLevel CRM via direct API (non-fatal)
+      try {
+        const GHL_API_KEY = process.env.GHL_API_KEY || "pit-24e8e4ec-6172-44e0-b0d7-6a621b9b4bc7";
+        const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
+        const ghlContact = {
+          locationId: GHL_LOCATION_ID,
+          firstName: proposal.customerFirstName1,
+          lastName: proposal.customerLastName1,
+          email: proposal.customerEmail,
+          address1: proposal.street,
+          city: proposal.city,
+          state: proposal.state,
+          postalCode: proposal.zip,
+          source: "Proposal App",
+          tags: [
+            proposal.waterSource === "well" ? "Well Water" : "City Water",
+            `Package: ${selectedLabel}`,
+            `Rep: ${proposal.repName}`,
+            "Proposal Sent",
+          ],
+        };
+        const ghlRes = execSync(
+          `curl -s -X POST "https://services.leadconnectorhq.com/contacts/upsert" \
+            -H "Authorization: Bearer ${GHL_API_KEY}" \
+            -H "Version: 2021-07-28" \
+            -H "Content-Type: application/json" \
+            -d '${JSON.stringify(ghlContact).replace(/'/g, "'\\''")}' `,
+          { timeout: 15000 }
+        ).toString();
+        const ghlData = JSON.parse(ghlRes);
+        const ghlContactId = ghlData?.contact?.id;
+        console.log("GHL contact upserted:", customerName, "id:", ghlContactId);
+
+        // Add opportunity to Water Treatment Proposals pipeline
+        if (ghlContactId) {
+          const oppPayload = JSON.stringify({
+            locationId: GHL_LOCATION_ID,
+            name: `${customerName} \u2014 ${selectedLabel} Package`,
+            contactId: ghlContactId,
+            monetaryValue: finalPrice,
+            status: "open",
+            pipelineId: "gyFJalG38xXKkAlmUHBo",
+            pipelineStageId: "1d1267dd-811c-4f81-b7ff-abe98135f387",
+          });
+          // Write payload to temp file to avoid shell escaping issues
+          const oppTmp = require("os").tmpdir() + "/ghl_opp_" + Date.now() + ".json";
+          require("fs").writeFileSync(oppTmp, oppPayload);
+          const oppRes = execSync(
+            `curl -s -X POST "https://services.leadconnectorhq.com/opportunities/" \
+              -H "Authorization: Bearer ${GHL_API_KEY}" \
+              -H "Version: 2021-07-28" \
+              -H "Content-Type: application/json" \
+              -d @${oppTmp}`,
+            { timeout: 15000 }
+          ).toString();
+          try { require("fs").unlinkSync(oppTmp); } catch {}
+          const oppData = JSON.parse(oppRes);
+          if (oppData?.opportunity?.id) {
+            console.log("GHL opportunity created:", oppData.opportunity.id);
+          } else if (oppData?.message?.includes("duplicate")) {
+            console.log("GHL opportunity already exists for this contact — skipping");
+          } else {
+            console.log("GHL opportunity response:", JSON.stringify(oppData).slice(0, 100));
+          }
+        }
+      } catch (ghlErr: any) {
+        console.error("GHL sync failed (non-fatal):", ghlErr.message);
+      }
 
       // Update proposal status
       await storage.updateProposal(proposal.id, {
