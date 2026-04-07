@@ -75,7 +75,10 @@ function rowToProposal(cols: string[], row: any[]): Proposal {
 }
 
 function toCamel(s: string): string {
-  return s.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+  // Handle double-digit suffixes like customer_first_name_1 -> customerFirstName1
+  return s
+    .replace(/_([a-z])/g, (_, c) => c.toUpperCase())
+    .replace(/_([0-9])/g, (_, n) => n);
 }
 
 // Initialize schema in Turso

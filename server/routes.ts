@@ -686,15 +686,168 @@ A Clear Alternative
   });
 
   // Sign proposal
-  app.patch("/api/proposals/:id/sign", async (req, res) => {
+  app.patch("/api/proposals/:id/sign", async (req: Request, res: Response) => {
     try {
       const { customerSignature1, customerSignature2 } = req.body;
+      const proposal = await storage.getProposal(parseInt(req.params.id));
+      if (!proposal) return res.status(404).json({ error: "Proposal not found" });
+
       const updated = await storage.updateProposal(parseInt(req.params.id), {
         customerSignature1,
         customerSignature2,
         status: "signed",
       });
       res.json(updated);
+
+      // Fire all post-sign actions async (don’t block the response)
+      setImmediate(async () => {
+        try {
+          const GHL_API_KEY = process.env.GHL_API_KEY || "pit-24e8e4ec-6172-44e0-b0d7-6a621b9b4bc7";
+          const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
+          const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
+          const repPhone = REPS[proposal.repName] || "(856) 663-8088";
+          const repPhoneFormatted = "+1" + repPhone.replace(/\D/g, "");
+          const packages = JSON.parse(proposal.packages || "[]");
+          const selectedPkg = packages.find((p: any) => p.tier === proposal.selectedPackage);
+          const selectedLabel = selectedPkg ? selectedPkg.label : "Selected";
+          const discountType = proposal.discountType || "none";
+          let discountPercent = 0;
+          if (discountType === "veteran") discountPercent = 5;
+          if (discountType === "fire_ems") discountPercent = 3;
+          const discountAmt = selectedPkg ? Math.round(selectedPkg.totalPrice * discountPercent / 100) : 0;
+          const finalPrice = selectedPkg ? selectedPkg.totalPrice - discountAmt : 0;
+          const deposit = proposal.deposit || 0;
+          const monthlyAmt = deposit >= finalPrice ? 0 : Math.round((finalPrice - deposit) / 120);
+          const proposalLink = `https://proposals.aclear.com/#/proposal/${proposal.shareId}`;
+
+          // 1. WELCOME EMAIL to customer
+          const welcomeBody = `Dear ${customerName},
+
+Welcome to the A Clear Alternative family!
+
+Thank you for choosing us to provide you and your family with the highest quality water. We are thrilled to have you as a customer and look forward to serving you for many years to come.
+
+Your signed proposal is on file. Here’s a summary of what you’ve selected:
+
+  Package: ${selectedLabel}
+  Final Price: $${finalPrice.toLocaleString()}
+  Monthly Investment: $${monthlyAmt}/mo
+
+What happens next:
+  • Your representative ${proposal.repName} will contact you within 24 hours to schedule your installation
+  • Installation typically takes 2-4 hours
+  • You can view your signed proposal anytime at: ${proposalLink}
+
+If you have any questions in the meantime, please call or text your representative directly:
+  ${repPhone}
+
+Thank you again for trusting A Clear Alternative.
+
+${proposal.repName}
+A Clear Alternative
+(856) 663-8088  |  info@aclear.com  |  www.aclear.com`;
+
+          await sendProposalEmail({
+            to: proposal.customerEmail,
+            subject: `Welcome to A Clear Alternative! — ${customerName}`,
+            body: welcomeBody,
+            bcc: ["aclearalternative@gmail.com", "asmith@aclear.com", "water325@aol.com"],
+          });
+          console.log(`Welcome email sent to ${customerName}`);
+
+          // 2. SMS TO REP — customer signed
+          try {
+            const repContactRes = execSync(
+              `curl -s "https://services.leadconnectorhq.com/contacts/search/duplicate?locationId=${GHL_LOCATION_ID}&number=${encodeURIComponent(repPhoneFormatted)}" \
+                -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28"`,
+              { timeout: 10000 }
+            ).toString();
+            let repContactId = JSON.parse(repContactRes)?.contact?.id;
+
+            if (!repContactId) {
+              const tmp = require("os").tmpdir() + "/rep_" + Date.now() + ".json";
+              require("fs").writeFileSync(tmp, JSON.stringify({
+                locationId: GHL_LOCATION_ID,
+                firstName: proposal.repName.split(" ")[0],
+                lastName: proposal.repName.split(" ").slice(1).join(" "),
+                phone: repPhoneFormatted,
+                tags: ["Rep", "A Clear Alternative Staff"],
+              }));
+              const r = execSync(`curl -s -X POST "https://services.leadconnectorhq.com/contacts/" \
+                -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28" \
+                -H "Content-Type: application/json" -d @${tmp}`, { timeout: 10000 }).toString();
+              require("fs").unlinkSync(tmp);
+              repContactId = JSON.parse(r)?.contact?.id;
+            }
+
+            if (repContactId) {
+              const smsTmp = require("os").tmpdir() + "/sms_sign_" + Date.now() + ".json";
+              require("fs").writeFileSync(smsTmp, JSON.stringify({
+                type: "SMS",
+                contactId: repContactId,
+                message: `🎉 ${customerName} just SIGNED their proposal!\n\nPackage: ${selectedLabel}\nTotal: $${finalPrice.toLocaleString()}\nMonthly: $${monthlyAmt}/mo\n\nSchedule their install ASAP.`,
+              }));
+              execSync(`curl -s -X POST "https://services.leadconnectorhq.com/conversations/messages" \
+                -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28" \
+                -H "Content-Type: application/json" -d @${smsTmp}`, { timeout: 10000 });
+              require("fs").unlinkSync(smsTmp);
+              console.log(`Rep SMS sent — ${customerName} signed`);
+            }
+          } catch (smsErr: any) {
+            console.error("Rep SMS (signed) error:", smsErr.message);
+          }
+
+          // 3. GHL PIPELINE — move to Closed Won + update monetary value
+          try {
+            const searchRes = execSync(
+              `curl -s "https://services.leadconnectorhq.com/opportunities/search?location_id=${GHL_LOCATION_ID}&pipeline_id=gyFJalG38xXKkAlmUHBo" \
+                -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28"`,
+              { timeout: 10000 }
+            ).toString();
+            const opps = JSON.parse(searchRes)?.opportunities || [];
+            const opp = opps.find((o: any) =>
+              o.contact?.email === proposal.customerEmail ||
+              o.name?.includes(customerName)
+            );
+            if (opp?.id) {
+              const wonTmp = require("os").tmpdir() + "/ghl_won_" + Date.now() + ".json";
+              require("fs").writeFileSync(wonTmp, JSON.stringify({
+                pipelineStageId: "ce89b632-21d2-47a2-850d-cca976fcedec", // Signed stage
+                status: "won",
+                monetaryValue: finalPrice,
+              }));
+              execSync(`curl -s -X PUT "https://services.leadconnectorhq.com/opportunities/${opp.id}" \
+                -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28" \
+                -H "Content-Type: application/json" -d @${wonTmp}`, { timeout: 10000 });
+              require("fs").unlinkSync(wonTmp);
+              console.log(`GHL opportunity marked Signed/Won for ${customerName}`);
+            }
+          } catch (ghlErr: any) {
+            console.error("GHL won update error:", ghlErr.message);
+          }
+
+          // 4. Tag the customer contact as signed in GHL
+          try {
+            const tagTmp = require("os").tmpdir() + "/ghl_tag_" + Date.now() + ".json";
+            require("fs").writeFileSync(tagTmp, JSON.stringify({
+              locationId: GHL_LOCATION_ID,
+              name: customerName,
+              email: proposal.customerEmail,
+              tags: ["Signed", `${selectedLabel} Package`, "Customer"],
+            }));
+            execSync(`curl -s -X POST "https://services.leadconnectorhq.com/contacts/upsert" \
+              -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28" \
+              -H "Content-Type: application/json" -d @${tagTmp}`, { timeout: 10000 });
+            require("fs").unlinkSync(tagTmp);
+          } catch (tagErr: any) {
+            console.error("GHL tag error:", tagErr.message);
+          }
+
+        } catch (err: any) {
+          console.error("Post-sign actions error:", err.message);
+        }
+      });
+
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
