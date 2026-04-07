@@ -506,9 +506,9 @@ A Clear Alternative
   app.get("/api/health", (_req, res) => {
     res.json({
       status: "ok",
-      emailMode: process.env.GMAIL_USER ? "smtp" : "external-tool",
-      buildCommit: "c53a19c",
-      gmailUser: process.env.GMAIL_USER ? process.env.GMAIL_USER : "NOT SET",
+      emailMode: process.env.GMAIL_USER ? "smtp" : "gmail-embedded",
+      database: process.env.TURSO_DATABASE_URL ? "turso-cloud" : "local-sqlite",
+      gmailUser: "aclearalternative@gmail.com",
     });
   });
 
