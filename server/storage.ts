@@ -1,7 +1,7 @@
 import { type Proposal, type InsertProposal, proposals } from "@shared/schema";
 import { drizzle as drizzleSqlite } from "drizzle-orm/better-sqlite3";
 import { drizzle as drizzleLibsql } from "drizzle-orm/libsql";
-import { createClient } from "@libsql/client";
+import { createClient } from "@libsql/client/http";
 import Database from "better-sqlite3";
 import { eq } from "drizzle-orm";
 
