@@ -755,6 +755,41 @@ A Clear Alternative
           });
           console.log(`Welcome email sent to ${customerName}`);
 
+          // 1b. INTERNAL INSTALL SCHEDULING EMAIL to office
+          const equipmentList = selectedPkg
+            ? selectedPkg.equipment.map((e: any) => `  - ${e.name}: $${e.price.toLocaleString()}`).join("\n")
+            : "  - See proposal";
+
+          const installBody = `NEW SIGNED PROPOSAL — SCHEDULE INSTALLATION
+
+Customer: ${customerName}
+Address: ${proposal.street}, ${proposal.city}, ${proposal.state} ${proposal.zip}
+Email: ${proposal.customerEmail}
+Phone: (on file)
+
+Rep: ${proposal.repName} — ${repPhone}
+Signed: ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+
+Package: ${selectedLabel}
+Equipment:
+${equipmentList}
+
+Total: $${finalPrice.toLocaleString()}
+Monthly Investment: $${monthlyAmt}/mo
+Deposit: $${deposit.toLocaleString()}
+
+Proposal Link: ${proposalLink}
+
+Please contact ${customerName} within 24 hours to schedule installation.`;
+
+          await sendProposalEmail({
+            to: "aclearalternative@gmail.com",
+            subject: `✅ Install Needed — ${customerName} — ${selectedLabel} Package`,
+            body: installBody,
+            bcc: ["asmith@aclear.com", "water325@aol.com"],
+          });
+          console.log(`Install scheduling email sent for ${customerName}`);
+
           // 2. SMS TO REP — customer signed
           try {
             const repContactRes = execSync(
