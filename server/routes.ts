@@ -1075,7 +1075,34 @@ A Clear Alternative
           if (oppData?.opportunity?.id) {
             console.log("GHL opportunity created:", oppData.opportunity.id);
           } else if (oppData?.message?.includes("duplicate")) {
-            console.log("GHL opportunity already exists for this contact — skipping");
+            // Opportunity already exists for this contact — find it and update
+            try {
+              const searchRes2 = execSync(
+                `curl -s "https://services.leadconnectorhq.com/opportunities/search?location_id=${GHL_LOCATION_ID}&pipeline_id=gyFJalG38xXKkAlmUHBo&contact_id=${ghlContactId}" \
+                  -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28"`,
+                { timeout: 10000 }
+              ).toString();
+              const existingOpp = JSON.parse(searchRes2)?.opportunities?.[0];
+              if (existingOpp?.id) {
+                const updateTmp = require("os").tmpdir() + "/ghl_opp_upd_" + Date.now() + ".json";
+                require("fs").writeFileSync(updateTmp, JSON.stringify({
+                  name: `${customerName} \u2014 ${selectedLabel} Package`,
+                  monetaryValue: finalPrice,
+                  status: "open",
+                  pipelineStageId: "1d1267dd-811c-4f81-b7ff-abe98135f387",
+                }));
+                execSync(
+                  `curl -s -X PUT "https://services.leadconnectorhq.com/opportunities/${existingOpp.id}" \
+                    -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28" \
+                    -H "Content-Type: application/json" -d @${updateTmp}`,
+                  { timeout: 10000 }
+                );
+                require("fs").unlinkSync(updateTmp);
+                console.log("GHL opportunity updated (was duplicate):", existingOpp.id);
+              }
+            } catch (dupErr: any) {
+              console.error("GHL duplicate update error:", dupErr.message);
+            }
           } else {
             console.log("GHL opportunity response:", JSON.stringify(oppData).slice(0, 100));
           }
