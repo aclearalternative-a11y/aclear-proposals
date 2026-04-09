@@ -70,6 +70,28 @@ export default function ProposalForm() {
   const [discountType, setDiscountType] = useState("none");
   const [deposit, setDeposit] = useState("");
   const [rentalMode, setRentalMode] = useState(false);
+  const [includedTiers, setIncludedTiers] = useState({ good: true, better: true, best: true });
+
+  // Multi-package discount: 2% on Better, 4% on Best when all 3 are included (water heaters excluded)
+  const allThreeIncluded = includedTiers.good && includedTiers.better && includedTiers.best;
+
+  function applyMultiPackageDiscount(pkgs: PackageData[]): PackageData[] {
+    return pkgs.map(pkg => {
+      if (!allThreeIncluded) return pkg;
+      const rate = pkg.tier === 'better' ? 0.02 : pkg.tier === 'best' ? 0.04 : 0;
+      if (rate === 0) return pkg;
+      // Exclude water heaters from discount
+      const waterHeaterTotal = pkg.equipment
+        .filter(e => e.category === 'Water Heaters')
+        .reduce((s, e) => s + e.price, 0);
+      const base = pkg.totalPrice - waterHeaterTotal;
+      const discountedTotal = Math.round(base * (1 - rate)) + waterHeaterTotal;
+      return { ...pkg, totalPrice: discountedTotal };
+    });
+  }
+
+  const packagesWithDiscount = applyMultiPackageDiscount(packages);
+  const filteredPackages = packagesWithDiscount.filter(p => includedTiers[p.tier as keyof typeof includedTiers]);
 
   const handleGeneratePackages = useCallback(() => {
     const waterTest: WaterTestResults = {
@@ -186,7 +208,7 @@ export default function ProposalForm() {
         waterTestResults: JSON.stringify(waterTest),
         numPeople: numPeople || 3,
         numBathrooms: numBathrooms || 2,
-        packages: JSON.stringify(packages),
+        packages: JSON.stringify(filteredPackages),
         selectedPackage: selectedTier,
         discountType,
         deposit: parseInt(deposit) || 0,
@@ -213,7 +235,7 @@ export default function ProposalForm() {
     }
   };
 
-  const selectedPkg = packages.find(p => p.tier === selectedTier);
+  const selectedPkg = packagesWithDiscount.find(p => p.tier === selectedTier);
   const depositNum = parseInt(deposit) || 0;
   const { discountedTotal, discountAmount, discountPercent } = selectedPkg
     ? applyDiscount(selectedPkg.totalPrice, discountType)
@@ -467,6 +489,39 @@ export default function ProposalForm() {
               </CardContent>
             </Card>
 
+            {/* Package Presentation Selection */}
+            <Card className="border border-dashed">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Packages to Include in Proposal</h3>
+                  {allThreeIncluded && (
+                    <span className="text-xs bg-green-50 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-medium">
+                      Multi-package: Better −2% &bull; Best −4% (excl. water heaters)
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-6">
+                  {(['good', 'better', 'best'] as const).map(tier => (
+                    <label key={tier} className="flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={includedTiers[tier]}
+                        onChange={e => {
+                          setIncludedTiers(prev => ({ ...prev, [tier]: e.target.checked }));
+                          // If deselecting the currently selected tier, clear it
+                          if (!e.target.checked && selectedTier === tier) setSelectedTier(null);
+                        }}
+                        className="w-4 h-4 rounded accent-[#1d8fc4]"
+                      />
+                      <span className="text-sm font-medium capitalize">{tier === 'good' ? 'Good' : tier === 'better' ? 'Better' : 'Best'}</span>
+                      {allThreeIncluded && tier === 'better' && <span className="text-xs text-green-600 font-medium">-2%</span>}
+                      {allThreeIncluded && tier === 'best' && <span className="text-xs text-green-600 font-medium">-4%</span>}
+                    </label>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">
                 Treatment Packages — {waterSource === "well" ? "Well Water" : "City Water"}
@@ -478,7 +533,8 @@ export default function ProposalForm() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              {packages.map((pkg, tierIdx) => (
+              {packagesWithDiscount.map((pkg, tierIdx) => (
+                <div key={pkg.tier} className={!includedTiers[pkg.tier as keyof typeof includedTiers] ? 'opacity-30 pointer-events-none' : ''}>
                 <PackageCard
                   key={pkg.tier}
                   pkg={pkg}
@@ -486,11 +542,12 @@ export default function ProposalForm() {
                   waterSource={waterSource}
                   isSelected={selectedTier === pkg.tier}
                   rentalMode={rentalMode}
-                  onSelect={() => setSelectedTier(pkg.tier)}
+                  onSelect={() => includedTiers[pkg.tier as keyof typeof includedTiers] && setSelectedTier(pkg.tier)}
                   onSizeChange={(ei, dir) => handleSizeChange(tierIdx, ei, dir)}
                   onRemove={(ei) => handleRemoveEquipment(tierIdx, ei)}
                   onAdd={(cat, itemIdx) => handleAddEquipment(tierIdx, cat, itemIdx)}
                 />
+                </div>
               ))}
             </div>
 
