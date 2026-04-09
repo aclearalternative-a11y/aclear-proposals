@@ -548,74 +548,82 @@ export default function ProposalForm() {
               ))}
             </div>
 
-            {/* Summary bar */}
-            {selectedTier && selectedPkg && (
-              <Card className="border-primary/30 bg-primary/5">
-                <CardContent className="p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    <div>
-                      <Label>Discount</Label>
-                      <Select value={discountType} onValueChange={setDiscountType}>
-                        <SelectTrigger data-testid="select-discount">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {DISCOUNTS.map(d => (
-                            <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Deposit</Label>
-                      <Input
-                        data-testid="input-deposit"
-                        type="number"
-                        value={deposit}
-                        onChange={e => setDeposit(e.target.value)}
-                        placeholder="0"
-                      />
-                    </div>
-                    <div className="text-sm space-y-1">
-                      <div className="flex justify-between">
-                        <span>Package Total:</span>
-                        <span className="font-medium">{formatCurrency(selectedPkg.totalPrice)}</span>
-                      </div>
-                      {discountAmount > 0 && (
-                        <div className="flex justify-between text-green-600">
-                          <span>Discount ({discountPercent}%):</span>
-                          <span>-{formatCurrency(discountAmount)}</span>
-                        </div>
-                      )}
-                      {depositNum > 0 && (
-                        <div className="flex justify-between">
-                          <span>Deposit:</span>
-                          <span>-{formatCurrency(depositNum)}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between font-semibold border-t pt-1">
-                        <span>Monthly Investment:</span>
-                        <span className="text-primary">{formatCurrency(monthly)}/mo</span>
-                      </div>
-                    </div>
-                    <div>
-                      <Button
-                        className="w-full"
-                        onClick={handleSendProposal}
-                        disabled={sending}
-                        data-testid="button-send-proposal"
-                      >
-                        {sending ? (
-                          <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Sending...</>
-                        ) : (
-                          <><Send className="h-4 w-4 mr-2" /> Email to Customer</>
-                        )}
-                      </Button>
-                    </div>
+            {/* Summary bar — always visible once packages are generated */}
+            <Card className="border-primary/30 bg-primary/5">
+              <CardContent className="p-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                  <div>
+                    <Label>Discount</Label>
+                    <Select value={discountType} onValueChange={setDiscountType}>
+                      <SelectTrigger data-testid="select-discount">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DISCOUNTS.map(d => (
+                          <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                  <div>
+                    <Label>Deposit</Label>
+                    <Input
+                      data-testid="input-deposit"
+                      type="number"
+                      value={deposit}
+                      onChange={e => setDeposit(e.target.value)}
+                      placeholder="0"
+                    />
+                  </div>
+                  <div className="text-sm space-y-1">
+                    {selectedTier && selectedPkg ? (
+                      <>
+                        <div className="flex justify-between">
+                          <span>Selected: {selectedPkg.label}</span>
+                          <span className="font-medium">{formatCurrency(selectedPkg.totalPrice)}</span>
+                        </div>
+                        {discountAmount > 0 && (
+                          <div className="flex justify-between text-green-600">
+                            <span>Discount ({discountPercent}%):</span>
+                            <span>-{formatCurrency(discountAmount)}</span>
+                          </div>
+                        )}
+                        {depositNum > 0 && (
+                          <div className="flex justify-between">
+                            <span>Deposit:</span>
+                            <span>-{formatCurrency(depositNum)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between font-semibold border-t pt-1">
+                          <span>Monthly Investment:</span>
+                          <span className="text-primary">{formatCurrency(monthly)}/mo</span>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic">
+                        {filteredPackages.length === 1
+                          ? 'Click “Select Package” above to confirm'
+                          : 'Customer will choose their package'}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <Button
+                      className="w-full"
+                      onClick={handleSendProposal}
+                      disabled={sending}
+                      data-testid="button-send-proposal"
+                    >
+                      {sending ? (
+                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Sending...</>
+                      ) : (
+                        <><Send className="h-4 w-4 mr-2" /> Email to Customer</>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             <Button variant="outline" onClick={() => setStep("water")} data-testid="button-back-water">
               Back to Water Test
