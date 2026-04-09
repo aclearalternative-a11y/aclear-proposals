@@ -31,8 +31,8 @@ export default function ProposalForm() {
   const [zip, setZip] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [repName, setRepName] = useState("");
-  const [numPeople, setNumPeople] = useState(3);
-  const [numBathrooms, setNumBathrooms] = useState(2);
+  const [numPeople, setNumPeople] = useState<number | "">("");
+  const [numBathrooms, setNumBathrooms] = useState<number | "">("");
 
   // Water source & test
   const [waterSource, setWaterSource] = useState<"well" | "city">("well");
@@ -65,7 +65,7 @@ export default function ProposalForm() {
       h2sCold: h2s ? parseInt(h2sCold) || 0 : undefined,
       h2sHot: h2s ? parseInt(h2sHot) || 0 : undefined,
     };
-    const pkgs = generatePackages(waterSource, waterTest, numPeople, numBathrooms);
+    const pkgs = generatePackages(waterSource, waterTest, numPeople || 3, numBathrooms || 2);
     setPackages(pkgs);
     setStep("packages");
   }, [pH, iron, hardness, tds, copper, chlorine, h2s, h2sCold, h2sHot, waterSource, numPeople, numBathrooms]);
@@ -166,8 +166,8 @@ export default function ProposalForm() {
         repName,
         waterSource,
         waterTestResults: JSON.stringify(waterTest),
-        numPeople,
-        numBathrooms,
+        numPeople: numPeople || 3,
+        numBathrooms: numBathrooms || 2,
         packages: JSON.stringify(packages),
         selectedPackage: selectedTier,
         discountType,
@@ -302,11 +302,11 @@ export default function ProposalForm() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Number of People in Household</Label>
-                  <Input data-testid="input-num-people" type="number" min={1} max={12} value={numPeople} onChange={e => setNumPeople(parseInt(e.target.value) || 1)} />
+                  <Input data-testid="input-num-people" type="number" min={1} max={12} placeholder="e.g. 3" value={numPeople} onChange={e => setNumPeople(e.target.value === "" ? "" : parseInt(e.target.value) || 1)} />
                 </div>
                 <div>
                   <Label>Number of Bathrooms</Label>
-                  <Input data-testid="input-num-bathrooms" type="number" min={1} max={10} value={numBathrooms} onChange={e => setNumBathrooms(parseInt(e.target.value) || 1)} />
+                  <Input data-testid="input-num-bathrooms" type="number" min={1} max={10} placeholder="e.g. 2" value={numBathrooms} onChange={e => setNumBathrooms(e.target.value === "" ? "" : parseInt(e.target.value) || 1)} />
                 </div>
               </div>
               <div className="flex justify-end pt-4">
