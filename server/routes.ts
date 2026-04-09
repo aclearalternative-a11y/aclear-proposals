@@ -285,6 +285,10 @@ function buildProposalHtml(proposal: any): string {
   .footer-bar p { margin: 0; color: #ffffff; font-size: 12px; line-height: 1.8; font-weight: 500; opacity: 0.92; }
   .footer-bar .rep-name { color: #ffffff; font-size: 14px; font-weight: 800; margin-top: 6px; }
   .accept-note { margin-top: 12px; font-size: 11px; color: #444; font-style: italic; }
+  .findings-box { margin-bottom: 14px; }
+  .finding-item { background-color: #fff8f0; border-left: 4px solid #e67e22; padding: 8px 12px; margin-bottom: 7px; border-radius: 0 4px 4px 0; }
+  .finding-label { font-size: 12px; font-weight: 700; color: #c0392b; margin-bottom: 3px; }
+  .finding-detail { font-size: 11px; color: #444; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -321,6 +325,20 @@ function buildProposalHtml(proposal: any): string {
   <tr><th>Parameter</th><th>Result</th></tr>
   ${testRows.join("\n")}
 </table>
+
+<!-- WHAT YOUR RESULTS MEAN -->
+${(() => {
+  const findings: string[] = [];
+  if (parseFloat(waterTest.pH) < 6.5) findings.push(`<div class="finding-item"><div class="finding-label">pH ${waterTest.pH} &mdash; Acidic Water</div><div class="finding-detail">Your water is acidic. Acidic water slowly corrodes copper pipes and fixtures, can leach metals into your drinking water, and gives water a slightly sour taste. An acid neutralizer raises pH to a safe, balanced level.</div></div>`);
+  if (parseFloat(waterTest.pH) > 8.5) findings.push(`<div class="finding-item"><div class="finding-label">pH ${waterTest.pH} &mdash; Alkaline Water</div><div class="finding-detail">Your water is alkaline. High pH can cause scale buildup in pipes, water heaters, and appliances and may give water a bitter taste.</div></div>`);
+  if (parseFloat(waterTest.iron) > 0.3) findings.push(`<div class="finding-item"><div class="finding-label">Iron ${waterTest.iron} ppm &mdash; Elevated</div><div class="finding-detail">Your iron level is above the recommended limit of 0.3 ppm. High iron causes orange and reddish-brown staining on fixtures, sinks, laundry, and toilets. It also gives water a metallic taste and clogs pipes over time.</div></div>`);
+  if (parseFloat(waterTest.hardness) > 7) findings.push(`<div class="finding-item"><div class="finding-label">Hardness ${waterTest.hardness} gpg &mdash; Hard Water</div><div class="finding-detail">Your water is hard. Hard water leaves white crusty scale deposits on faucets, showerheads, and inside pipes and water heaters. It reduces the efficiency and lifespan of appliances and makes soap and detergent less effective.</div></div>`);
+  if (waterTest.copper && parseFloat(waterTest.copper) > 0.3) findings.push(`<div class="finding-item"><div class="finding-label">Copper ${waterTest.copper} ppm &mdash; Elevated</div><div class="finding-detail">Copper above 0.3 ppm can give water a metallic taste and cause blue-green staining on fixtures. High levels may indicate corrosion of copper pipes in your home.</div></div>`);
+  if (waterTest.chlorine && parseFloat(waterTest.chlorine) > 0) findings.push(`<div class="finding-item"><div class="finding-label">Chlorine ${waterTest.chlorine} ppm &mdash; Present</div><div class="finding-detail">Chlorine is added by municipal systems to disinfect water. While regulated, it can give water an unpleasant taste and odor and may react with organic matter to form byproducts.</div></div>`);
+  if (waterTest.hydrogenSulfide && ((parseInt(waterTest.h2sCold)||0) > 3 || (parseInt(waterTest.h2sHot)||0) > 3)) findings.push(`<div class="finding-item"><div class="finding-label">Hydrogen Sulfide &mdash; Detected</div><div class="finding-detail">Hydrogen sulfide produces the characteristic &ldquo;rotten egg&rdquo; smell in your water. It is corrosive to pipes and fixtures and affects the taste of beverages and food prepared with the water.</div></div>`);
+  if (findings.length === 0) return '';
+  return `<div class="findings-box"><div class="section-title" style="margin-bottom:8px;">What Your Results Mean</div>${findings.join('')}</div>`;
+})()}
 
 <!-- PACKAGES -->
 <div class="section-title">Recommended Treatment Packages</div>

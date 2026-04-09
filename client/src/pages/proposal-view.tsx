@@ -207,6 +207,30 @@ export default function ProposalView() {
                 </>
               )}
             </div>
+
+            {/* What Your Results Mean */}
+            {(() => {
+              const findings: {label: string; detail: string}[] = [];
+              if (waterTest.pH < 6.5) findings.push({ label: `pH ${waterTest.pH} — Acidic Water`, detail: "Your water is acidic. Acidic water slowly corrodes copper pipes and fixtures, can leach metals into your drinking water, and gives water a slightly sour taste. An acid neutralizer raises pH to a safe, balanced level." });
+              if (waterTest.pH > 8.5) findings.push({ label: `pH ${waterTest.pH} — Alkaline Water`, detail: "Your water is alkaline. High pH can cause scale buildup in pipes, water heaters, and appliances and may give water a bitter taste." });
+              if (waterTest.iron > 0.3) findings.push({ label: `Iron ${waterTest.iron} ppm — Elevated`, detail: "Your iron level is above the recommended limit of 0.3 ppm. High iron causes orange and reddish-brown staining on fixtures, sinks, laundry, and toilets. It also gives water a metallic taste and clogs pipes over time." });
+              if (waterTest.hardness > 7) findings.push({ label: `Hardness ${waterTest.hardness} gpg — Hard Water`, detail: "Your water is hard. Hard water leaves white crusty scale deposits on faucets, showerheads, and inside pipes and water heaters. It reduces the efficiency and lifespan of appliances and makes soap and detergent less effective." });
+              if (waterTest.copper !== undefined && waterTest.copper > 0.3) findings.push({ label: `Copper ${waterTest.copper} ppm — Elevated`, detail: "Copper above 0.3 ppm can give water a metallic taste and cause blue-green staining on fixtures. High copper levels may indicate corrosion of copper pipes in your home." });
+              if (waterTest.chlorine !== undefined && waterTest.chlorine > 0) findings.push({ label: `Chlorine ${waterTest.chlorine} ppm — Present`, detail: "Chlorine is added by municipal water systems to disinfect water. While safe at regulated levels, it can give water an unpleasant taste and odor, and may react with organic matter to form byproducts." });
+              if (waterTest.hydrogenSulfide && ((waterTest.h2sCold || 0) > 3 || (waterTest.h2sHot || 0) > 3)) findings.push({ label: `Hydrogen Sulfide — Detected`, detail: "Hydrogen sulfide produces the characteristic \"rotten egg\" smell in your water. It is corrosive to pipes and fixtures, affects the taste of beverages and food prepared with the water, and indicates the presence of sulfur bacteria." });
+              if (findings.length === 0) return null;
+              return (
+                <div className="mt-4 pt-4 border-t space-y-3">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">What Your Results Mean</h3>
+                  {findings.map((f, i) => (
+                    <div key={i} className="bg-orange-50 border-l-4 border-orange-400 px-3 py-2 rounded-r">
+                      <div className="text-sm font-semibold text-orange-800 mb-0.5">{f.label}</div>
+                      <div className="text-sm text-orange-900 leading-snug">{f.detail}</div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
 
