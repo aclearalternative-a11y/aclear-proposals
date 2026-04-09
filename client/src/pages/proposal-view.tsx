@@ -43,6 +43,15 @@ export default function ProposalView() {
     queryKey: ["/api/proposals/share", shareId],
   });
 
+  // Must be declared before early returns (React rules of hooks)
+  const [localSelectedTier, setLocalSelectedTier] = useState<string | null>(null);
+
+  const selectPackageMutation = useMutation({
+    mutationFn: (tier: string) =>
+      apiRequest(`/api/proposals/${proposal?.id}/select-package`, { method: "PATCH", body: { selectedPackage: tier } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/proposals/share", shareId] }),
+  });
+
   const signMutation = useMutation({
     mutationFn: async () => {
       await apiRequest("PATCH", `/api/proposals/${proposal!.id}/sign`, {
@@ -117,7 +126,6 @@ export default function ProposalView() {
 
   const packages: PackageData[] = JSON.parse(proposal.packages);
   const waterTest: WaterTestResults = JSON.parse(proposal.waterTestResults);
-  const [localSelectedTier, setLocalSelectedTier] = useState<string | null>(null);
   const effectiveTier = proposal.selectedPackage || localSelectedTier;
   const selectedPkg = packages.find(p => p.tier === effectiveTier);
   const { discountedTotal, discountAmount, discountPercent } = selectedPkg
@@ -128,13 +136,6 @@ export default function ProposalView() {
   const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
   const hasSecond = proposal.customerFirstName2 && proposal.customerLastName2;
   const customerMustChoose = !proposal.selectedPackage && packages.length > 1;
-
-  // Mutation to save customer's package selection
-  const selectPackageMutation = useMutation({
-    mutationFn: (tier: string) =>
-      apiRequest(`/api/proposals/${proposal.id}/select-package`, { method: "PATCH", body: { selectedPackage: tier } }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/proposals/share", shareId] }),
-  });
 
   return (
     <div className="min-h-screen bg-background">
