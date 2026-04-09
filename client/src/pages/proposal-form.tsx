@@ -95,7 +95,7 @@ export default function ProposalForm() {
 
   const handleGeneratePackages = useCallback(() => {
     const waterTest: WaterTestResults = {
-      pH: parseFloat(pH) || 0,
+      pH: pH !== "" ? parseFloat(pH) : undefined,
       iron: parseFloat(iron) || 0,
       hardness: parseFloat(hardness) || 0,
       tds: parseFloat(tds) || 0,
@@ -179,7 +179,7 @@ export default function ProposalForm() {
     setSending(true);
     try {
       const waterTest: WaterTestResults = {
-        pH: parseFloat(pH) || 0,
+        pH: pH !== "" ? parseFloat(pH) : undefined,
         iron: parseFloat(iron) || 0,
         hardness: parseFloat(hardness) || 0,
         tds: parseFloat(tds) || 0,

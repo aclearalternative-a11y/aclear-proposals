@@ -204,7 +204,9 @@ function buildProposalHtml(proposal: any): string {
       <td class="${flagged ? "val-flagged" : "val-normal"}" style="padding:5px 10px;border-bottom:1px solid #f0f0f0;">${val}${flagged ? " &#9888;" : ""}</td>
     </tr>`);
   };
-  addTest("pH", `${waterTest.pH}`, parseFloat(waterTest.pH) < 6.5);
+  if (waterTest.pH !== undefined && waterTest.pH !== null) {
+    addTest("pH", `${waterTest.pH}`, waterTest.pH < 6.5);
+  }
   addTest("Iron", `${waterTest.iron} ppm`, parseFloat(waterTest.iron) > 0.3);
   addTest("Hardness", `${waterTest.hardness} gpg`, parseFloat(waterTest.hardness) > 7);
   addTest("TDS", `${waterTest.tds}`);
@@ -325,8 +327,8 @@ function buildProposalHtml(proposal: any): string {
 <!-- WHAT YOUR RESULTS MEAN -->
 ${(() => {
   const findings: string[] = [];
-  if (parseFloat(waterTest.pH) < 6.5) findings.push(`<div class="finding-item"><div class="finding-label">pH ${waterTest.pH} &mdash; Acidic Water</div><div class="finding-detail">Your water is acidic. Acidic water slowly corrodes copper pipes and fixtures, can leach metals into your drinking water, and gives water a slightly sour taste. An acid neutralizer raises pH to a safe, balanced level.</div></div>`);
-  if (parseFloat(waterTest.pH) > 8.5) findings.push(`<div class="finding-item"><div class="finding-label">pH ${waterTest.pH} &mdash; Alkaline Water</div><div class="finding-detail">Your water is alkaline. High pH can cause scale buildup in pipes, water heaters, and appliances and may give water a bitter taste.</div></div>`);
+  if (waterTest.pH !== undefined && waterTest.pH !== null && waterTest.pH < 6.5) findings.push(`<div class="finding-item"><div class="finding-label">pH ${waterTest.pH} &mdash; Acidic Water</div><div class="finding-detail">Your water is acidic. Acidic water slowly corrodes copper pipes and fixtures, can leach metals into your drinking water, and gives water a slightly sour taste. An acid neutralizer raises pH to a safe, balanced level.</div></div>`);
+  if (waterTest.pH !== undefined && waterTest.pH !== null && waterTest.pH > 8.5) findings.push(`<div class="finding-item"><div class="finding-label">pH ${waterTest.pH} &mdash; Alkaline Water</div><div class="finding-detail">Your water is alkaline. High pH can cause scale buildup in pipes, water heaters, and appliances and may give water a bitter taste.</div></div>`);
   if (parseFloat(waterTest.iron) > 0.3) findings.push(`<div class="finding-item"><div class="finding-label">Iron ${waterTest.iron} ppm &mdash; Elevated</div><div class="finding-detail">Your iron level is above the recommended limit of 0.3 ppm. High iron causes orange and reddish-brown staining on fixtures, sinks, laundry, and toilets. It also gives water a metallic taste and clogs pipes over time.</div></div>`);
   if (parseFloat(waterTest.hardness) > 7) findings.push(`<div class="finding-item"><div class="finding-label">Hardness ${waterTest.hardness} gpg &mdash; Hard Water</div><div class="finding-detail">Your water is hard. Hard water leaves white crusty scale deposits on faucets, showerheads, and inside pipes and water heaters. It reduces the efficiency and lifespan of appliances and makes soap and detergent less effective.</div></div>`);
   if (waterTest.copper && parseFloat(waterTest.copper) > 0.3) findings.push(`<div class="finding-item"><div class="finding-label">Copper ${waterTest.copper} ppm &mdash; Elevated</div><div class="finding-detail">Copper above 0.3 ppm can give water a metallic taste and cause blue-green staining on fixtures. High levels may indicate corrosion of copper pipes in your home.</div></div>`);

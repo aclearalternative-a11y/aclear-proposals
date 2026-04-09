@@ -209,7 +209,7 @@ export default function ProposalView() {
           <CardContent className="p-4">
             <h2 className="font-semibold text-sm text-muted-foreground mb-3">WATER ANALYSIS RESULTS — {proposal.waterSource === "well" ? "WELL WATER" : "CITY WATER"}</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <ResultBadge label="pH" value={waterTest.pH.toString()} alert={waterTest.pH < 6.5} />
+              {waterTest.pH !== undefined && <ResultBadge label="pH" value={waterTest.pH.toString()} alert={waterTest.pH < 6.5} />}
               <ResultBadge label="Iron" value={`${waterTest.iron} ppm`} alert={waterTest.iron > 0.3} />
               <ResultBadge label="Hardness" value={`${waterTest.hardness} gpg`} alert={waterTest.hardness > 7} />
               <ResultBadge label="TDS" value={waterTest.tds.toString()} />
@@ -226,8 +226,8 @@ export default function ProposalView() {
             {/* What Your Results Mean */}
             {(() => {
               const findings: {label: string; detail: string}[] = [];
-              if (waterTest.pH < 6.5) findings.push({ label: `pH ${waterTest.pH} — Acidic Water`, detail: "Your water is acidic. Acidic water slowly corrodes copper pipes and fixtures, can leach metals into your drinking water, and gives water a slightly sour taste. An acid neutralizer raises pH to a safe, balanced level." });
-              if (waterTest.pH > 8.5) findings.push({ label: `pH ${waterTest.pH} — Alkaline Water`, detail: "Your water is alkaline. High pH can cause scale buildup in pipes, water heaters, and appliances and may give water a bitter taste." });
+              if (waterTest.pH !== undefined && waterTest.pH < 6.5) findings.push({ label: `pH ${waterTest.pH} — Acidic Water`, detail: "Your water is acidic. Acidic water slowly corrodes copper pipes and fixtures, can leach metals into your drinking water, and gives water a slightly sour taste. An acid neutralizer raises pH to a safe, balanced level." });
+              if (waterTest.pH !== undefined && waterTest.pH > 8.5) findings.push({ label: `pH ${waterTest.pH} — Alkaline Water`, detail: "Your water is alkaline. High pH can cause scale buildup in pipes, water heaters, and appliances and may give water a bitter taste." });
               if (waterTest.iron > 0.3) findings.push({ label: `Iron ${waterTest.iron} ppm — Elevated`, detail: "Your iron level is above the recommended limit of 0.3 ppm. High iron causes orange and reddish-brown staining on fixtures, sinks, laundry, and toilets. It also gives water a metallic taste and clogs pipes over time." });
               if (waterTest.hardness > 7) findings.push({ label: `Hardness ${waterTest.hardness} gpg — Hard Water`, detail: "Your water is hard. Hard water leaves white crusty scale deposits on faucets, showerheads, and inside pipes and water heaters. It reduces the efficiency and lifespan of appliances and makes soap and detergent less effective." });
               if (waterTest.copper !== undefined && waterTest.copper > 0.3) findings.push({ label: `Copper ${waterTest.copper} ppm — Elevated`, detail: "Copper above 0.3 ppm can give water a metallic taste and cause blue-green staining on fixtures. High copper levels may indicate corrosion of copper pipes in your home." });

@@ -69,7 +69,7 @@ export interface PackageData {
 }
 
 export interface WaterTestResults {
-  pH: number;
+  pH?: number;
   iron: number;
   hardness: number;
   tds: number;

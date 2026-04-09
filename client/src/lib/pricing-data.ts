@@ -202,7 +202,8 @@ export function generatePackages(
   numBathrooms: number
 ): PackageData[] {
   const useTwin = waterTest.iron > 1.5;
-  const needsAcidNeutralizer = waterTest.pH < 6.5;
+  // Only trigger acid neutralizer if pH was actually entered AND is below threshold
+  const needsAcidNeutralizer = !!waterTest.pH && waterTest.pH < 6.5;
   const hasH2S = waterTest.hydrogenSulfide;
   const h2sHigh = (waterTest.h2sCold && waterTest.h2sCold > 7) || (waterTest.h2sHot && waterTest.h2sHot > 7);
 
