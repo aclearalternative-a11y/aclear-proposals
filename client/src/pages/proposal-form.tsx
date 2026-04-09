@@ -235,7 +235,7 @@ export default function ProposalForm() {
   const selectedPkg = packagesWithDiscount.find(p => p.tier === selectedTier);
   const depositNum = parseInt(deposit) || 0;
   const { discountedTotal, discountAmount, discountPercent } = selectedPkg
-    ? applyDiscount(selectedPkg.totalPrice, discountType)
+    ? applyDiscount(selectedPkg.totalPrice, discountType, (selectedPkg as any).discountRate || 0)
     : { discountedTotal: 0, discountAmount: 0, discountPercent: 0 };
   const monthly = selectedPkg ? calcMonthlyInvestment(discountedTotal, depositNum) : 0;
 

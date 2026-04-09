@@ -17,9 +17,20 @@ const BROCHURE_MAP: Record<string, string> = {
   "Iron Odor Breaker": "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5",
   "Carbon Filtration": "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd",
   "Leak Shut Off": "https://acrobat.adobe.com/id/urn:aaid:sc:US:02daeba4-c657-41de-9318-29ba0899d91d",
+  "Rusco": "https://ruscowater.com/products/spin-down-filters/",
+  "ELECTRIC": "https://docs.bradfordwhite.com/Spec_Sheets/1201_Current.pdf",
+  "POWER VENT": "https://docs.bradfordwhite.com/Spec_Sheets/1117_Current.pdf",
+  "GAS Bradford White": "https://docs.bradfordwhite.com/Spec_Sheets/1101_Current.pdf",
+  "Tankless Water Heater": "https://www.navien.com/products/residential/condensing-gas-tankless-water-heater/npe-2",
 };
 
 function getBrochureUrl(name: string): string {
+  // Water heater matching — order matters (most specific first)
+  if (name.includes("POWER VENT")) return BROCHURE_MAP["POWER VENT"];
+  if (name.includes("ELECTRIC")) return BROCHURE_MAP["ELECTRIC"];
+  if (name.includes("Tankless Water Heater")) return BROCHURE_MAP["Tankless Water Heater"];
+  if (name.includes("Bradford White")) return BROCHURE_MAP["GAS Bradford White"];
+  // General matching
   for (const [key, url] of Object.entries(BROCHURE_MAP)) {
     if (name.includes(key)) return url;
   }
@@ -129,7 +140,7 @@ export default function ProposalView() {
   const effectiveTier = proposal.selectedPackage || localSelectedTier;
   const selectedPkg = packages.find(p => p.tier === effectiveTier);
   const { discountedTotal, discountAmount, discountPercent } = selectedPkg
-    ? applyDiscount(selectedPkg.totalPrice, proposal.discountType || "none")
+    ? applyDiscount(selectedPkg.totalPrice, proposal.discountType || "none", (selectedPkg as any).discountRate || 0)
     : { discountedTotal: 0, discountAmount: 0, discountPercent: 0 };
   const monthly = selectedPkg ? calcMonthlyInvestment(discountedTotal, proposal.deposit || 0) : 0;
   const repPhone = getRepPhone(proposal.repName);
@@ -340,7 +351,10 @@ export default function ProposalView() {
         {selectedPkg && (
           <Card className="bg-primary/5 border-primary/20">
             <CardContent className="p-4 space-y-2">
-              <h2 className="font-semibold">Selected: {selectedPkg.label} Package</h2>
+              <div className="flex items-baseline justify-between mb-1">
+                <h2 className="font-semibold">{selectedPkg.label} Package Selected</h2>
+                <span className="text-2xl font-bold text-primary">{formatCurrency(discountedTotal)}</span>
+              </div>
               <div className="text-sm space-y-1">
                 {/* Show multi-package original if applicable */}
                 {(selectedPkg as any).originalPrice && (selectedPkg as any).originalPrice > selectedPkg.totalPrice && (
@@ -349,7 +363,7 @@ export default function ProposalView() {
                     <span>-{formatCurrency((selectedPkg as any).originalPrice - selectedPkg.totalPrice)}</span>
                   </div>
                 )}
-                <div className="flex justify-between"><span>Package Total:</span><span className="font-semibold">{formatCurrency(selectedPkg.totalPrice)}</span></div>
+                <div className="flex justify-between text-muted-foreground"><span>Package Total:</span><span>{formatCurrency(selectedPkg.totalPrice)}</span></div>
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>{proposal.discountType === 'veteran' ? 'Veteran Discount (5%)' : proposal.discountType === 'fire_ems' ? 'Fire/EMS Discount (3%)' : `Discount (${discountPercent}%)`}:</span>

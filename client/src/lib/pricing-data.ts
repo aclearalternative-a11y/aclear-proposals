@@ -293,11 +293,19 @@ export function calcTotal(equipment: EquipmentItem[]): number {
   return equipment.reduce((sum, e) => sum + e.price, 0);
 }
 
-export function applyDiscount(total: number, discountType: string): { discountedTotal: number; discountAmount: number; discountPercent: number } {
+export function applyDiscount(
+  total: number,
+  discountType: string,
+  alreadyAppliedRate: number = 0  // multi-package discount already baked in (0.02 or 0.04)
+): { discountedTotal: number; discountAmount: number; discountPercent: number } {
   const discount = DISCOUNTS.find(d => d.value === discountType);
-  const percent = discount?.percent || 0;
-  const discountAmount = Math.round(total * percent / 100);
-  return { discountedTotal: total - discountAmount, discountAmount, discountPercent: percent };
+  const rawPercent = discount?.percent || 0;
+  // Cap combined discount at 5% total
+  const MAX_TOTAL_DISCOUNT = 5;
+  const alreadyAppliedPercent = Math.round(alreadyAppliedRate * 100);
+  const effectivePercent = Math.min(rawPercent, Math.max(0, MAX_TOTAL_DISCOUNT - alreadyAppliedPercent));
+  const discountAmount = Math.round(total * effectivePercent / 100);
+  return { discountedTotal: total - discountAmount, discountAmount, discountPercent: effectivePercent };
 }
 
 export function calcMonthlyInvestment(totalAfterDiscount: number, deposit: number): number {

@@ -114,6 +114,12 @@ function getBrochureUrl(equipName: string): string {
   if (equipName.includes("Iron Odor Breaker")) return BROCHURE_MAP["Iron Odor Breaker"];
   if (equipName.includes("Carbon Filtration")) return BROCHURE_MAP["Carbon Filtration"];
   if (equipName.includes("Leak Shut Off") || equipName.includes("Leak Valve")) return BROCHURE_MAP["Leak Shut Off Valve"];
+  if (equipName.includes("Rusco")) return "https://ruscowater.com/products/spin-down-filters/";
+  // Water heaters — most specific first
+  if (equipName.includes("POWER VENT")) return "https://docs.bradfordwhite.com/Spec_Sheets/1117_Current.pdf";
+  if (equipName.includes("ELECTRIC")) return "https://docs.bradfordwhite.com/Spec_Sheets/1201_Current.pdf";
+  if (equipName.includes("Tankless Water Heater")) return "https://www.navien.com/products/residential/condensing-gas-tankless-water-heater/npe-2";
+  if (equipName.includes("Bradford White")) return "https://docs.bradfordwhite.com/Spec_Sheets/1101_Current.pdf";
   return "";
 }
 
