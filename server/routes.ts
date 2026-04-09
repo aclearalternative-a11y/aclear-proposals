@@ -7,6 +7,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 // ---------------------------------------------------------------------------
 // Email transport — nodemailer (Gmail SMTP) when env vars are set,
@@ -18,12 +19,22 @@ async function sendProposalEmail(opts: {
   body: string;
   bcc: string[];
 }): Promise<void> {
+  const resendKey = process.env.RESEND_API_KEY;
   const gmailUser = process.env.GMAIL_USER || "aclearalternative@gmail.com";
   const gmailPass = process.env.GMAIL_APP_PASSWORD || "kcjswmfawaaugwqo";
 
-  if (gmailUser && gmailPass) {
-    // Production path: Gmail SMTP with app password
-    // Force IPv4 — Render free tier blocks outbound IPv6 to Gmail SMTP
+  if (resendKey) {
+    // Production path: Resend API (HTTPS-based, works on Render free tier)
+    const resend = new Resend(resendKey);
+    await resend.emails.send({
+      from: "A Clear Alternative <proposals@aclear.com>",
+      to: [opts.to],
+      bcc: opts.bcc,
+      subject: opts.subject,
+      text: opts.body,
+    });
+  } else if (process.env.NODE_ENV === "production") {
+    // Render without Resend key: fall back to Gmail SMTP with IPv4
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
@@ -39,7 +50,7 @@ async function sendProposalEmail(opts: {
       text: opts.body,
     });
   } else {
-    // Dev/sandbox path: use Perplexity external-tool CLI
+    // Local dev/sandbox: use Perplexity external-tool CLI
     const params = JSON.stringify({
       source_id: "gcal",
       tool_name: "send_email",
@@ -514,7 +525,7 @@ A Clear Alternative
   app.get("/api/health", (_req, res) => {
     res.json({
       status: "ok",
-      emailMode: process.env.GMAIL_USER ? "smtp" : "gmail-embedded",
+      emailMode: process.env.RESEND_API_KEY ? "resend" : process.env.GMAIL_USER ? "smtp" : "gmail-embedded",
       database: "turso-cloud",
       gmailUser: "aclearalternative@gmail.com",
     });

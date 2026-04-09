@@ -19,6 +19,7 @@ const allowlist = [
   "multer",
   "nanoid",
   "nodemailer",
+  "resend",
   "@libsql/client",
 
   "openai",
