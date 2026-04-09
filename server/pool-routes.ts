@@ -5,6 +5,7 @@ import type { Express, Request, Response } from "express";
 import { execSync } from "child_process";
 import * as fs from "fs";
 import nodemailer from "nodemailer";
+import { POOL_ZIP_DATA } from "./pool_zip_data";
 
 const GHL_API_KEY = process.env.GHL_API_KEY || "pit-24e8e4ec-6172-44e0-b0d7-6a621b9b4bc7";
 const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
@@ -12,17 +13,10 @@ const POOL_PIPELINE_ID = "xNaG2uwpPxq6BePj7zR8";
 const POOL_STAGE_NEW_LEAD = "8c4c4efa-a7d9-4020-9c88-d181cd0ba6b3";
 const POOL_SHEET_ID = "1yJEFzqwntC0DYlJRv9mHILctsFZSnt5Ij4yS-m3i8qY";
 
-// Persistent path on Render disk (survives deploys, doesn't reset)
+// Persistent path on Render disk (survives deploys)
 const DATA_PATH = "/data/pool_zip_data.json";
 
-// ---------------------------------------------------------------------------
-// Zip data bundled at build time — esbuild includes JSON imports inline.
-// Used to seed /data/pool_zip_data.json on first deploy.
-// ---------------------------------------------------------------------------
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const bundledZipData: Record<string, ZipEntry> = require("./pool_zip_data.json");
-
-interface ZipEntry { price: string; town: string; county: string; state: string; }
+export type ZipEntry = import("./pool_zip_data").ZipEntry;
 let zipData: Record<string, ZipEntry> = {};
 
 function loadZipData() {
@@ -31,16 +25,17 @@ function loadZipData() {
       zipData = JSON.parse(fs.readFileSync(DATA_PATH, "utf8"));
       console.log(`Pool zip data loaded from disk: ${Object.keys(zipData).length} zones`);
     } else {
-      // First deploy — seed from bundled data, save to disk
-      zipData = bundledZipData;
-      fs.mkdirSync("/data", { recursive: true });
-      fs.writeFileSync(DATA_PATH, JSON.stringify(zipData, null, 2), "utf8");
+      // First deploy or no disk — use bundled TypeScript data
+      zipData = { ...POOL_ZIP_DATA };
+      try {
+        fs.mkdirSync("/data", { recursive: true });
+        fs.writeFileSync(DATA_PATH, JSON.stringify(zipData, null, 2), "utf8");
+      } catch {}
       console.log(`Pool zip data seeded from bundle: ${Object.keys(zipData).length} zones`);
     }
   } catch (e: any) {
-    // Fallback to bundled data (dev or disk unavailable)
-    zipData = bundledZipData;
-    console.warn("Pool zip data: using bundled fallback. Error:", e.message);
+    zipData = { ...POOL_ZIP_DATA };
+    console.warn("Pool zip data: using bundled fallback:", e.message);
   }
 }
 loadZipData();
