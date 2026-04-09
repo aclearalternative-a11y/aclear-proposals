@@ -86,7 +86,7 @@ export default function ProposalForm() {
         .reduce((s, e) => s + e.price, 0);
       const base = pkg.totalPrice - waterHeaterTotal;
       const discountedTotal = Math.round(base * (1 - rate)) + waterHeaterTotal;
-      return { ...pkg, totalPrice: discountedTotal };
+      return { ...pkg, totalPrice: discountedTotal, originalPrice: pkg.totalPrice, discountRate: rate };
     });
   }
 

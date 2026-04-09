@@ -286,6 +286,19 @@ export default function ProposalView() {
                       <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full font-medium">Recommended</span>
                     )}
                   </div>
+                  {/* Multi-package discount badge */}
+                  {(pkg as any).originalPrice && (pkg as any).originalPrice > pkg.totalPrice && (
+                    <div className="flex items-center justify-between mb-2 bg-green-50 border border-green-200 rounded px-3 py-1.5 text-sm">
+                      <span className="text-green-700 font-medium">
+                        Multi-package savings applied
+                      </span>
+                      <span className="text-green-700 font-semibold">
+                        <span className="line-through text-gray-400 mr-2">{formatCurrency((pkg as any).originalPrice)}</span>
+                        {formatCurrency(pkg.totalPrice)}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="space-y-1.5">
                     {pkg.equipment.map((item: any) => {
                       const brochureUrl = getBrochureUrl(item.name);
@@ -329,9 +342,19 @@ export default function ProposalView() {
             <CardContent className="p-4 space-y-2">
               <h2 className="font-semibold">Selected: {selectedPkg.label} Package</h2>
               <div className="text-sm space-y-1">
-                <div className="flex justify-between"><span>Package Total:</span><span>{formatCurrency(selectedPkg.totalPrice)}</span></div>
+                {/* Show multi-package original if applicable */}
+                {(selectedPkg as any).originalPrice && (selectedPkg as any).originalPrice > selectedPkg.totalPrice && (
+                  <div className="flex justify-between text-green-600 text-xs">
+                    <span>Multi-package discount ({Math.round(((selectedPkg as any).discountRate || 0) * 100)}% off equipment)</span>
+                    <span>-{formatCurrency((selectedPkg as any).originalPrice - selectedPkg.totalPrice)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between"><span>Package Total:</span><span className="font-semibold">{formatCurrency(selectedPkg.totalPrice)}</span></div>
                 {discountAmount > 0 && (
-                  <div className="flex justify-between text-green-600"><span>Discount ({discountPercent}%):</span><span>-{formatCurrency(discountAmount)}</span></div>
+                  <div className="flex justify-between text-green-600">
+                    <span>{proposal.discountType === 'veteran' ? 'Veteran Discount (5%)' : proposal.discountType === 'fire_ems' ? 'Fire/EMS Discount (3%)' : `Discount (${discountPercent}%)`}:</span>
+                    <span>-{formatCurrency(discountAmount)}</span>
+                  </div>
                 )}
                 {(proposal.deposit || 0) > 0 && (
                   <div className="flex justify-between"><span>Deposit:</span><span>-{formatCurrency(proposal.deposit || 0)}</span></div>
