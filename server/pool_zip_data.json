@@ -1,0 +1,2078 @@
+{
+  "08037": {
+    "price": "900.00",
+    "town": "Hammonton",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08201": {
+    "price": "1050.00",
+    "town": "Absecon",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08203": {
+    "price": "1050.00",
+    "town": "Brigantine",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08205": {
+    "price": "1050.00",
+    "town": "Galloway",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08213": {
+    "price": "1050.00",
+    "town": "Cologne",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08215": {
+    "price": "1050.00",
+    "town": "Egg Harbor City",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08217": {
+    "price": "1050.00",
+    "town": "Elwood",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08221": {
+    "price": "1050.00",
+    "town": "Linwood",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08225": {
+    "price": "1050.00",
+    "town": "Northfield",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08231": {
+    "price": "1050.00",
+    "town": "Oceanville",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08232": {
+    "price": "1050.00",
+    "town": "Pleasantville",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08234": {
+    "price": "1050.00",
+    "town": "Egg Harbor Township",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08240": {
+    "price": "1050.00",
+    "town": "Pomona",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08241": {
+    "price": "1050.00",
+    "town": "Port Republic",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08244": {
+    "price": "1050.00",
+    "town": "Somers Point",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08401": {
+    "price": "1050.00",
+    "town": "Atlantic City",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08402": {
+    "price": "1050.00",
+    "town": "Margate City",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08403": {
+    "price": "1050.00",
+    "town": "Longport",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08404": {
+    "price": "1050.00",
+    "town": "Atlantic City",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08405": {
+    "price": "1050.00",
+    "town": "Atlantic City",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08406": {
+    "price": "1050.00",
+    "town": "Ventnor City",
+    "county": "Atlantic",
+    "state": "NJ"
+  },
+  "08010": {
+    "price": "600.00",
+    "town": "Beverly",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08011": {
+    "price": "600.00",
+    "town": "Birmingham",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08015": {
+    "price": "600.00",
+    "town": "Browns Mills",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08016": {
+    "price": "600.00",
+    "town": "Burlington",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08019": {
+    "price": "600.00",
+    "town": "Chatsworth",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08022": {
+    "price": "600.00",
+    "town": "Columbus",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08036": {
+    "price": "600.00",
+    "town": "Hainesport",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08041": {
+    "price": "600.00",
+    "town": "Jobstown",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08042": {
+    "price": "600.00",
+    "town": "Juliustown",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08046": {
+    "price": "600.00",
+    "town": "Willingboro",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08048": {
+    "price": "600.00",
+    "town": "Lumberton",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08052": {
+    "price": "600.00",
+    "town": "Maple Shade",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08053": {
+    "price": "600.00",
+    "town": "Marlton",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08054": {
+    "price": "600.00",
+    "town": "Mount Laurel",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08055": {
+    "price": "600.00",
+    "town": "Medford",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08057": {
+    "price": "600.00",
+    "town": "Moorestown",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08060": {
+    "price": "600.00",
+    "town": "Mount Holly",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08061": {
+    "price": "600.00",
+    "town": "Mount Royal",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08064": {
+    "price": "600.00",
+    "town": "New Lisbon",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08065": {
+    "price": "600.00",
+    "town": "Palmyra",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08068": {
+    "price": "600.00",
+    "town": "Pemberton",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08073": {
+    "price": "600.00",
+    "town": "Rancocas",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08075": {
+    "price": "600.00",
+    "town": "Riverside",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08076": {
+    "price": "600.00",
+    "town": "Riverton",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08077": {
+    "price": "600.00",
+    "town": "Riverton",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08088": {
+    "price": "600.00",
+    "town": "Tabernacle",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08224": {
+    "price": "600.00",
+    "town": "New Gretna",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08505": {
+    "price": "600.00",
+    "town": "Bordentown",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08511": {
+    "price": "600.00",
+    "town": "Cookstown",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08515": {
+    "price": "600.00",
+    "town": "Chesterfield",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08518": {
+    "price": "600.00",
+    "town": "Florence",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08554": {
+    "price": "600.00",
+    "town": "Roebling",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08562": {
+    "price": "600.00",
+    "town": "Wrightstown",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08640": {
+    "price": "600.00",
+    "town": "Fort Dix",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08641": {
+    "price": "600.00",
+    "town": "Trenton",
+    "county": "Burlington",
+    "state": "NJ"
+  },
+  "08002": {
+    "price": "600.00",
+    "town": "Cherry Hill",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08003": {
+    "price": "600.00",
+    "town": "Cherry Hill",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08004": {
+    "price": "600.00",
+    "town": "Atco",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08007": {
+    "price": "600.00",
+    "town": "Barrington",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08009": {
+    "price": "600.00",
+    "town": "Berlin",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08012": {
+    "price": "600.00",
+    "town": "Blackwood",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08018": {
+    "price": "600.00",
+    "town": "Cedar Brook",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08021": {
+    "price": "600.00",
+    "town": "Clementon",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08026": {
+    "price": "600.00",
+    "town": "Gibbsboro",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08029": {
+    "price": "600.00",
+    "town": "Glendora",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08030": {
+    "price": "600.00",
+    "town": "Gloucester City",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08031": {
+    "price": "600.00",
+    "town": "Bellmawr",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08033": {
+    "price": "600.00",
+    "town": "Haddonfield",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08034": {
+    "price": "600.00",
+    "town": "Cherry Hill",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08035": {
+    "price": "600.00",
+    "town": "Haddon Heights",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08043": {
+    "price": "600.00",
+    "town": "Voorhees",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08045": {
+    "price": "600.00",
+    "town": "Lawnside",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08049": {
+    "price": "600.00",
+    "town": "Magnolia",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08059": {
+    "price": "600.00",
+    "town": "Mount Ephraim",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08078": {
+    "price": "600.00",
+    "town": "Runnemede",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08081": {
+    "price": "600.00",
+    "town": "Sicklerville",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08083": {
+    "price": "600.00",
+    "town": "Somerdale",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08084": {
+    "price": "600.00",
+    "town": "Stratford",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08089": {
+    "price": "600.00",
+    "town": "Waterford Work",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08091": {
+    "price": "600.00",
+    "town": "West Berlin",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08095": {
+    "price": "600.00",
+    "town": "Winslow",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08101": {
+    "price": "600.00",
+    "town": "Camden",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08102": {
+    "price": "600.00",
+    "town": "Camden",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08103": {
+    "price": "600.00",
+    "town": "Camden",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08104": {
+    "price": "600.00",
+    "town": "Haddon Township",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08105": {
+    "price": "600.00",
+    "town": "Camden",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08106": {
+    "price": "600.00",
+    "town": "Audubon",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08107": {
+    "price": "600.00",
+    "town": "Oaklyn",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08108": {
+    "price": "600.00",
+    "town": "Haddon Township",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08109": {
+    "price": "600.00",
+    "town": "Merchantville",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08110": {
+    "price": "600.00",
+    "town": "Pennsauken",
+    "county": "Camden",
+    "state": "NJ"
+  },
+  "08202": {
+    "price": "1200.00",
+    "town": "Avalon",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08204": {
+    "price": "1200.00",
+    "town": "Cape May",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08210": {
+    "price": "1200.00",
+    "town": "Cape May Court House",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08214": {
+    "price": "1200.00",
+    "town": "Dennisville",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08218": {
+    "price": "1200.00",
+    "town": "Goshen",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08219": {
+    "price": "1200.00",
+    "town": "Green Creek",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08223": {
+    "price": "1200.00",
+    "town": "Marmora",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08226": {
+    "price": "1200.00",
+    "town": "Ocean City",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08230": {
+    "price": "1200.00",
+    "town": "Ocean View",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08242": {
+    "price": "1200.00",
+    "town": "Rio Grande",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08243": {
+    "price": "1200.00",
+    "town": "Sea Isle City",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08245": {
+    "price": "1200.00",
+    "town": "South Dennis",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08246": {
+    "price": "1200.00",
+    "town": "South Seaville",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08247": {
+    "price": "1200.00",
+    "town": "Stone Harbor",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08248": {
+    "price": "1200.00",
+    "town": "Strathmere",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08250": {
+    "price": "1200.00",
+    "town": "Tuckahoe",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08251": {
+    "price": "1200.00",
+    "town": "Villas",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08252": {
+    "price": "1200.00",
+    "town": "Whitesboro",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08260": {
+    "price": "1200.00",
+    "town": "Wildwood",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08270": {
+    "price": "1200.00",
+    "town": "Woodbine",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08212": {
+    "price": "1200.00",
+    "town": "Cape May Point",
+    "county": "Cape May",
+    "state": "NJ"
+  },
+  "08014": {
+    "price": "725.00",
+    "town": "Bridgeport",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08020": {
+    "price": "725.00",
+    "town": "Clarksboro",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08025": {
+    "price": "725.00",
+    "town": "Ewan",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08027": {
+    "price": "725.00",
+    "town": "Gibbstown",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08028": {
+    "price": "725.00",
+    "town": "Glassboro",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08032": {
+    "price": "725.00",
+    "town": "Grenloch",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08039": {
+    "price": "825.00",
+    "town": "Harrisonville",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08051": {
+    "price": "775.00",
+    "town": "Mantua",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08056": {
+    "price": "775.00",
+    "town": "Mickleton",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08062": {
+    "price": "825.00",
+    "town": "Mullica Hill",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08063": {
+    "price": "725.00",
+    "town": "National Park",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08066": {
+    "price": "725.00",
+    "town": "Paulsboro",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08071": {
+    "price": "775.00",
+    "town": "Pitman",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08074": {
+    "price": "775.00",
+    "town": "Richwood",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08080": {
+    "price": "775.00",
+    "town": "Sewell",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08085": {
+    "price": "725.00",
+    "town": "Swedesboro",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08086": {
+    "price": "725.00",
+    "town": "Thorofare",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08090": {
+    "price": "775.00",
+    "town": "Wenonah",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08093": {
+    "price": "675.00",
+    "town": "Westville",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08094": {
+    "price": "825.00",
+    "town": "Williamstown",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08096": {
+    "price": "675.00",
+    "town": "Woodbury",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08097": {
+    "price": "675.00",
+    "town": "Woodbury Heights",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08312": {
+    "price": "825.00",
+    "town": "Clayton",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08322": {
+    "price": "825.00",
+    "town": "Franklinville",
+    "county": "Gloucester",
+    "state": "NJ"
+  },
+  "08520": {
+    "price": "725.00",
+    "town": "Hightstown",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08525": {
+    "price": "725.00",
+    "town": "Hopewell",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08534": {
+    "price": "725.00",
+    "town": "Pennington",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08540": {
+    "price": "725.00",
+    "town": "Princeton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08541": {
+    "price": "725.00",
+    "town": "Princeton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08542": {
+    "price": "725.00",
+    "town": "Princeton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08543": {
+    "price": "725.00",
+    "town": "Princeton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08544": {
+    "price": "725.00",
+    "town": "Princeton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08550": {
+    "price": "700.00",
+    "town": "Princeton Junction",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08560": {
+    "price": "725.00",
+    "town": "Titusville",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08561": {
+    "price": "725.00",
+    "town": "Windsor",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08601": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08602": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08603": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08604": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08605": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08606": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08607": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08608": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08609": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08610": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08611": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08618": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08619": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08620": {
+    "price": "700.00",
+    "town": "Hamilton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08625": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08628": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08629": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08638": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08645": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08646": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08647": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08648": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08650": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08666": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08677": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08690": {
+    "price": "700.00",
+    "town": "Hamilton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08691": {
+    "price": "700.00",
+    "town": "Hamilton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "08695": {
+    "price": "700.00",
+    "town": "Trenton",
+    "county": "Mercer",
+    "state": "NJ"
+  },
+  "07001": {
+    "price": "675.00",
+    "town": "Avenel",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "07008": {
+    "price": "675.00",
+    "town": "Carteret",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "07064": {
+    "price": "675.00",
+    "town": "Port Reading",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "07067": {
+    "price": "675.00",
+    "town": "Colonia",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "07077": {
+    "price": "675.00",
+    "town": "Sewaren",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "07080": {
+    "price": "675.00",
+    "town": "South Plainfield",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08512": {
+    "price": "675.00",
+    "town": "Cranbury",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08536": {
+    "price": "675.00",
+    "town": "Plainsboro",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08810": {
+    "price": "675.00",
+    "town": "Dayton",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08812": {
+    "price": "675.00",
+    "town": "Dunellen",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08816": {
+    "price": "675.00",
+    "town": "East Brunswick",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08817": {
+    "price": "675.00",
+    "town": "Edison",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08818": {
+    "price": "675.00",
+    "town": "Edison",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08820": {
+    "price": "675.00",
+    "town": "Edison",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08824": {
+    "price": "675.00",
+    "town": "Kendall Park",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08828": {
+    "price": "675.00",
+    "town": "Helmetta",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08830": {
+    "price": "675.00",
+    "town": "Iselin",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08831": {
+    "price": "675.00",
+    "town": "Monroe Township",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08832": {
+    "price": "675.00",
+    "town": "Keasbey",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08837": {
+    "price": "675.00",
+    "town": "Edison",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08840": {
+    "price": "675.00",
+    "town": "Metuchen",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08846": {
+    "price": "675.00",
+    "town": "Middlesex",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08850": {
+    "price": "675.00",
+    "town": "Milltown",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08852": {
+    "price": "675.00",
+    "town": "Monmouth Junction",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08854": {
+    "price": "675.00",
+    "town": "Piscataway",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08855": {
+    "price": "675.00",
+    "town": "Piscataway",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08857": {
+    "price": "675.00",
+    "town": "Old Bridge",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08859": {
+    "price": "675.00",
+    "town": "Parlin",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08861": {
+    "price": "675.00",
+    "town": "Perth Amboy",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08862": {
+    "price": "675.00",
+    "town": "Perth Amboy",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08863": {
+    "price": "675.00",
+    "town": "Fords",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08871": {
+    "price": "675.00",
+    "town": "Sayreville",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08872": {
+    "price": "675.00",
+    "town": "Sayreville",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08879": {
+    "price": "675.00",
+    "town": "South Amboy",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08882": {
+    "price": "675.00",
+    "town": "South River",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08884": {
+    "price": "675.00",
+    "town": "Spotswood",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08899": {
+    "price": "675.00",
+    "town": "Edison",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08901": {
+    "price": "675.00",
+    "town": "New Brunswick",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08902": {
+    "price": "675.00",
+    "town": "North Brunswick",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08903": {
+    "price": "675.00",
+    "town": "New Brunswick",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08904": {
+    "price": "675.00",
+    "town": "Highland Park",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08905": {
+    "price": "675.00",
+    "town": "New Brunswick",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08906": {
+    "price": "675.00",
+    "town": "New Brunswick",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08922": {
+    "price": "675.00",
+    "town": "New Brunswick",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08933": {
+    "price": "675.00",
+    "town": "New Brunswick",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08988": {
+    "price": "675.00",
+    "town": "New Brunswick",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "08989": {
+    "price": "675.00",
+    "town": "New Brunswick",
+    "county": "Middlesex",
+    "state": "NJ"
+  },
+  "07701": {
+    "price": "1050.00",
+    "town": "Red Bank",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07702": {
+    "price": "1050.00",
+    "town": "Shrewsbury",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07703": {
+    "price": "700.00",
+    "town": "Fort Monmouth",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07704": {
+    "price": "700.00",
+    "town": "Fair Haven",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07709": {
+    "price": "1050.00",
+    "town": "Red Bank",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07710": {
+    "price": "700.00",
+    "town": "Adelphia",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07711": {
+    "price": "1050.00",
+    "town": "Allenhurst",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07712": {
+    "price": "1050.00",
+    "town": "Asbury Park",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07715": {
+    "price": "1050.00",
+    "town": "Belmar",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07716": {
+    "price": "1050.00",
+    "town": "Atlantic Highlands",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07717": {
+    "price": "1050.00",
+    "town": "Avon By The Sea",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07718": {
+    "price": "1050.00",
+    "town": "Belford",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07719": {
+    "price": "1050.00",
+    "town": "Belmar",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07720": {
+    "price": "1050.00",
+    "town": "Bradley Beach",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07721": {
+    "price": "700.00",
+    "town": "Cliffwood",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07722": {
+    "price": "700.00",
+    "town": "Colts Neck",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07723": {
+    "price": "1050.00",
+    "town": "Deal",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07724": {
+    "price": "700.00",
+    "town": "Eatontown",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07726": {
+    "price": "750.00",
+    "town": "Englishtown",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07727": {
+    "price": "700.00",
+    "town": "Farmingdale",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07728": {
+    "price": "700.00",
+    "town": "Freehold",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07730": {
+    "price": "700.00",
+    "town": "Hazlet",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07731": {
+    "price": "700.00",
+    "town": "Howell",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07732": {
+    "price": "1050.00",
+    "town": "Highlands",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07733": {
+    "price": "700.00",
+    "town": "Holmdel",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07734": {
+    "price": "1050.00",
+    "town": "Keansburg",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07735": {
+    "price": "1050.00",
+    "town": "Keyport",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07737": {
+    "price": "1050.00",
+    "town": "Leonardo",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07738": {
+    "price": "1050.00",
+    "town": "Lincroft",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07739": {
+    "price": "1050.00",
+    "town": "Little Silver",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07740": {
+    "price": "1050.00",
+    "town": "Long Branch",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07746": {
+    "price": "800.00",
+    "town": "Marlboro",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07747": {
+    "price": "1050.00",
+    "town": "Matawan",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07748": {
+    "price": "1050.00",
+    "town": "Middletown",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07750": {
+    "price": "1050.00",
+    "town": "Monmouth Beach",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07751": {
+    "price": "800.00",
+    "town": "Morganville",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07752": {
+    "price": "1050.00",
+    "town": "Navesink",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07753": {
+    "price": "1050.00",
+    "town": "Neptune",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07754": {
+    "price": "1050.00",
+    "town": "Neptune",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07755": {
+    "price": "1050.00",
+    "town": "Oakhurst",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07756": {
+    "price": "1050.00",
+    "town": "Ocean Grove",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07757": {
+    "price": "1050.00",
+    "town": "Oceanport",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07758": {
+    "price": "1050.00",
+    "town": "Port Monmouth",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07760": {
+    "price": "1050.00",
+    "town": "Rumson",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07762": {
+    "price": "1050.00",
+    "town": "Spring Lake",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07763": {
+    "price": "800.00",
+    "town": "Tennent",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07764": {
+    "price": "1050.00",
+    "town": "West Long Branch",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07765": {
+    "price": "700.00",
+    "town": "Wickatunk",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07777": {
+    "price": "700.00",
+    "town": "Holmdel",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "07799": {
+    "price": "700.00",
+    "town": "Eatontown",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "08501": {
+    "price": "700.00",
+    "town": "Allentown",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "08510": {
+    "price": "700.00",
+    "town": "Millstone Township",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "08514": {
+    "price": "700.00",
+    "town": "Cream Ridge",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "08526": {
+    "price": "700.00",
+    "town": "Imlaystown",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "08535": {
+    "price": "700.00",
+    "town": "Perrineville",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "08555": {
+    "price": "700.00",
+    "town": "Roosevelt",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "08720": {
+    "price": "1050.00",
+    "town": "Allenwood",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "08730": {
+    "price": "1050.00",
+    "town": "Brielle",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "08736": {
+    "price": "1050.00",
+    "town": "Manasquan",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "08750": {
+    "price": "1050.00",
+    "town": "Sea Girt",
+    "county": "Monmouth",
+    "state": "NJ"
+  },
+  "08005": {
+    "price": "1050.00",
+    "town": "Barnegat",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08006": {
+    "price": "1050.00",
+    "town": "Barnegat Light",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08008": {
+    "price": "1050.00",
+    "town": "Beach Haven",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08050": {
+    "price": "1050.00",
+    "town": "Manahawkin",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08087": {
+    "price": "1050.00",
+    "town": "Tuckerton",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08092": {
+    "price": "1050.00",
+    "town": "West Creek",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08527": {
+    "price": "750.00",
+    "town": "Jackson",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08533": {
+    "price": "750.00",
+    "town": "New Egypt",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08701": {
+    "price": "1050.00",
+    "town": "Lakewood",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08721": {
+    "price": "1050.00",
+    "town": "Bayville",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08722": {
+    "price": "1050.00",
+    "town": "Beachwood",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08723": {
+    "price": "1050.00",
+    "town": "Brick",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08724": {
+    "price": "1050.00",
+    "town": "Brick",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08731": {
+    "price": "1050.00",
+    "town": "Forked River",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08732": {
+    "price": "1050.00",
+    "town": "Island Heights",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08733": {
+    "price": "750.00",
+    "town": "Lakehurst",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08734": {
+    "price": "1050.00",
+    "town": "Lanoka Harbor",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08735": {
+    "price": "1050.00",
+    "town": "Lavallette",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08738": {
+    "price": "1050.00",
+    "town": "Mantoloking",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08739": {
+    "price": "1050.00",
+    "town": "Normandy Beach",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08740": {
+    "price": "1050.00",
+    "town": "Ocean Gate",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08741": {
+    "price": "1050.00",
+    "town": "Pine Beach",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08742": {
+    "price": "1050.00",
+    "town": "Point Pleasant Beach",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08751": {
+    "price": "1050.00",
+    "town": "Seaside Heights",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08752": {
+    "price": "1050.00",
+    "town": "Seaside Park",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08753": {
+    "price": "750.00",
+    "town": "Toms River",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08754": {
+    "price": "750.00",
+    "town": "Toms River",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08755": {
+    "price": "750.00",
+    "town": "Toms River",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08756": {
+    "price": "750.00",
+    "town": "Toms River",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08757": {
+    "price": "750.00",
+    "town": "Toms River",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08758": {
+    "price": "1050.00",
+    "town": "Waretown",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08759": {
+    "price": "1050.00",
+    "town": "Manchester Township",
+    "county": "Ocean",
+    "state": "NJ"
+  },
+  "08001": {
+    "price": "800.00",
+    "town": "Alloway",
+    "county": "Salem",
+    "state": "NJ"
+  },
+  "08023": {
+    "price": "700.00",
+    "town": "Deepwater",
+    "county": "Salem",
+    "state": "NJ"
+  },
+  "08038": {
+    "price": "700.00",
+    "town": "Hancocks Bridge",
+    "county": "Salem",
+    "state": "NJ"
+  },
+  "08067": {
+    "price": "700.00",
+    "town": "Pedricktown",
+    "county": "Salem",
+    "state": "NJ"
+  },
+  "08069": {
+    "price": "700.00",
+    "town": "Penns Grove",
+    "county": "Salem",
+    "state": "NJ"
+  },
+  "08070": {
+    "price": "725.00",
+    "town": "Pennsville",
+    "county": "Salem",
+    "state": "NJ"
+  },
+  "08072": {
+    "price": "750.00",
+    "town": "Quinton",
+    "county": "Salem",
+    "state": "NJ"
+  },
+  "08079": {
+    "price": "750.00",
+    "town": "Salem",
+    "county": "Salem",
+    "state": "NJ"
+  },
+  "08098": {
+    "price": "725.00",
+    "town": "Woodstown",
+    "county": "Salem",
+    "state": "NJ"
+  },
+  "08318": {
+    "price": "800.00",
+    "town": "Elmer",
+    "county": "Salem",
+    "state": "NJ"
+  },
+  "08343": {
+    "price": "775.00",
+    "town": "Monroeville",
+    "county": "Salem",
+    "state": "NJ"
+  },
+  "08347": {
+    "price": "800.00",
+    "town": "Norma",
+    "county": "Salem",
+    "state": "NJ"
+  },
+  "08502": {
+    "price": "750.00",
+    "town": "Belle Mead",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08504": {
+    "price": "750.00",
+    "town": "Blawenburg",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08528": {
+    "price": "750.00",
+    "town": "Kingston",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08553": {
+    "price": "750.00",
+    "town": "Rocky Hill",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08558": {
+    "price": "750.00",
+    "town": "Skillman",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08805": {
+    "price": "750.00",
+    "town": "Bound Brook",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08821": {
+    "price": "750.00",
+    "town": "Flagtown",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08823": {
+    "price": "750.00",
+    "town": "Franklin Park",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08835": {
+    "price": "750.00",
+    "town": "Manville",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08836": {
+    "price": "750.00",
+    "town": "Martinsville",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08844": {
+    "price": "750.00",
+    "town": "Hillsborough",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08853": {
+    "price": "750.00",
+    "town": "Neshanic Station",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08869": {
+    "price": "750.00",
+    "town": "Raritan",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08873": {
+    "price": "750.00",
+    "town": "Somerset",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08875": {
+    "price": "750.00",
+    "town": "Somerset",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08876": {
+    "price": "750.00",
+    "town": "Somerset",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08880": {
+    "price": "750.00",
+    "town": "South Bound Brook",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08890": {
+    "price": "750.00",
+    "town": "Zarephath",
+    "county": "Somerset",
+    "state": "NJ"
+  },
+  "08896": {
+    "price": "750.00",
+    "town": "Raritan",
+    "county": "Somerset",
+    "state": "NJ"
+  }
+}
