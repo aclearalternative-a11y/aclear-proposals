@@ -23,8 +23,12 @@ async function sendProposalEmail(opts: {
 
   if (gmailUser && gmailPass) {
     // Production path: Gmail SMTP with app password
+    // Force IPv4 — Render free tier blocks outbound IPv6 to Gmail SMTP
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      family: 4,
       auth: { user: gmailUser, pass: gmailPass },
     });
     await transporter.sendMail({

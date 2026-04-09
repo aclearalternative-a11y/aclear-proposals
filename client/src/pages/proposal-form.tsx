@@ -406,6 +406,49 @@ export default function ProposalForm() {
         {/* STEP 3: Packages */}
         {step === "packages" && packages.length > 0 && (
           <div className="space-y-6">
+
+            {/* Water Analysis Summary */}
+            <Card className="border-[#1d8fc4] border">
+              <CardHeader className="pb-2 pt-4 px-4">
+                <CardTitle className="text-sm font-semibold uppercase tracking-wide text-[#1d8fc4] flex items-center gap-2">
+                  <Droplets className="h-4 w-4" />
+                  Water Analysis Results — {waterSource === "well" ? "Well Water" : "City Water"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-4 pb-4">
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  <div className={`p-2 rounded text-center ${parseFloat(pH) < 6.5 ? "bg-orange-50 border border-orange-200" : "bg-gray-50"}`}>
+                    <div className="text-xs text-muted-foreground">pH</div>
+                    <div className={`font-semibold ${parseFloat(pH) < 6.5 ? "text-orange-600" : ""}`}>{pH}</div>
+                  </div>
+                  <div className={`p-2 rounded text-center ${parseFloat(iron) > 0.3 ? "bg-orange-50 border border-orange-200" : "bg-gray-50"}`}>
+                    <div className="text-xs text-muted-foreground">Iron</div>
+                    <div className={`font-semibold ${parseFloat(iron) > 0.3 ? "text-orange-600" : ""}`}>{iron} ppm</div>
+                  </div>
+                  <div className={`p-2 rounded text-center ${parseFloat(hardness) > 7 ? "bg-orange-50 border border-orange-200" : "bg-gray-50"}`}>
+                    <div className="text-xs text-muted-foreground">Hardness</div>
+                    <div className={`font-semibold ${parseFloat(hardness) > 7 ? "text-orange-600" : ""}`}>{hardness} gpg</div>
+                  </div>
+                  <div className="p-2 rounded text-center bg-gray-50">
+                    <div className="text-xs text-muted-foreground">TDS</div>
+                    <div className="font-semibold">{tds}</div>
+                  </div>
+                  {waterSource === "well" && copper && (
+                    <div className="p-2 rounded text-center bg-gray-50">
+                      <div className="text-xs text-muted-foreground">Copper</div>
+                      <div className="font-semibold">{copper} ppm</div>
+                    </div>
+                  )}
+                  {waterSource === "city" && chlorine && (
+                    <div className={`p-2 rounded text-center ${parseFloat(chlorine) > 0 ? "bg-orange-50 border border-orange-200" : "bg-gray-50"}`}>
+                      <div className="text-xs text-muted-foreground">Chlorine</div>
+                      <div className={`font-semibold ${parseFloat(chlorine) > 0 ? "text-orange-600" : ""}`}>{chlorine} ppm</div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">
                 Treatment Packages — {waterSource === "well" ? "Well Water" : "City Water"}
