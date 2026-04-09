@@ -29,6 +29,24 @@ export default function ProposalForm() {
   const [city, setCity] = useState("");
   const [state, setState] = useState("NJ");
   const [zip, setZip] = useState("");
+
+  // Auto-populate city from zip code
+  const handleZipChange = async (val: string) => {
+    setZip(val);
+    if (val.length === 5 && /^\d{5}$/.test(val)) {
+      try {
+        const res = await fetch(`https://api.zippopotam.us/us/${val}`);
+        if (res.ok) {
+          const data = await res.json();
+          const place = data.places?.[0];
+          if (place) {
+            setCity(place["place name"]);
+            setState(place["state abbreviation"]);
+          }
+        }
+      } catch {}
+    }
+  };
   const [customerEmail, setCustomerEmail] = useState("");
   const [repName, setRepName] = useState("");
   const [numPeople, setNumPeople] = useState<number | "">("");
@@ -55,7 +73,7 @@ export default function ProposalForm() {
 
   const handleGeneratePackages = useCallback(() => {
     const waterTest: WaterTestResults = {
-      pH: parseFloat(pH) || 7,
+      pH: parseFloat(pH) || 0,
       iron: parseFloat(iron) || 0,
       hardness: parseFloat(hardness) || 0,
       tds: parseFloat(tds) || 0,
@@ -142,7 +160,7 @@ export default function ProposalForm() {
     setSending(true);
     try {
       const waterTest: WaterTestResults = {
-        pH: parseFloat(pH) || 7,
+        pH: parseFloat(pH) || 0,
         iron: parseFloat(iron) || 0,
         hardness: parseFloat(hardness) || 0,
         tds: parseFloat(tds) || 0,
@@ -277,7 +295,7 @@ export default function ProposalForm() {
                 </div>
                 <div>
                   <Label>Zip *</Label>
-                  <Input data-testid="input-zip" value={zip} onChange={e => setZip(e.target.value)} placeholder="08002" />
+                  <Input data-testid="input-zip" value={zip} onChange={e => handleZipChange(e.target.value)} placeholder="08002" maxLength={5} />
                 </div>
               </div>
               <div>
@@ -344,7 +362,7 @@ export default function ProposalForm() {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                   <Label>pH</Label>
-                  <Input data-testid="input-ph" type="number" step="0.1" value={pH} onChange={e => setPH(e.target.value)} placeholder="7.0" />
+                  <Input data-testid="input-ph" type="number" step="0.1" value={pH} onChange={e => setPH(e.target.value)} placeholder="e.g. 6.5" />
                 </div>
                 <div>
                   <Label>Iron (ppm)</Label>
