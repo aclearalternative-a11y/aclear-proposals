@@ -166,10 +166,7 @@ export default function ProposalForm() {
   };
 
   const handleSendProposal = async () => {
-    if (!selectedTier) {
-      toast({ title: "Please select a package", variant: "destructive" });
-      return;
-    }
+    // No longer require a pre-selected tier — customer can choose if multiple packages sent
     if (!customerEmail) {
       toast({ title: "Please enter customer email", variant: "destructive" });
       return;

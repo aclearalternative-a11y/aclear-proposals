@@ -748,6 +748,17 @@ A Clear Alternative
     }
   });
 
+  // Customer selects a package (when rep sent multiple and customer chooses)
+  app.patch("/api/proposals/:id/select-package", async (req: Request, res: Response) => {
+    try {
+      const { selectedPackage } = req.body;
+      const updated = await storage.updateProposal(parseInt(req.params.id), { selectedPackage });
+      res.json(updated);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // Sign proposal
   app.patch("/api/proposals/:id/sign", async (req: Request, res: Response) => {
     try {

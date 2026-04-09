@@ -117,7 +117,9 @@ export default function ProposalView() {
 
   const packages: PackageData[] = JSON.parse(proposal.packages);
   const waterTest: WaterTestResults = JSON.parse(proposal.waterTestResults);
-  const selectedPkg = packages.find(p => p.tier === proposal.selectedPackage);
+  const [localSelectedTier, setLocalSelectedTier] = useState<string | null>(null);
+  const effectiveTier = proposal.selectedPackage || localSelectedTier;
+  const selectedPkg = packages.find(p => p.tier === effectiveTier);
   const { discountedTotal, discountAmount, discountPercent } = selectedPkg
     ? applyDiscount(selectedPkg.totalPrice, proposal.discountType || "none")
     : { discountedTotal: 0, discountAmount: 0, discountPercent: 0 };
@@ -125,6 +127,14 @@ export default function ProposalView() {
   const repPhone = getRepPhone(proposal.repName);
   const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
   const hasSecond = proposal.customerFirstName2 && proposal.customerLastName2;
+  const customerMustChoose = !proposal.selectedPackage && packages.length > 1;
+
+  // Mutation to save customer's package selection
+  const selectPackageMutation = useMutation({
+    mutationFn: (tier: string) =>
+      apiRequest(`/api/proposals/${proposal.id}/select-package`, { method: "PATCH", body: { selectedPackage: tier } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/proposals/share", shareId] }),
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -238,11 +248,37 @@ export default function ProposalView() {
         {/* Packages */}
         <div className="space-y-4">
           <h2 className="font-semibold text-sm text-muted-foreground">RECOMMENDED TREATMENT PACKAGES</h2>
+          {/* Customer choice prompt when rep sent multiple packages */}
+          {customerMustChoose && !localSelectedTier && (
+            <div className="bg-[#1d8fc4] text-white rounded-lg p-4 text-center">
+              <p className="font-semibold text-lg mb-1">Please review the packages below and select the one that works best for you.</p>
+              <p className="text-sm opacity-90">Once you choose a package you can sign your proposal digitally.</p>
+            </div>
+          )}
+
           {packages.map(pkg => {
-            const isSelected = pkg.tier === proposal.selectedPackage;
+            const isSelected = pkg.tier === effectiveTier;
             return (
               <Card key={pkg.tier} className={isSelected ? "ring-2 ring-primary border-primary/30" : "opacity-75"} data-testid={`proposal-package-${pkg.tier}`}>
                 <CardContent className="p-4">
+                  {/* Customer package selection button */}
+                  {customerMustChoose && !isSelected && (
+                    <button
+                      onClick={() => {
+                        setLocalSelectedTier(pkg.tier);
+                        selectPackageMutation.mutate(pkg.tier);
+                      }}
+                      className="w-full mb-3 bg-[#1d8fc4] hover:bg-[#1778a8] text-white font-semibold py-2 rounded-md transition-colors text-sm"
+                    >
+                      ✓ Choose This Package
+                    </button>
+                  )}
+                  {customerMustChoose && isSelected && (
+                    <div className="w-full mb-3 bg-green-50 border border-green-300 text-green-800 font-semibold py-2 rounded-md text-center text-sm">
+                      ✓ You selected this package
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-semibold">{pkg.label} Package — {proposal.waterSource === "well" ? "Well Water" : "City Water"}</h3>
                     {isSelected && (
