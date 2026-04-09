@@ -10,30 +10,23 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle2, Droplets, Phone, Mail, MapPin, Download, FileText } from "lucide-react";
 
-const BROCHURE_MAP: Record<string, string> = {
-  "Twin Alternating": "https://acrobat.adobe.com/id/urn:aaid:sc:US:79762e60-034c-4e7d-a225-6a2837b781ab",
-  "Water Conditioner": "https://acrobat.adobe.com/id/urn:aaid:sc:US:b85f25e9-cbdf-421a-8f9e-2dffa9936a91",
-  "Acid Neutralizer": "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd",
-  "Iron Odor Breaker": "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5",
-  "Carbon Filtration": "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd",
-  "Leak Shut Off": "https://acrobat.adobe.com/id/urn:aaid:sc:US:02daeba4-c657-41de-9318-29ba0899d91d",
-  "Rusco": "https://ruscowater.com/products/spin-down-filters/",
-  "ELECTRIC": "https://docs.bradfordwhite.com/Spec_Sheets/1201_Current.pdf",
-  "POWER VENT": "https://docs.bradfordwhite.com/Spec_Sheets/1117_Current.pdf",
-  "GAS Bradford White": "https://docs.bradfordwhite.com/Spec_Sheets/1101_Current.pdf",
-  "Tankless Water Heater": "https://www.navien.com/products/residential/condensing-gas-tankless-water-heater/npe-2",
-};
-
 function getBrochureUrl(name: string): string {
-  // Water heater matching — order matters (most specific first)
-  if (name.includes("POWER VENT")) return BROCHURE_MAP["POWER VENT"];
-  if (name.includes("ELECTRIC")) return BROCHURE_MAP["ELECTRIC"];
-  if (name.includes("Tankless Water Heater")) return BROCHURE_MAP["Tankless Water Heater"];
-  if (name.includes("Bradford White")) return BROCHURE_MAP["GAS Bradford White"];
-  // General matching
-  for (const [key, url] of Object.entries(BROCHURE_MAP)) {
-    if (name.includes(key)) return url;
-  }
+  // Water heaters — most specific first
+  if (name.includes("POWER VENT")) return "https://docs.bradfordwhite.com/Spec_Sheets/1117_Current.pdf";
+  if (name.includes("ELECTRIC")) return "https://docs.bradfordwhite.com/Spec_Sheets/1201_Current.pdf";
+  if (name.includes("Tankless Water Heater")) return "https://www.navien.com/products/residential/condensing-gas-tankless-water-heater/npe-2";
+  if (name.includes("Bradford White")) return "https://docs.bradfordwhite.com/Spec_Sheets/1101_Current.pdf";
+  // Water treatment — check Twin Alternating before generic ACA pattern
+  if (name.includes("Twin Alternating")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:79762e60-034c-4e7d-a225-6a2837b781ab";
+  if (name.includes("Acid Neutralizer")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd";
+  if (name.includes("Iron Odor Breaker")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5";
+  if (name.includes("Carbon Filtration")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd";
+  // Single water conditioners: "ACA .75 24,000", "ACA 1.0 32,000", "ACA 1.5 48,000", etc.
+  // These names start with "ACA" and contain a grain-size pattern like "24,000"
+  if (name.startsWith("ACA") && /\d+,\d{3}/.test(name)) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:b85f25e9-cbdf-421a-8f9e-2dffa9936a91";
+  // Accessories
+  if (name.includes("Leak Shut Off") || name.includes("Leak Valve")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:02daeba4-c657-41de-9318-29ba0899d91d";
+  if (name.includes("Rusco")) return "https://ruscowater.com/products/spin-down-filters/";
   return "";
 }
 import { useRef, useState, useCallback } from "react";

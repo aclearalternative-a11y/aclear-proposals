@@ -93,33 +93,23 @@ const REPS: Record<string, string> = {
   "Eric Fusco": "856-649-5467",
 };
 
-// Brochure URL map keyed by equipment category keyword
-const BROCHURE_MAP: Record<string, string> = {
-  "Twin Alternating": "https://acrobat.adobe.com/id/urn:aaid:sc:US:79762e60-034c-4e7d-a225-6a2837b781ab",
-  "Water Conditioner": "https://acrobat.adobe.com/id/urn:aaid:sc:US:b85f25e9-cbdf-421a-8f9e-2dffa9936a91",
-  "Acid Neutralizer": "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd",
-  "Iron Odor Breaker": "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5",
-  "Carbon Filtration": "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd",
-  "Leak Shut Off Valve": "https://acrobat.adobe.com/id/urn:aaid:sc:US:02daeba4-c657-41de-9318-29ba0899d91d",
-  "Bradford White 40 Gallon GAS POWER": "https://docs.bradfordwhite.com/Spec_Sheets/1117_Current.pdf",
-  "Bradford White 40 Gallon ELECTRIC": "https://docs.bradfordwhite.com/Spec_Sheets/1201_Current.pdf",
-  "Bradford White 50 Gallon GAS POWER": "https://docs.bradfordwhite.com/Spec_Sheets/1117_Current.pdf",
-  "Bradford White 50 Gallon ELECTRIC": "https://docs.bradfordwhite.com/Spec_Sheets/1201_Current.pdf",
-};
-
 function getBrochureUrl(equipName: string): string {
-  if (equipName.includes("Twin Alternating")) return BROCHURE_MAP["Twin Alternating"];
-  if (equipName.includes("Water Conditioner")) return BROCHURE_MAP["Water Conditioner"];
-  if (equipName.includes("Acid Neutralizer")) return BROCHURE_MAP["Acid Neutralizer"];
-  if (equipName.includes("Iron Odor Breaker")) return BROCHURE_MAP["Iron Odor Breaker"];
-  if (equipName.includes("Carbon Filtration")) return BROCHURE_MAP["Carbon Filtration"];
-  if (equipName.includes("Leak Shut Off") || equipName.includes("Leak Valve")) return BROCHURE_MAP["Leak Shut Off Valve"];
-  if (equipName.includes("Rusco")) return "https://ruscowater.com/products/spin-down-filters/";
-  // Water heaters — most specific first
+  // Water heaters — most specific first (POWER VENT before Bradford White catch-all)
   if (equipName.includes("POWER VENT")) return "https://docs.bradfordwhite.com/Spec_Sheets/1117_Current.pdf";
   if (equipName.includes("ELECTRIC")) return "https://docs.bradfordwhite.com/Spec_Sheets/1201_Current.pdf";
   if (equipName.includes("Tankless Water Heater")) return "https://www.navien.com/products/residential/condensing-gas-tankless-water-heater/npe-2";
   if (equipName.includes("Bradford White")) return "https://docs.bradfordwhite.com/Spec_Sheets/1101_Current.pdf";
+  // Water treatment — Twin Alternating must be checked before ACA grain-size pattern
+  if (equipName.includes("Twin Alternating")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:79762e60-034c-4e7d-a225-6a2837b781ab";
+  if (equipName.includes("Acid Neutralizer")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd";
+  if (equipName.includes("Iron Odor Breaker")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5";
+  if (equipName.includes("Carbon Filtration")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd";
+  // Single water conditioners: "ACA .75 24,000", "ACA 1.0 32,000", "ACA 1.5 48,000", etc.
+  // The grain-size pattern (e.g. "24,000") uniquely identifies single conditioners
+  if (equipName.startsWith("ACA") && /\d+,\d{3}/.test(equipName)) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:b85f25e9-cbdf-421a-8f9e-2dffa9936a91";
+  // Accessories
+  if (equipName.includes("Leak Shut Off") || equipName.includes("Leak Valve")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:02daeba4-c657-41de-9318-29ba0899d91d";
+  if (equipName.includes("Rusco")) return "https://ruscowater.com/products/spin-down-filters/";
   return "";
 }
 
