@@ -7,7 +7,7 @@ import * as fs from "fs";
 import nodemailer from "nodemailer";
 import { POOL_ZIP_DATA } from "./pool_zip_data";
 
-const GHL_API_KEY = process.env.GHL_API_KEY || "pit-24e8e4ec-6172-44e0-b0d7-6a621b9b4bc7";
+const GHL_API_KEY = process.env.GHL_API_KEY || "pit-8acdc061-acf4-40a8-a1f8-5f91e3f3430c";
 const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
 const POOL_PIPELINE_ID = "xNaG2uwpPxq6BePj7zR8";
 const POOL_STAGE_NEW_LEAD = "8c4c4efa-a7d9-4020-9c88-d181cd0ba6b3";
