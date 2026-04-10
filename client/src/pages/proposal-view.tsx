@@ -168,9 +168,9 @@ export default function ProposalView() {
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
 
         {/* PDF Download Banner */}
-        <div className="flex items-center justify-between bg-[#eaf5fb] border border-[#a8d8f0] rounded-lg px-4 py-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-[#eaf5fb] border border-[#a8d8f0] rounded-lg px-4 py-3">
           <div className="flex items-center gap-2 text-[#1d8fc4]">
-            <FileText className="h-4 w-4" />
+            <FileText className="h-4 w-4 shrink-0" />
             <span className="text-sm font-medium">Your personalized proposal is ready to download</span>
           </div>
           <button
@@ -208,7 +208,7 @@ export default function ProposalView() {
         <Card>
           <CardContent className="p-4">
             <h2 className="font-semibold text-sm text-muted-foreground mb-3">WATER ANALYSIS RESULTS — {proposal.waterSource === "well" ? "WELL WATER" : "CITY WATER"}</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {waterTest.pH !== undefined && <ResultBadge label="pH" value={waterTest.pH.toString()} alert={waterTest.pH < 6.5} />}
               <ResultBadge label="Iron" value={`${waterTest.iron} ppm`} alert={waterTest.iron > 0.3} />
               <ResultBadge label="Hardness" value={`${waterTest.hardness} gpg`} alert={waterTest.hardness > 7} />
@@ -284,15 +284,15 @@ export default function ProposalView() {
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-semibold">{pkg.label} Package — {proposal.waterSource === "well" ? "Well Water" : "City Water"}</h3>
+                  <div className="flex items-start sm:items-center justify-between mb-3 gap-2">
+                    <h3 className="font-semibold text-sm sm:text-base">{pkg.label} Package<span className="hidden sm:inline"> — {proposal.waterSource === "well" ? "Well Water" : "City Water"}</span><span className="block sm:hidden text-xs font-normal text-muted-foreground">{proposal.waterSource === "well" ? "Well Water" : "City Water"}</span></h3>
                     {isSelected && (
                       <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full font-medium">Recommended</span>
                     )}
                   </div>
                   {/* Multi-package discount badge */}
                   {(pkg as any).originalPrice && (pkg as any).originalPrice > pkg.totalPrice && (
-                    <div className="flex items-center justify-between mb-2 bg-green-50 border border-green-200 rounded px-3 py-1.5 text-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 bg-green-50 border border-green-200 rounded px-3 py-1.5 text-sm gap-0.5">
                       <span className="text-green-700 font-medium">
                         Multi-package savings applied
                       </span>
@@ -307,21 +307,21 @@ export default function ProposalView() {
                     {pkg.equipment.map((item: any) => {
                       const brochureUrl = getBrochureUrl(item.name);
                       return (
-                        <div key={item.id} className="flex justify-between text-sm py-1 border-b border-border/50 last:border-0">
+                        <div key={item.id} className="flex flex-col sm:flex-row sm:justify-between text-sm py-1.5 border-b border-border/50 last:border-0">
                           <span className="flex items-center gap-2 flex-wrap">
-                            {item.name}
+                            <span className="break-words">{item.name}</span>
                             {brochureUrl && (
                               <a
                                 href={brochureUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs text-[#1d8fc4] border border-[#1d8fc4] rounded-full px-2 py-0.5 hover:bg-[#eaf5fb] transition-colors whitespace-nowrap"
+                                className="text-xs text-[#1d8fc4] border border-[#1d8fc4] rounded-full px-3 py-1 sm:px-2 sm:py-0.5 hover:bg-[#eaf5fb] transition-colors whitespace-nowrap"
                               >
                                 View Brochure
                               </a>
                             )}
                           </span>
-                          <span className="font-medium shrink-0 ml-2">{formatCurrency(item.price)}</span>
+                          <span className="font-medium shrink-0 sm:ml-2 text-right">{formatCurrency(item.price)}</span>
                         </div>
                       );
                     })}
@@ -344,9 +344,9 @@ export default function ProposalView() {
         {selectedPkg && (
           <Card className="bg-primary/5 border-primary/20">
             <CardContent className="p-4 space-y-2">
-              <div className="flex items-baseline justify-between mb-1">
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-1 gap-1">
                 <h2 className="font-semibold">{selectedPkg.label} Package Selected</h2>
-                <span className="text-2xl font-bold text-primary">{formatCurrency(discountedTotal)}</span>
+                <span className="text-xl sm:text-2xl font-bold text-primary">{formatCurrency(discountedTotal)}</span>
               </div>
               <div className="text-sm space-y-1">
                 {/* Show multi-package original if applicable */}
@@ -482,9 +482,9 @@ export default function ProposalView() {
 
 function ResultBadge({ label, value, alert }: { label: string; value: string; alert?: boolean }) {
   return (
-    <div className={`rounded-lg p-2.5 text-center ${alert ? "bg-amber-50 border border-amber-200" : "bg-muted/50"}`}>
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className={`font-semibold ${alert ? "text-amber-700" : ""}`}>{value}</div>
+    <div className={`rounded-lg p-2 sm:p-2.5 text-center ${alert ? "bg-amber-50 border border-amber-200" : "bg-muted/50 border border-border/30"}`}>
+      <div className="text-[10px] sm:text-xs text-muted-foreground">{label}</div>
+      <div className={`font-semibold text-sm sm:text-base ${alert ? "text-amber-700" : ""}`}>{value}</div>
     </div>
   );
 }
