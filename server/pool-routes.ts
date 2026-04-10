@@ -338,7 +338,10 @@ export function registerPoolRoutes(app: Express) {
   // action = "save_lead" → GHL contact/opportunity + quote email to customer
   // -----------------------------------------------------------------------
   app.post("/api/pool/ali-webhook", async (req: Request, res: Response) => {
-    const { action, zip, firstName, lastName, address, city, state, phone, email } = req.body;
+    const { action, zip, phone, email, address, city, state } = req.body;
+    // Voice AI sends snake_case params; accept both formats
+    const firstName = req.body.firstName || req.body.first_name;
+    const lastName  = req.body.lastName  || req.body.last_name;
 
     // — Zip check (mid-call) —
     if (action === "check_zip") {
