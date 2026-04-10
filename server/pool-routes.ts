@@ -286,7 +286,7 @@ async function sendPoolLeadEmails(params: {
     await mailer.sendMail({
       from: `"A Clear Alternative" <aclearalternative@gmail.com>`,
       to: email,
-      bcc: ["aclearalternative@gmail.com", "asmith@aclear.com", "water325@aol.com"],
+      // bcc removed per John's request — only aclearalternative@gmail.com for now
       subject: `Your Pool Water Delivery Quote — A Clear Alternative`,
       html: quoteHtml,
       text: `Dear ${firstName},\n\nThank you for contacting A Clear Alternative!\n\nWe're pleased to provide your pool water delivery quote for ${entry?.town || city}, NJ.\n\nYour Price: ${entry ? `$${entry.price}` : "See attached"}\n\nTo schedule your delivery, call us at (856) 663-8088 or reply to this email.\n\nA Clear Alternative\n9230 Collins Ave, Pennsauken, NJ 08110\n(856) 663-8088 | info@aclear.com`,
@@ -298,7 +298,7 @@ async function sendPoolLeadEmails(params: {
   await mailer.sendMail({
     from: `"A Clear Alternative — Ali" <aclearalternative@gmail.com>`,
     to: "aclearalternative@gmail.com",
-    bcc: ["asmith@aclear.com", "water325@aol.com"],
+    // bcc removed per John's request — only aclearalternative@gmail.com for now
     subject: `🏊 New Pool Water Lead — ${fullName} (${zip || "??"})`,
     text: `New pool water inquiry via Ali (AI Phone Agent):\n\nName: ${fullName}\nAddress: ${address}, ${city}, ${state} ${zip}\nPhone: ${phone || "not provided"}\nEmail: ${email || "not provided"}${priceNote}\n\nAdded to GHL → Swimming Pool Water → New Lead\nContact ID: ${contactId || "n/a"}\nOpportunity ID: ${opportunityId || "n/a"}\n\n${email ? "✅ Quote email sent to customer." : "⚠️  No email address — quote NOT sent. Follow up by phone."}\n\n— Ali, A Clear Alternative AI`,
   });
