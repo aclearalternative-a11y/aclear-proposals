@@ -378,6 +378,12 @@ export default function ProposalView() {
                             <span className="text-green-600">-{formatCurrency(pkgDiscount.discountAmount)}</span>
                           </div>
                         )}
+                        {(multiAmt > 0 || pkgDiscount.discountAmount > 0) && (
+                          <div className="flex justify-between font-semibold text-foreground pt-1 border-t border-dotted">
+                            <span>After Discount:</span>
+                            <span>{formatCurrency(pkgDiscount.discountedTotal)}</span>
+                          </div>
+                        )}
                         {(proposal.deposit || 0) > 0 && (
                           <div className="flex justify-between"><span>Deposit</span><span>-{formatCurrency(proposal.deposit)}</span></div>
                         )}

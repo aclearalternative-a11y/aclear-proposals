@@ -815,6 +815,12 @@ function PackageCard({
                     <span className="text-green-600">-{formatCurrency(d.discountAmount)}</span>
                   </div>
                 )}
+                {(multiAmt > 0 || d.discountAmount > 0) && (
+                  <div className="flex justify-between font-semibold text-foreground pt-0.5 border-t border-dotted">
+                    <span>After Discount:</span>
+                    <span>{formatCurrency(d.discountedTotal)}</span>
+                  </div>
+                )}
                 {depositNum > 0 && (
                   <div className="flex justify-between"><span>Deposit</span><span>-{formatCurrency(depositNum)}</span></div>
                 )}
