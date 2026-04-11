@@ -491,7 +491,7 @@ A Clear Alternative
             to: proposal.customerEmail,
             subject: `Following Up — Your Water Treatment Proposal (${customerName})`,
             body: followUpBody,
-            bcc: ["aclearalternative@gmail.com", "asmith@aclear.com", "water325@aol.com"],
+            bcc: [] // TESTING MODE — BCCs disabled,
           });
 
           // Move GHL opportunity to "Contacted" stage (follow-up)
@@ -824,7 +824,7 @@ A Clear Alternative
             to: proposal.customerEmail,
             subject: `Welcome to A Clear Alternative! — ${customerName}`,
             body: welcomeBody,
-            bcc: ["aclearalternative@gmail.com", "asmith@aclear.com", "water325@aol.com"],
+            bcc: [] // TESTING MODE — BCCs disabled,
           });
           console.log(`Welcome email sent to ${customerName}`);
 
@@ -859,7 +859,7 @@ Please contact ${customerName} within 24 hours to schedule installation.`;
             to: "aclearalternative@gmail.com",
             subject: `✅ Install Needed — ${customerName} — ${selectedLabel} Package`,
             body: installBody,
-            bcc: ["asmith@aclear.com", "water325@aol.com"],
+            bcc: [] // TESTING MODE — BCCs disabled,
           });
           console.log(`Install scheduling email sent for ${customerName}`);
 
@@ -1023,7 +1023,7 @@ A Clear Alternative
         to: proposal.customerEmail,
         subject: `Your Water Treatment Proposal — A Clear Alternative (${customerName})`,
         body: emailBody,
-        bcc: ["aclearalternative@gmail.com", "asmith@aclear.com", "water325@aol.com"],
+        bcc: [] // TESTING MODE — BCCs disabled,
       });
 
       // Log to pipeline Google Sheet (non-fatal)
