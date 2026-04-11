@@ -357,6 +357,66 @@ ${(() => {
   return `<div class="findings-box"><div class="section-title" style="margin-bottom:8px;">What Your Results Mean</div>${findings.join('')}</div>`;
 })()}
 
+<!-- NEIGHBORHOOD WATER QUALITY REPORT -->
+${(() => {
+  const { lookupWellWaterData, NJ_CITY_WATER_CONCERNS, NJ_ZIP_MAP, COUNTY_PWTA } = require("./water-quality-data");
+  const location = NJ_ZIP_MAP[proposal.zip];
+  if (!location) return '';
+  
+  if (isWell) {
+    const wellData = lookupWellWaterData(proposal.zip);
+    if (!wellData) return '';
+    const w = wellData.stats;
+    const c = COUNTY_PWTA[wellData.county];
+    const areaName = wellData.level === 'municipality' ? wellData.municipality : `${wellData.county} County`;
+    const ironRatio = w.iron >= 30 ? '1 in 3' : w.iron >= 20 ? '1 in 5' : w.iron >= 10 ? '1 in 10' : `${w.iron}%`;
+    const phRatio = w.pH >= 40 ? 'Nearly half' : w.pH >= 25 ? '1 in 4' : w.pH >= 15 ? '1 in 6' : `${w.pH}%`;
+    return `
+    <div style="border:1px solid #c5dff0;border-radius:6px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:linear-gradient(135deg,#1d6fa4,#145a87);padding:10px 16px;color:#fff;">
+        <div style="font-weight:700;font-size:13px;">Neighborhood Water Quality Report</div>
+        <div style="font-size:9px;color:#b8daf0;">NJ DEP Private Well Testing Data &mdash; ${w.wellsTested.toLocaleString()} wells tested in ${areaName}</div>
+      </div>
+      <div style="padding:12px 16px;">
+        <p style="font-size:10px;color:#666;margin-bottom:10px;">Under NJ's Private Well Testing Act, every private well is tested when a property is sold or leased. Here's what ${w.wellsTested.toLocaleString()} tests near <strong>${fullAddress}</strong> revealed:</p>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:10px;">
+          <tr>
+            <td style="width:25%;text-align:center;padding:8px;background:#fff5f4;border:1px solid #f0c4c0;border-radius:4px;"><div style="font-size:20px;font-weight:800;color:#c0392b;">${ironRatio}</div><div style="font-size:8px;color:#666;text-transform:uppercase;">Exceed Iron Limits</div><div style="font-size:7px;color:#999;">${w.iron}% of wells</div></td>
+            <td style="width:4%;"></td>
+            <td style="width:25%;text-align:center;padding:8px;background:#fff5f4;border:1px solid #f0c4c0;border-radius:4px;"><div style="font-size:20px;font-weight:800;color:#c0392b;">${phRatio}</div><div style="font-size:8px;color:#666;text-transform:uppercase;">Acidic Water</div><div style="font-size:7px;color:#999;">${w.pH}% outside range</div></td>
+            <td style="width:4%;"></td>
+            <td style="width:21%;text-align:center;padding:8px;background:#fffaf0;border:1px solid #f0deb0;border-radius:4px;"><div style="font-size:20px;font-weight:800;color:#c07b2b;">${w.manganese}%</div><div style="font-size:8px;color:#666;text-transform:uppercase;">Manganese High</div></td>
+            <td style="width:4%;"></td>
+            <td style="width:21%;text-align:center;padding:8px;background:#fffaf0;border:1px solid #f0deb0;border-radius:4px;"><div style="font-size:20px;font-weight:800;color:#c07b2b;">${w.grossAlpha}%</div><div style="font-size:8px;color:#666;text-transform:uppercase;">Radioactivity</div></td>
+          </tr>
+        </table>
+        ${w.iron > 10 ? `<div style="background:#fff5f4;border-left:3px solid #c0392b;padding:6px 10px;margin-bottom:4px;font-size:9px;"><strong style="color:#8b1a1a;">Iron at ${w.iron}%</strong> <span style="color:#666;">— Causes rust staining, metallic taste, and pipe buildup.</span></div>` : ''}
+        ${w.pH > 10 ? `<div style="background:#fff5f4;border-left:3px solid #c0392b;padding:6px 10px;margin-bottom:4px;font-size:9px;"><strong style="color:#8b1a1a;">Low pH at ${w.pH}%</strong> <span style="color:#666;">— Acidic water corrodes pipes and leaches metals into drinking water.</span></div>` : ''}
+        <div style="font-size:7px;color:#bbb;margin-top:6px;">Source: NJ DEP PWTA, Sept 2002 &ndash; Dec 2024 | ${areaName}</div>
+      </div>
+    </div>`;
+  } else {
+    // City water
+    const concerns = NJ_CITY_WATER_CONCERNS;
+    return `
+    <div style="border:1px solid #c5dff0;border-radius:6px;overflow:hidden;margin-bottom:14px;">
+      <div style="background:linear-gradient(135deg,#1d6fa4,#145a87);padding:10px 16px;color:#fff;">
+        <div style="font-weight:700;font-size:13px;">Your Municipal Water Quality Report</div>
+        <div style="font-size:9px;color:#b8daf0;">Common contaminants in NJ municipal water &mdash; ${location.municipality}, ${location.county} County</div>
+      </div>
+      <div style="padding:12px 16px;">
+        <p style="font-size:10px;color:#666;margin-bottom:10px;">Even treated municipal water contains contaminants that affect taste, health, and your home. Common concerns near <strong>${fullAddress}</strong>:</p>
+        ${concerns.map((c: any) => `
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:6px 0;border-bottom:1px solid #f0f4f8;">
+          <div style="width:36px;height:36px;border-radius:50%;background:${c.pct >= 70 ? '#fff0ef' : c.pct >= 40 ? '#fffaf0' : '#f0f7ff'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700;color:${c.pct >= 70 ? '#c0392b' : c.pct >= 40 ? '#c07b2b' : '#1d6fa4'};">${c.pct}%</div>
+          <div><div style="font-size:10px;font-weight:600;">${c.name}</div><div style="font-size:8.5px;color:#666;">${c.detail}</div></div>
+        </div>`).join('')}
+        <div style="font-size:7px;color:#bbb;margin-top:6px;">Source: EPA ECHO, NJ DEP, Environmental Working Group</div>
+      </div>
+    </div>`;
+  }
+})()}
+
 <!-- PACKAGES -->
 <div class="section-title">Recommended Treatment Packages</div>
 ${allPackagesHtml}
