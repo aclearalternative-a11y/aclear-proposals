@@ -3,6 +3,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useParams } from "wouter";
 import type { Proposal, PackageData, WaterTestResults } from "@shared/schema";
 import { formatCurrency, applyDiscount, calcMonthlyInvestment, getRepPhone, DISCOUNTS } from "@/lib/pricing-data";
+import { WellWaterQualityReport, CityWaterQualityReport } from "@/components/WaterQualityReport";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -254,6 +255,23 @@ export default function ProposalView() {
 
         {/* Packages */}
         <div className="space-y-4">
+          {/* Water Quality Report — auto-generated based on customer ZIP */}
+          {proposal.waterSource === "well" ? (
+            <WellWaterQualityReport
+              zip={proposal.zip}
+              address={`${proposal.street}, ${proposal.city}, ${proposal.state} ${proposal.zip}`}
+              municipality={undefined}
+              county={undefined}
+            />
+          ) : (
+            <CityWaterQualityReport
+              zip={proposal.zip}
+              address={`${proposal.street}, ${proposal.city}, ${proposal.state} ${proposal.zip}`}
+              municipality={undefined}
+              county={undefined}
+            />
+          )}
+
           <h2 className="font-semibold text-sm text-muted-foreground">RECOMMENDED TREATMENT PACKAGES</h2>
           {/* Customer choice prompt when rep sent multiple packages */}
           {customerMustChoose && !localSelectedTier && (

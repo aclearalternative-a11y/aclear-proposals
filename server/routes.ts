@@ -556,6 +556,26 @@ A Clear Alternative
     }
   });
 
+  // Water quality data lookup by ZIP
+  app.get("/api/water-quality/:zip", (req: Request, res: Response) => {
+    const { lookupWellWaterData, NJ_CITY_WATER_CONCERNS, NJ_ZIP_MAP, COUNTY_PWTA } = require("./water-quality-data");
+    const zip = req.params.zip;
+    const location = NJ_ZIP_MAP[zip];
+    if (!location) {
+      return res.json({ found: false, zip });
+    }
+    const wellData = lookupWellWaterData(zip);
+    return res.json({
+      found: true,
+      zip,
+      municipality: location.municipality,
+      county: location.county,
+      wellData: wellData ? { ...wellData.stats, level: wellData.level } : null,
+      countyData: COUNTY_PWTA[location.county] || null,
+      cityWaterConcerns: NJ_CITY_WATER_CONCERNS,
+    });
+  });
+
   // Health check — confirms server is running and env vars are loaded
   app.get("/api/health", (_req, res) => {
     res.json({
