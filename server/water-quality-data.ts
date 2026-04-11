@@ -14,26 +14,19 @@ export interface PWTAStats {
 }
 
 // County-level data — fallback when municipality data isn't available
+// Real data from NJDEP PWTA Interactive Map, Sept 2002 – Dec 2024
 export const COUNTY_PWTA: Record<string, PWTAStats> = {
   "Burlington": { wellsTested: 12189, iron: 42.2, pH: 44.5, manganese: 21.2, grossAlpha: 10.0, coliform: 0.7, nitrate: 1.1, pfas: 6.8 },
-  // Remaining counties will be populated by browser task — using statewide averages as placeholder
-  "Camden": { wellsTested: 2100, iron: 35.0, pH: 40.0, manganese: 18.0, grossAlpha: 8.0, coliform: 0.7, nitrate: 1.0, pfas: 5.0 },
-  "Gloucester": { wellsTested: 5800, iron: 38.0, pH: 42.0, manganese: 19.0, grossAlpha: 9.0, coliform: 0.7, nitrate: 1.0, pfas: 4.0 },
-  "Atlantic": { wellsTested: 4200, iron: 30.0, pH: 35.0, manganese: 15.0, grossAlpha: 7.0, coliform: 0.8, nitrate: 1.2, pfas: 3.0 },
-  "Ocean": { wellsTested: 8500, iron: 40.0, pH: 45.0, manganese: 20.0, grossAlpha: 12.0, coliform: 0.6, nitrate: 0.9, pfas: 5.5 },
-  "Mercer": { wellsTested: 3200, iron: 25.0, pH: 30.0, manganese: 12.0, grossAlpha: 6.0, coliform: 0.5, nitrate: 1.5, pfas: 4.0 },
-  "Salem": { wellsTested: 1800, iron: 32.0, pH: 38.0, manganese: 16.0, grossAlpha: 5.0, coliform: 0.8, nitrate: 1.3, pfas: 2.0 },
-  "Cumberland": { wellsTested: 2500, iron: 28.0, pH: 33.0, manganese: 14.0, grossAlpha: 4.0, coliform: 0.9, nitrate: 2.0, pfas: 2.5 },
-  "Monmouth": { wellsTested: 6800, iron: 22.0, pH: 25.0, manganese: 10.0, grossAlpha: 8.0, coliform: 0.5, nitrate: 1.0, pfas: 6.0 },
-  "Morris": { wellsTested: 7200, iron: 18.0, pH: 20.0, manganese: 8.0, grossAlpha: 3.0, coliform: 0.4, nitrate: 0.8, pfas: 3.5 },
-  "Hunterdon": { wellsTested: 5500, iron: 20.0, pH: 22.0, manganese: 9.0, grossAlpha: 5.0, coliform: 0.6, nitrate: 1.2, pfas: 3.0 },
-  "Somerset": { wellsTested: 4000, iron: 15.0, pH: 18.0, manganese: 7.0, grossAlpha: 4.0, coliform: 0.4, nitrate: 0.9, pfas: 4.0 },
-  "Middlesex": { wellsTested: 3500, iron: 20.0, pH: 25.0, manganese: 10.0, grossAlpha: 5.0, coliform: 0.5, nitrate: 1.0, pfas: 5.0 },
-  "Sussex": { wellsTested: 4800, iron: 15.0, pH: 15.0, manganese: 6.0, grossAlpha: 2.0, coliform: 0.5, nitrate: 1.5, pfas: 1.0 },
-  "Warren": { wellsTested: 3000, iron: 16.0, pH: 16.0, manganese: 7.0, grossAlpha: 3.0, coliform: 0.6, nitrate: 1.8, pfas: 1.5 },
-  "Passaic": { wellsTested: 2800, iron: 18.0, pH: 20.0, manganese: 8.0, grossAlpha: 3.0, coliform: 0.5, nitrate: 0.7, pfas: 4.0 },
-  "Bergen": { wellsTested: 2200, iron: 12.0, pH: 15.0, manganese: 5.0, grossAlpha: 2.0, coliform: 0.3, nitrate: 0.5, pfas: 5.0 },
-  "Cape May": { wellsTested: 3000, iron: 35.0, pH: 40.0, manganese: 17.0, grossAlpha: 6.0, coliform: 0.8, nitrate: 1.0, pfas: 3.0 },
+  "Camden": { wellsTested: 3759, iron: 23.3, pH: 88.9, manganese: 14.3, grossAlpha: 36.3, coliform: 0.5, nitrate: 1.5, pfas: 5.5 },
+  "Gloucester": { wellsTested: 9220, iron: 35.8, pH: 61.6, manganese: 13.9, grossAlpha: 12.8, coliform: 0.6, nitrate: 2.7, pfas: 5.2 },
+  "Atlantic": { wellsTested: 8102, iron: 24.2, pH: 95.6, manganese: 12.7, grossAlpha: 11.2, coliform: 0.5, nitrate: 3.1, pfas: 4.7 },
+  "Ocean": { wellsTested: 9102, iron: 27.3, pH: 60.5, manganese: 16.7, grossAlpha: 5.3, coliform: 0.8, nitrate: 0.5, pfas: 4.3 },
+  "Mercer": { wellsTested: 3471, iron: 21.2, pH: 25.0, manganese: 23.1, grossAlpha: 5.9, coliform: 3.0, nitrate: 1.5, pfas: 15.2 },
+  "Salem": { wellsTested: 5094, iron: 45.4, pH: 54.3, manganese: 20.7, grossAlpha: 17.4, coliform: 0.8, nitrate: 8.8, pfas: 7.2 },
+  "Cumberland": { wellsTested: 8423, iron: 26.5, pH: 92.3, manganese: 15.4, grossAlpha: 30.6, coliform: 0.6, nitrate: 12.9, pfas: 5.0 },
+  "Monmouth": { wellsTested: 7586, iron: 73.7, pH: 29.9, manganese: 39.1, grossAlpha: 2.2, coliform: 0.8, nitrate: 0.5, pfas: 1.2 },
+  "Morris": { wellsTested: 13112, iron: 25.1, pH: 50.4, manganese: 18.9, grossAlpha: 4.2, coliform: 1.9, nitrate: 1.8, pfas: 17.1 },
+  "Hunterdon": { wellsTested: 13703, iron: 16.0, pH: 28.1, manganese: 10.9, grossAlpha: 5.8, coliform: 3.3, nitrate: 0.8, pfas: 4.4 },
 };
 
 // Municipality-level data — more precise when available
