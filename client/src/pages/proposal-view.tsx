@@ -451,48 +451,60 @@ export default function ProposalView() {
               
               <div>
                 <Label>Customer 1 Signature — {proposal.customerFirstName1} {proposal.customerLastName1}</Label>
-                <canvas
-                  ref={sigRef1}
-                  width={500}
-                  height={150}
-                  className="sig-canvas w-full mt-1"
-                  style={{ maxHeight: "150px" }}
-                  onMouseDown={(e) => startDraw(sigRef1.current!, e)}
-                  onMouseMove={(e) => draw(sigRef1.current!, e)}
-                  onMouseUp={() => endDraw(sigRef1.current!, setSigData1)}
-                  onMouseLeave={() => endDraw(sigRef1.current!, setSigData1)}
-                  onTouchStart={(e) => { e.preventDefault(); startDraw(sigRef1.current!, e); }}
-                  onTouchMove={(e) => { e.preventDefault(); draw(sigRef1.current!, e); }}
-                  onTouchEnd={() => endDraw(sigRef1.current!, setSigData1)}
-                  data-testid="canvas-signature-1"
-                />
+                <div className="mt-1 border rounded-lg bg-white p-3" style={{ minHeight: "70px" }}>
+                  {printedName1 ? (
+                    <div style={{ fontFamily: "'Architects Daughter', cursive", fontSize: "28px", color: "#1a1a2e", lineHeight: 1.2, padding: "8px 4px" }}>
+                      {printedName1}
+                    </div>
+                  ) : (
+                    <div className="text-muted-foreground text-sm italic py-4 text-center">Type your name below to sign</div>
+                  )}
+                </div>
                 <div className="flex items-center gap-2 mt-2">
-                  <Input value={printedName1} onChange={e => setPrintedName1(e.target.value)} placeholder="Printed Name" className="flex-1" data-testid="input-printed-name-1" />
-                  <Button variant="outline" size="sm" onClick={() => clearCanvas(sigRef1.current, setSigData1)} data-testid="button-clear-sig-1">Clear</Button>
+                  <Input
+                    value={printedName1}
+                    onChange={e => {
+                      setPrintedName1(e.target.value);
+                      if (e.target.value.trim()) {
+                        setSigData1(`typed:${e.target.value.trim()}`);
+                      } else {
+                        setSigData1("");
+                      }
+                    }}
+                    placeholder="Type your full name to sign"
+                    className="flex-1"
+                    data-testid="input-printed-name-1"
+                  />
                 </div>
               </div>
 
               {hasSecond && (
                 <div>
                   <Label>Customer 2 Signature — {proposal.customerFirstName2} {proposal.customerLastName2}</Label>
-                  <canvas
-                    ref={sigRef2}
-                    width={500}
-                    height={150}
-                    className="sig-canvas w-full mt-1"
-                    style={{ maxHeight: "150px" }}
-                    onMouseDown={(e) => startDraw(sigRef2.current!, e)}
-                    onMouseMove={(e) => draw(sigRef2.current!, e)}
-                    onMouseUp={() => endDraw(sigRef2.current!, setSigData2)}
-                    onMouseLeave={() => endDraw(sigRef2.current!, setSigData2)}
-                    onTouchStart={(e) => { e.preventDefault(); startDraw(sigRef2.current!, e); }}
-                    onTouchMove={(e) => { e.preventDefault(); draw(sigRef2.current!, e); }}
-                    onTouchEnd={() => endDraw(sigRef2.current!, setSigData2)}
-                    data-testid="canvas-signature-2"
-                  />
+                  <div className="mt-1 border rounded-lg bg-white p-3" style={{ minHeight: "70px" }}>
+                    {printedName2 ? (
+                      <div style={{ fontFamily: "'Architects Daughter', cursive", fontSize: "28px", color: "#1a1a2e", lineHeight: 1.2, padding: "8px 4px" }}>
+                        {printedName2}
+                      </div>
+                    ) : (
+                      <div className="text-muted-foreground text-sm italic py-4 text-center">Type your name below to sign</div>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 mt-2">
-                    <Input value={printedName2} onChange={e => setPrintedName2(e.target.value)} placeholder="Printed Name" className="flex-1" data-testid="input-printed-name-2" />
-                    <Button variant="outline" size="sm" onClick={() => clearCanvas(sigRef2.current, setSigData2)} data-testid="button-clear-sig-2">Clear</Button>
+                    <Input
+                      value={printedName2}
+                      onChange={e => {
+                        setPrintedName2(e.target.value);
+                        if (e.target.value.trim()) {
+                          setSigData2(`typed:${e.target.value.trim()}`);
+                        } else {
+                          setSigData2("");
+                        }
+                      }}
+                      placeholder="Type your full name to sign"
+                      className="flex-1"
+                      data-testid="input-printed-name-2"
+                    />
                   </div>
                 </div>
               )}
