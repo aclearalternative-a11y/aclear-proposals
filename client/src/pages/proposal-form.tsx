@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -92,6 +92,15 @@ export default function ProposalForm() {
 
   const packagesWithDiscount = applyMultiPackageDiscount(packages);
   const filteredPackages = packagesWithDiscount.filter(p => includedTiers[p.tier as keyof typeof includedTiers]);
+
+  // Auto-select tier when exactly 1 package is checked — no extra tap needed
+  useEffect(() => {
+    if (filteredPackages.length === 1) {
+      setSelectedTier(filteredPackages[0].tier);
+    } else if (filteredPackages.length > 1 && selectedTier && !filteredPackages.find(p => p.tier === selectedTier)) {
+      setSelectedTier(null);
+    }
+  }, [filteredPackages.length, includedTiers.good, includedTiers.better, includedTiers.best]);
 
   const handleGeneratePackages = useCallback(() => {
     const waterTest: WaterTestResults = {
@@ -601,8 +610,8 @@ export default function ProposalForm() {
                       </>
                     ) : (
                       <p className="text-sm text-muted-foreground italic">
-                        {filteredPackages.length === 1
-                          ? 'Click “Select Package” above to confirm'
+                        {filteredPackages.length === 0
+                          ? 'Check at least one package above'
                           : 'Customer will choose their package'}
                       </p>
                     )}
