@@ -77,8 +77,10 @@ export default function ProposalForm() {
   const allThreeIncluded = includedTiers.good && includedTiers.better && includedTiers.best;
 
   function applyMultiPackageDiscount(pkgs: PackageData[]): PackageData[] {
+    // Multi-package discount ONLY applies when no other discount is selected
+    const hasOtherDiscount = discountType !== "none";
     return pkgs.map(pkg => {
-      if (!allThreeIncluded) return pkg;
+      if (!allThreeIncluded || hasOtherDiscount) return pkg;
       const rate = pkg.tier === 'better' ? 0.02 : pkg.tier === 'best' ? 0.04 : 0;
       if (rate === 0) return pkg;
       // Exclude water heaters from discount
