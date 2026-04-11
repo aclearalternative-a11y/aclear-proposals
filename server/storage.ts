@@ -160,7 +160,7 @@ export class DatabaseStorage implements IStorage {
       "customer_first_name_2","customer_last_name_2","customer_email",
       "street","city","state","zip","rep_name","water_source",
       "water_test_results","num_people","num_bathrooms","packages",
-      "selected_package","discount_type","deposit","rental_mode","sent_date"
+      "selected_package","discount_type","custom_discount_value","deposit","rental_mode","sent_date"
     ];
     const vals = [
       p.shareId, p.status || "draft",
@@ -170,7 +170,7 @@ export class DatabaseStorage implements IStorage {
       p.repName, p.waterSource, p.waterTestResults || "{}",
       p.numPeople || 3, p.numBathrooms || 2, p.packages || "[]",
       p.selectedPackage || null, p.discountType || "none",
-      p.deposit || 0, p.rentalMode || 0, p.sentDate || null
+      p.customDiscountValue || 0, p.deposit || 0, p.rentalMode || 0, p.sentDate || null
     ];
     const placeholders = vals.map(() => "?").join(",");
     await tursoExecute(
