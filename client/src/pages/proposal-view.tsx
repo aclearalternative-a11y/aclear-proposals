@@ -4,6 +4,12 @@ import { useParams } from "wouter";
 import type { Proposal, PackageData, WaterTestResults } from "@shared/schema";
 import { formatCurrency, applyDiscount, calcMonthlyInvestment, getRepPhone, DISCOUNTS } from "@/lib/pricing-data";
 import { WellWaterQualityReport, CityWaterQualityReport } from "@/components/WaterQualityReport";
+
+function getWaterHeaterTotal(pkg: any): number {
+  return (pkg.equipment || []).filter((e: any) =>
+    e.name?.includes("Water Heater") || e.name?.includes("Bradford White") || e.name?.includes("Tankless Water Heater")
+  ).reduce((sum: number, e: any) => sum + (e.price || 0), 0);
+}
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -136,7 +142,7 @@ export default function ProposalView() {
   const selectedPkg = packages.find(p => p.tier === effectiveTier);
   const customVal = proposal.customDiscountValue || 0;
   const { discountedTotal, discountAmount, discountPercent } = selectedPkg
-    ? applyDiscount(selectedPkg.totalPrice, proposal.discountType || "none", (selectedPkg as any).discountRate || 0, customVal)
+    ? applyDiscount(selectedPkg.totalPrice, proposal.discountType || "none", (selectedPkg as any).discountRate || 0, customVal, getWaterHeaterTotal(selectedPkg))
     : { discountedTotal: 0, discountAmount: 0, discountPercent: 0 };
   const monthly = selectedPkg ? calcMonthlyInvestment(discountedTotal, proposal.deposit || 0) : 0;
   const repPhone = getRepPhone(proposal.repName);
@@ -356,7 +362,7 @@ export default function ProposalView() {
                   </div>
                   {/* Per-package discount + monthly investment breakdown */}
                   {(() => {
-                    const pkgDiscount = applyDiscount(pkg.totalPrice, proposal.discountType || "none", (pkg as any).discountRate || 0, customVal);
+                    const pkgDiscount = applyDiscount(pkg.totalPrice, proposal.discountType || "none", (pkg as any).discountRate || 0, customVal, getWaterHeaterTotal(pkg));
                     const pkgMonthly = calcMonthlyInvestment(pkgDiscount.discountedTotal, proposal.deposit || 0);
                     const multiAmt = (pkg as any).originalPrice ? (pkg as any).originalPrice - pkg.totalPrice : 0;
                     const hasAnyDiscount = multiAmt > 0 || pkgDiscount.discountAmount > 0;

@@ -120,19 +120,41 @@ function calcPkgDiscount(proposal: any, pkg: any) {
   const multiPkgRate = (pkg as any).discountRate || 0;
   const multiPkgPct = Math.round(multiPkgRate * 100);
   const MAX = 5;
+
+  // Water heaters are NEVER discounted
+  const waterHeaterTotal = (pkg.equipment || []).filter((e: any) =>
+    e.name?.includes("Water Heater") || e.name?.includes("Bradford White") || e.name?.includes("Tankless Water Heater")
+  ).reduce((sum: number, e: any) => sum + (e.price || 0), 0);
+  const discountableBase = pkg.totalPrice - waterHeaterTotal;
+
   let discountPercent = 0;
   let discountAmt = 0;
   let discountLabel = "";
-  if (discountType === "veteran") { discountPercent = Math.min(5, MAX - multiPkgPct); discountLabel = `Veteran Discount (${discountPercent}%)`; }
-  else if (discountType === "fire_ems") { discountPercent = Math.min(3, MAX - multiPkgPct); discountLabel = `Fire/EMS Discount (${discountPercent}%)`; }
-  else if (discountType === "custom_percent") { discountPercent = Math.min(customVal, MAX - multiPkgPct); discountLabel = `Discount (${discountPercent}%)`; }
-  else if (discountType === "custom_dollar") {
-    const maxDollar = Math.round(pkg.totalPrice * Math.max(0, MAX - multiPkgPct) / 100);
-    discountAmt = Math.min(customVal, maxDollar);
-    discountPercent = pkg.totalPrice > 0 ? Math.round((discountAmt / pkg.totalPrice) * 100) : 0;
+
+  if (discountType === "none" || discountableBase <= 0) {
+    // No discount
+  } else if (discountType === "custom_percent") {
+    // Custom % — NO cap, rep decides
+    discountPercent = customVal;
+    discountAmt = Math.round(discountableBase * customVal / 100);
+    discountLabel = `Discount (${discountPercent}%)`;
+  } else if (discountType === "custom_dollar") {
+    // Custom $ — NO cap, rep decides
+    discountAmt = Math.min(customVal, discountableBase);
+    discountPercent = discountableBase > 0 ? Math.round((discountAmt / discountableBase) * 100) : 0;
     discountLabel = `Discount (-$${discountAmt})`;
+  } else if (discountType === "veteran") {
+    // Veteran 5% — capped at 5% combined with multi-package
+    discountPercent = Math.min(5, Math.max(0, MAX - multiPkgPct));
+    discountAmt = Math.round(discountableBase * discountPercent / 100);
+    discountLabel = `Veteran Discount (${discountPercent}%)`;
+  } else if (discountType === "fire_ems") {
+    // Fire/EMS 3% — capped at 5% combined with multi-package
+    discountPercent = Math.min(3, Math.max(0, MAX - multiPkgPct));
+    discountAmt = Math.round(discountableBase * discountPercent / 100);
+    discountLabel = `Fire/EMS Discount (${discountPercent}%)`;
   }
-  if (discountType !== "custom_dollar") discountAmt = Math.round(pkg.totalPrice * discountPercent / 100);
+
   const finalPrice = pkg.totalPrice - discountAmt;
   const deposit = proposal.deposit || 0;
   const monthlyAmt = deposit >= finalPrice ? 0 : Math.round((finalPrice - deposit) / 120);

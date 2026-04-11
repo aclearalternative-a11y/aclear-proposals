@@ -247,7 +247,10 @@ export default function ProposalForm() {
   const depositNum = parseInt(deposit) || 0;
   const customNum = parseFloat(customDiscountValue) || 0;
   const { discountedTotal, discountAmount, discountPercent } = selectedPkg
-    ? applyDiscount(selectedPkg.totalPrice, discountType, (selectedPkg as any).discountRate || 0, customNum)
+    ? (() => {
+      const whTotal = (selectedPkg.equipment || []).filter((e: any) => e.name?.includes('Water Heater') || e.name?.includes('Bradford White') || e.name?.includes('Tankless Water Heater')).reduce((s: number, e: any) => s + (e.price || 0), 0);
+      return applyDiscount(selectedPkg.totalPrice, discountType, (selectedPkg as any).discountRate || 0, customNum, whTotal);
+    })()
     : { discountedTotal: 0, discountAmount: 0, discountPercent: 0 };
   const monthly = selectedPkg ? calcMonthlyInvestment(discountedTotal, depositNum) : 0;
 

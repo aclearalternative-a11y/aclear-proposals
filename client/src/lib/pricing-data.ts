@@ -300,30 +300,35 @@ export function applyDiscount(
   total: number,
   discountType: string,
   alreadyAppliedRate: number = 0,  // multi-package discount already baked in (0.02 or 0.04)
-  customValue: number = 0  // custom % or $ amount entered by rep
+  customValue: number = 0,  // custom % or $ amount entered by rep
+  waterHeaterTotal: number = 0  // excluded from all discounts
 ): { discountedTotal: number; discountAmount: number; discountPercent: number } {
-  // Cap combined discount at 5% total
+  const discountableBase = total - waterHeaterTotal; // never discount water heaters
+  if (discountableBase <= 0 || discountType === "none") {
+    return { discountedTotal: total, discountAmount: 0, discountPercent: 0 };
+  }
+
   const MAX_TOTAL_DISCOUNT = 5;
   const alreadyAppliedPercent = Math.round(alreadyAppliedRate * 100);
 
   if (discountType === "custom_dollar") {
-    // Flat dollar discount — cap so combined doesn't exceed 5% of total
-    const maxDollar = Math.round(total * Math.max(0, MAX_TOTAL_DISCOUNT - alreadyAppliedPercent) / 100);
-    const amt = Math.min(customValue, maxDollar);
-    const pct = total > 0 ? Math.round((amt / total) * 100) : 0;
+    // Custom $ — NO cap, rep decides. Still excludes water heaters.
+    const amt = Math.min(customValue, discountableBase); // can't discount more than equipment total
+    const pct = discountableBase > 0 ? Math.round((amt / discountableBase) * 100) : 0;
     return { discountedTotal: total - amt, discountAmount: amt, discountPercent: pct };
   }
 
   if (discountType === "custom_percent") {
-    const effectivePercent = Math.min(customValue, Math.max(0, MAX_TOTAL_DISCOUNT - alreadyAppliedPercent));
-    const amt = Math.round(total * effectivePercent / 100);
-    return { discountedTotal: total - amt, discountAmount: amt, discountPercent: effectivePercent };
+    // Custom % — NO cap, rep decides. Still excludes water heaters.
+    const amt = Math.round(discountableBase * customValue / 100);
+    return { discountedTotal: total - amt, discountAmount: amt, discountPercent: customValue };
   }
 
+  // Veteran / Fire-EMS — capped at 5% combined with multi-package
   const discount = DISCOUNTS.find(d => d.value === discountType);
   const rawPercent = discount?.percent || 0;
   const effectivePercent = Math.min(rawPercent, Math.max(0, MAX_TOTAL_DISCOUNT - alreadyAppliedPercent));
-  const discountAmount = Math.round(total * effectivePercent / 100);
+  const discountAmount = Math.round(discountableBase * effectivePercent / 100);
   return { discountedTotal: total - discountAmount, discountAmount, discountPercent: effectivePercent };
 }
 
