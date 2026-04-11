@@ -554,6 +554,9 @@ export default function ProposalForm() {
                   waterSource={waterSource}
                   isSelected={selectedTier === pkg.tier}
                   rentalMode={rentalMode}
+                  discountType={discountType}
+                  customDiscountValue={customNum}
+                  depositNum={depositNum}
                   onSelect={() => includedTiers[pkg.tier as keyof typeof includedTiers] && setSelectedTier(pkg.tier)}
                   onSizeChange={(ei, dir) => handleSizeChange(tierIdx, ei, dir)}
                   onRemove={(ei) => handleRemoveEquipment(tierIdx, ei)}
@@ -669,6 +672,9 @@ function PackageCard({
   waterSource,
   isSelected,
   rentalMode,
+  discountType,
+  customDiscountValue,
+  depositNum,
   onSelect,
   onSizeChange,
   onRemove,
@@ -784,12 +790,39 @@ function PackageCard({
           )}
         </div>
 
-        {/* Total + Select */}
+        {/* Total + Discount Breakdown + Select */}
         <div className="pt-2 border-t space-y-2">
           <div className="flex justify-between font-semibold text-sm">
             <span>Total:</span>
             <span>{formatCurrency(pkg.totalPrice)}</span>
           </div>
+          {discountType && discountType !== "none" && (() => {
+            const whTotal = (pkg.equipment || []).filter((e: any) => e.name?.includes('Water Heater') || e.name?.includes('Bradford White') || e.name?.includes('Tankless Water Heater')).reduce((s: number, e: any) => s + (e.price || 0), 0);
+            const d = applyDiscount(pkg.totalPrice, discountType, (pkg as any).discountRate || 0, customDiscountValue, whTotal);
+            const monthly = calcMonthlyInvestment(d.discountedTotal, depositNum);
+            const multiAmt = (pkg as any).originalPrice ? (pkg as any).originalPrice - pkg.totalPrice : 0;
+            if (d.discountAmount === 0 && multiAmt === 0) return null;
+            return (
+              <div className="text-xs space-y-0.5 text-muted-foreground border-t border-dashed pt-1">
+                {multiAmt > 0 && (
+                  <div className="flex justify-between"><span>Multi-pkg savings</span><span className="text-green-600">-{formatCurrency(multiAmt)}</span></div>
+                )}
+                {d.discountAmount > 0 && (
+                  <div className="flex justify-between">
+                    <span>{discountType === 'veteran' ? 'Veteran' : discountType === 'fire_ems' ? 'Fire/EMS' : 'Discount'} ({d.discountPercent}%)</span>
+                    <span className="text-green-600">-{formatCurrency(d.discountAmount)}</span>
+                  </div>
+                )}
+                {depositNum > 0 && (
+                  <div className="flex justify-between"><span>Deposit</span><span>-{formatCurrency(depositNum)}</span></div>
+                )}
+                <div className="flex justify-between font-semibold text-foreground">
+                  <span>Monthly:</span>
+                  <span className="text-primary">{formatCurrency(monthly)}/mo</span>
+                </div>
+              </div>
+            );
+          })()}
           <Button
             onClick={onSelect}
             variant={isSelected ? "default" : "outline"}
