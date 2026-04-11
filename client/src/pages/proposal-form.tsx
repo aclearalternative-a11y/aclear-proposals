@@ -559,7 +559,16 @@ export default function ProposalForm() {
                   discountType={discountType}
                   customDiscountValue={customNum}
                   depositNum={depositNum}
-                  onSelect={() => includedTiers[pkg.tier as keyof typeof includedTiers] && setSelectedTier(pkg.tier)}
+                  onSelect={() => {
+                    if (!includedTiers[pkg.tier as keyof typeof includedTiers]) return;
+                    setSelectedTier(pkg.tier);
+                    // Auto-uncheck other packages — customer only sees the selected one
+                    setIncludedTiers({
+                      good: pkg.tier === 'good',
+                      better: pkg.tier === 'better',
+                      best: pkg.tier === 'best',
+                    });
+                  }}
                   onSizeChange={(ei, dir) => handleSizeChange(tierIdx, ei, dir)}
                   onRemove={(ei) => handleRemoveEquipment(tierIdx, ei)}
                   onAdd={(cat, itemIdx) => handleAddEquipment(tierIdx, cat, itemIdx)}
