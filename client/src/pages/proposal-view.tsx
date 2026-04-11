@@ -457,13 +457,13 @@ export default function ProposalView() {
               
               <div>
                 <Label>Customer 1 Signature — {proposal.customerFirstName1} {proposal.customerLastName1}</Label>
-                <div className="mt-1 border rounded-lg bg-white p-3" style={{ minHeight: "70px" }}>
+                <div className="mt-1 border rounded-lg bg-white px-4 py-2" style={{ minHeight: "80px", borderBottom: "2px solid #ccc" }}>
                   {printedName1 ? (
-                    <div style={{ fontFamily: "'Architects Daughter', cursive", fontSize: "28px", color: "#1a1a2e", lineHeight: 1.2, padding: "8px 4px" }}>
+                    <div style={{ fontFamily: "'Alex Brush', cursive", fontSize: "42px", color: "#1a237e", lineHeight: 1.3, padding: "6px 0" }}>
                       {printedName1}
                     </div>
                   ) : (
-                    <div className="text-muted-foreground text-sm italic py-4 text-center">Type your name below to sign</div>
+                    <div className="text-muted-foreground text-sm italic py-5 text-center">Type your name below to sign</div>
                   )}
                 </div>
                 <div className="flex items-center gap-2 mt-2">
@@ -487,13 +487,13 @@ export default function ProposalView() {
               {hasSecond && (
                 <div>
                   <Label>Customer 2 Signature — {proposal.customerFirstName2} {proposal.customerLastName2}</Label>
-                  <div className="mt-1 border rounded-lg bg-white p-3" style={{ minHeight: "70px" }}>
+                  <div className="mt-1 border rounded-lg bg-white px-4 py-2" style={{ minHeight: "80px", borderBottom: "2px solid #ccc" }}>
                     {printedName2 ? (
-                      <div style={{ fontFamily: "'Architects Daughter', cursive", fontSize: "28px", color: "#1a1a2e", lineHeight: 1.2, padding: "8px 4px" }}>
+                      <div style={{ fontFamily: "'Alex Brush', cursive", fontSize: "42px", color: "#1a237e", lineHeight: 1.3, padding: "6px 0" }}>
                         {printedName2}
                       </div>
                     ) : (
-                      <div className="text-muted-foreground text-sm italic py-4 text-center">Type your name below to sign</div>
+                      <div className="text-muted-foreground text-sm italic py-5 text-center">Type your name below to sign</div>
                     )}
                   </div>
                   <div className="flex items-center gap-2 mt-2">
