@@ -18,6 +18,8 @@ export const DISCOUNTS = [
   { label: "No Discount", value: "none", percent: 0 },
   { label: "Retired Veteran (5%)", value: "veteran", percent: 5 },
   { label: "Fire/EMS (3%)", value: "fire_ems", percent: 3 },
+  { label: "Custom Percent (%)", value: "custom_percent", percent: 0 },
+  { label: "Custom Dollar ($)", value: "custom_dollar", percent: 0 },
 ];
 
 // ---- Equipment Catalog ----
@@ -297,13 +299,29 @@ export function calcTotal(equipment: EquipmentItem[]): number {
 export function applyDiscount(
   total: number,
   discountType: string,
-  alreadyAppliedRate: number = 0  // multi-package discount already baked in (0.02 or 0.04)
+  alreadyAppliedRate: number = 0,  // multi-package discount already baked in (0.02 or 0.04)
+  customValue: number = 0  // custom % or $ amount entered by rep
 ): { discountedTotal: number; discountAmount: number; discountPercent: number } {
-  const discount = DISCOUNTS.find(d => d.value === discountType);
-  const rawPercent = discount?.percent || 0;
   // Cap combined discount at 5% total
   const MAX_TOTAL_DISCOUNT = 5;
   const alreadyAppliedPercent = Math.round(alreadyAppliedRate * 100);
+
+  if (discountType === "custom_dollar") {
+    // Flat dollar discount — cap so combined doesn't exceed 5% of total
+    const maxDollar = Math.round(total * Math.max(0, MAX_TOTAL_DISCOUNT - alreadyAppliedPercent) / 100);
+    const amt = Math.min(customValue, maxDollar);
+    const pct = total > 0 ? Math.round((amt / total) * 100) : 0;
+    return { discountedTotal: total - amt, discountAmount: amt, discountPercent: pct };
+  }
+
+  if (discountType === "custom_percent") {
+    const effectivePercent = Math.min(customValue, Math.max(0, MAX_TOTAL_DISCOUNT - alreadyAppliedPercent));
+    const amt = Math.round(total * effectivePercent / 100);
+    return { discountedTotal: total - amt, discountAmount: amt, discountPercent: effectivePercent };
+  }
+
+  const discount = DISCOUNTS.find(d => d.value === discountType);
+  const rawPercent = discount?.percent || 0;
   const effectivePercent = Math.min(rawPercent, Math.max(0, MAX_TOTAL_DISCOUNT - alreadyAppliedPercent));
   const discountAmount = Math.round(total * effectivePercent / 100);
   return { discountedTotal: total - discountAmount, discountAmount, discountPercent: effectivePercent };

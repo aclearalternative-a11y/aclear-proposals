@@ -68,6 +68,7 @@ export default function ProposalForm() {
   const [packages, setPackages] = useState<PackageData[]>([]);
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [discountType, setDiscountType] = useState("none");
+  const [customDiscountValue, setCustomDiscountValue] = useState("");
   const [deposit, setDeposit] = useState("");
   const [rentalMode, setRentalMode] = useState(false);
   const [includedTiers, setIncludedTiers] = useState({ good: true, better: true, best: true });
@@ -217,6 +218,7 @@ export default function ProposalForm() {
         packages: JSON.stringify(filteredPackages),
         selectedPackage: selectedTier,
         discountType,
+        customDiscountValue: customNum,
         deposit: parseInt(deposit) || 0,
         rentalMode,
       });
@@ -243,8 +245,9 @@ export default function ProposalForm() {
 
   const selectedPkg = packagesWithDiscount.find(p => p.tier === selectedTier);
   const depositNum = parseInt(deposit) || 0;
+  const customNum = parseFloat(customDiscountValue) || 0;
   const { discountedTotal, discountAmount, discountPercent } = selectedPkg
-    ? applyDiscount(selectedPkg.totalPrice, discountType, (selectedPkg as any).discountRate || 0)
+    ? applyDiscount(selectedPkg.totalPrice, discountType, (selectedPkg as any).discountRate || 0, customNum)
     : { discountedTotal: 0, discountAmount: 0, discountPercent: 0 };
   const monthly = selectedPkg ? calcMonthlyInvestment(discountedTotal, depositNum) : 0;
 
@@ -574,6 +577,18 @@ export default function ProposalForm() {
                       </SelectContent>
                     </Select>
                   </div>
+                  {(discountType === "custom_percent" || discountType === "custom_dollar") && (
+                    <div>
+                      <Label>{discountType === "custom_percent" ? "Discount %" : "Discount $"}</Label>
+                      <Input
+                        data-testid="input-custom-discount"
+                        type="number"
+                        value={customDiscountValue}
+                        onChange={e => setCustomDiscountValue(e.target.value)}
+                        placeholder={discountType === "custom_percent" ? "e.g. 3" : "e.g. 200"}
+                      />
+                    </div>
+                  )}
                   <div>
                     <Label>Deposit</Label>
                     <Input

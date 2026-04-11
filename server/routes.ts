@@ -97,7 +97,7 @@ function getBrochureUrl(equipName: string): string {
   // Water heaters — most specific first (POWER VENT before Bradford White catch-all)
   if (equipName.includes("POWER VENT")) return "https://docs.bradfordwhite.com/Spec_Sheets/1117_Current.pdf";
   if (equipName.includes("ELECTRIC")) return "https://docs.bradfordwhite.com/Spec_Sheets/1201_Current.pdf";
-  if (equipName.includes("Tankless Water Heater")) return "https://www.navien.com/products/residential/condensing-gas-tankless-water-heater/npe-2";
+  if (equipName.includes("Tankless Water Heater")) return "https://whitehvac.com/media/Navien-NPE-2-Brochure-2203-LO.pdf";
   if (equipName.includes("Bradford White")) return "https://docs.bradfordwhite.com/Spec_Sheets/1101_Current.pdf";
   // Water treatment — Twin Alternating must be checked before ACA grain-size pattern
   if (equipName.includes("Twin Alternating")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:79762e60-034c-4e7d-a225-6a2837b781ab";
