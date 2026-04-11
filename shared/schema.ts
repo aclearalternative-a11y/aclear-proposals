@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -27,6 +27,7 @@ export const proposals = sqliteTable("proposals", {
   selectedPackage: text("selected_package"),
   // Discount type and deposit
   discountType: text("discount_type").default("none"),
+  customDiscountValue: real("custom_discount_value").default(0),
   deposit: integer("deposit").default(0),
   // Rental mode
   rentalMode: integer("rental_mode", { mode: "boolean" }).default(false),

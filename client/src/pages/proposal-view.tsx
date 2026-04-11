@@ -133,8 +133,9 @@ export default function ProposalView() {
   const waterTest: WaterTestResults = JSON.parse(proposal.waterTestResults);
   const effectiveTier = proposal.selectedPackage || localSelectedTier;
   const selectedPkg = packages.find(p => p.tier === effectiveTier);
+  const customVal = proposal.customDiscountValue || 0;
   const { discountedTotal, discountAmount, discountPercent } = selectedPkg
-    ? applyDiscount(selectedPkg.totalPrice, proposal.discountType || "none", (selectedPkg as any).discountRate || 0)
+    ? applyDiscount(selectedPkg.totalPrice, proposal.discountType || "none", (selectedPkg as any).discountRate || 0, customVal)
     : { discountedTotal: 0, discountAmount: 0, discountPercent: 0 };
   const monthly = selectedPkg ? calcMonthlyInvestment(discountedTotal, proposal.deposit || 0) : 0;
   const repPhone = getRepPhone(proposal.repName);
@@ -335,6 +336,34 @@ export default function ProposalView() {
                     <span>Total:</span>
                     <span>{formatCurrency(pkg.totalPrice)}</span>
                   </div>
+                  {/* Per-package discount + monthly investment breakdown */}
+                  {(() => {
+                    const pkgDiscount = applyDiscount(pkg.totalPrice, proposal.discountType || "none", (pkg as any).discountRate || 0, customVal);
+                    const pkgMonthly = calcMonthlyInvestment(pkgDiscount.discountedTotal, proposal.deposit || 0);
+                    const multiAmt = (pkg as any).originalPrice ? (pkg as any).originalPrice - pkg.totalPrice : 0;
+                    const hasAnyDiscount = multiAmt > 0 || pkgDiscount.discountAmount > 0;
+                    if (!hasAnyDiscount && !proposal.deposit) return null;
+                    return (
+                      <div className="mt-2 pt-2 border-t border-dashed text-xs space-y-1 text-muted-foreground">
+                        {multiAmt > 0 && (
+                          <div className="flex justify-between"><span>Multi-package savings</span><span className="text-green-600">-{formatCurrency(multiAmt)}</span></div>
+                        )}
+                        {pkgDiscount.discountAmount > 0 && (
+                          <div className="flex justify-between">
+                            <span>{proposal.discountType === 'veteran' ? 'Veteran Discount' : proposal.discountType === 'fire_ems' ? 'Fire/EMS Discount' : 'Discount'} ({pkgDiscount.discountPercent}%)</span>
+                            <span className="text-green-600">-{formatCurrency(pkgDiscount.discountAmount)}</span>
+                          </div>
+                        )}
+                        {(proposal.deposit || 0) > 0 && (
+                          <div className="flex justify-between"><span>Deposit</span><span>-{formatCurrency(proposal.deposit)}</span></div>
+                        )}
+                        <div className="flex justify-between font-semibold text-sm text-foreground pt-1">
+                          <span>Monthly Investment:</span>
+                          <span className="text-primary">{formatCurrency(pkgMonthly)}/mo</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </CardContent>
               </Card>
             );

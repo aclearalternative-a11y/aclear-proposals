@@ -114,6 +114,31 @@ function getBrochureUrl(equipName: string): string {
   return "";
 }
 
+function calcPkgDiscount(proposal: any, pkg: any) {
+  const discountType = proposal.discountType || "none";
+  const customVal = proposal.customDiscountValue || 0;
+  const multiPkgRate = (pkg as any).discountRate || 0;
+  const multiPkgPct = Math.round(multiPkgRate * 100);
+  const MAX = 5;
+  let discountPercent = 0;
+  let discountAmt = 0;
+  let discountLabel = "";
+  if (discountType === "veteran") { discountPercent = Math.min(5, MAX - multiPkgPct); discountLabel = `Veteran Discount (${discountPercent}%)`; }
+  else if (discountType === "fire_ems") { discountPercent = Math.min(3, MAX - multiPkgPct); discountLabel = `Fire/EMS Discount (${discountPercent}%)`; }
+  else if (discountType === "custom_percent") { discountPercent = Math.min(customVal, MAX - multiPkgPct); discountLabel = `Discount (${discountPercent}%)`; }
+  else if (discountType === "custom_dollar") {
+    const maxDollar = Math.round(pkg.totalPrice * Math.max(0, MAX - multiPkgPct) / 100);
+    discountAmt = Math.min(customVal, maxDollar);
+    discountPercent = pkg.totalPrice > 0 ? Math.round((discountAmt / pkg.totalPrice) * 100) : 0;
+    discountLabel = `Discount (-$${discountAmt})`;
+  }
+  if (discountType !== "custom_dollar") discountAmt = Math.round(pkg.totalPrice * discountPercent / 100);
+  const finalPrice = pkg.totalPrice - discountAmt;
+  const deposit = proposal.deposit || 0;
+  const monthlyAmt = deposit >= finalPrice ? 0 : Math.round((finalPrice - deposit) / 120);
+  return { discountPercent, discountAmt, finalPrice, deposit, monthlyAmt, discountLabel };
+}
+
 function buildProposalHtml(proposal: any): string {
   const repPhone = REPS[proposal.repName] || "";
   const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
@@ -125,15 +150,7 @@ function buildProposalHtml(proposal: any): string {
   const today = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 
   function calcPackagePricing(pkg: any) {
-    const discountType = proposal.discountType || "none";
-    let discountPercent = 0;
-    if (discountType === "veteran") discountPercent = 5;
-    if (discountType === "fire_ems") discountPercent = 3;
-    const discountAmt = Math.round(pkg.totalPrice * discountPercent / 100);
-    const finalPrice = pkg.totalPrice - discountAmt;
-    const deposit = proposal.deposit || 0;
-    const monthlyAmt = deposit >= finalPrice ? 0 : Math.round((finalPrice - deposit) / 120);
-    return { discountPercent, discountAmt, finalPrice, deposit, monthlyAmt };
+    return calcPkgDiscount(proposal, pkg);
   }
 
   function buildPackageBlock(pkg: any): string {
@@ -783,14 +800,8 @@ A Clear Alternative
           const packages = JSON.parse(proposal.packages || "[]");
           const selectedPkg = packages.find((p: any) => p.tier === proposal.selectedPackage);
           const selectedLabel = selectedPkg ? selectedPkg.label : "Selected";
-          const discountType = proposal.discountType || "none";
-          let discountPercent = 0;
-          if (discountType === "veteran") discountPercent = 5;
-          if (discountType === "fire_ems") discountPercent = 3;
-          const discountAmt = selectedPkg ? Math.round(selectedPkg.totalPrice * discountPercent / 100) : 0;
-          const finalPrice = selectedPkg ? selectedPkg.totalPrice - discountAmt : 0;
-          const deposit = proposal.deposit || 0;
-          const monthlyAmt = deposit >= finalPrice ? 0 : Math.round((finalPrice - deposit) / 120);
+          const sigPricing = selectedPkg ? calcPkgDiscount(proposal, selectedPkg) : { discountAmt: 0, finalPrice: 0, deposit: 0, monthlyAmt: 0, discountPercent: 0 };
+          const { discountAmt, finalPrice, deposit: depAmt, monthlyAmt } = sigPricing;
           const proposalLink = `https://proposals.aclear.com/#/proposal/${proposal.shareId}`;
 
           // 1. WELCOME EMAIL to customer
@@ -976,13 +987,8 @@ Please contact ${customerName} within 24 hours to schedule installation.`;
       const selectedLabel = selectedPkg ? selectedPkg.label : "Selected";
 
       const discountType = proposal.discountType || "none";
-      let discountPercent = 0;
-      if (discountType === "veteran") discountPercent = 5;
-      if (discountType === "fire_ems") discountPercent = 3;
-      const discountAmt = selectedPkg ? Math.round(selectedPkg.totalPrice * discountPercent / 100) : 0;
-      const finalPrice = selectedPkg ? selectedPkg.totalPrice - discountAmt : 0;
-      const deposit = proposal.deposit || 0;
-      const monthlyAmt = deposit >= finalPrice ? 0 : Math.round((finalPrice - deposit) / 120);
+      const followPricing = selectedPkg ? calcPkgDiscount(proposal, selectedPkg) : { discountAmt: 0, finalPrice: 0, deposit: 0, monthlyAmt: 0 };
+      const { discountAmt, finalPrice, monthlyAmt } = followPricing;
 
       // Build the proposal view link — points to the React frontend page
       // The customer opens this, sees the full proposal, and can download the PDF from there
