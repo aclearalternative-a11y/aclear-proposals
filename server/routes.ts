@@ -801,7 +801,7 @@ A Clear Alternative
           const selectedPkg = packages.find((p: any) => p.tier === proposal.selectedPackage);
           const selectedLabel = selectedPkg ? selectedPkg.label : "Selected";
           const sigPricing = selectedPkg ? calcPkgDiscount(proposal, selectedPkg) : { discountAmt: 0, finalPrice: 0, deposit: 0, monthlyAmt: 0, discountPercent: 0 };
-          const { discountAmt, finalPrice, deposit: depAmt, monthlyAmt } = sigPricing;
+          const { discountAmt, finalPrice, deposit, monthlyAmt } = sigPricing;
           const proposalLink = `https://proposals.aclear.com/#/proposal/${proposal.shareId}`;
 
           // 1. WELCOME EMAIL to customer
@@ -988,7 +988,7 @@ Please contact ${customerName} within 24 hours to schedule installation.`;
 
       const discountType = proposal.discountType || "none";
       const followPricing = selectedPkg ? calcPkgDiscount(proposal, selectedPkg) : { discountAmt: 0, finalPrice: 0, deposit: 0, monthlyAmt: 0 };
-      const { discountAmt, finalPrice, monthlyAmt } = followPricing;
+      const { discountAmt, finalPrice, monthlyAmt, deposit } = followPricing;
 
       // Build the proposal view link — points to the React frontend page
       // The customer opens this, sees the full proposal, and can download the PDF from there
