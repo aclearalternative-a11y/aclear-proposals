@@ -291,15 +291,23 @@ export function registerZillowRoutes(app: Express) {
       let stagedCount = 0;
       let ghlCount = 0;
       const newListings: ZillowListing[] = [];
+      const errors: string[] = [];
 
       for (const listing of filtered) {
         const staged = await appendToSheet(listing);
         if (staged) stagedCount++;
 
-        const contactId = await createGhlPropertyContact(listing);
-        if (contactId) {
-          ghlCount++;
-          newListings.push(listing);
+        try {
+          const contactId = await createGhlPropertyContact(listing);
+          if (contactId) {
+            ghlCount++;
+            newListings.push(listing);
+          } else {
+            errors.push(`No contactId for ${listing.address}`);
+          }
+        } catch (ghlErr: any) {
+          errors.push(`GHL error for ${listing.address}: ${ghlErr.message}`);
+          console.error(`[Zillow] GHL sync error for ${listing.address}:`, ghlErr.message);
         }
       }
 
@@ -314,6 +322,7 @@ export function registerZillowRoutes(app: Express) {
         matchedZipFilter: filtered.length,
         stagedToSheet: stagedCount,
         syncedToGhl: ghlCount,
+        errors: errors.length > 0 ? errors : undefined,
       });
 
     } catch (e: any) {
@@ -522,6 +531,50 @@ export function registerZillowRoutes(app: Express) {
       stagedListings: stagedCount,
       webhookUrl: "/api/zillow/webhook",
     });
+  });
+
+  // -----------------------------------------------------------------------
+  // GET /api/zillow/test-ghl
+  // Diagnostic: tests GHL API connectivity from Render
+  // -----------------------------------------------------------------------
+  app.get("/api/zillow/test-ghl", async (_req: Request, res: Response) => {
+    try {
+      const testPayload = {
+        locationId: GHL_LOCATION_ID,
+        firstName: "ZILLOW-DIAG-TEST",
+        lastName: "Delete Me",
+        email: "zillow-diag-test@test.com",
+        tags: ["Zillow Feed", "DIAGNOSTIC-DELETE"],
+        source: "Zillow Diagnostic Test",
+      };
+
+      const contactRes = await fetch("https://services.leadconnectorhq.com/contacts/upsert", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${GHL_API_KEY}`,
+          "Version": "2021-07-28",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(testPayload),
+      });
+
+      const status = contactRes.status;
+      const text = await contactRes.text();
+      let parsed: any = null;
+      try { parsed = JSON.parse(text); } catch {}
+
+      res.json({
+        ghlApiReachable: true,
+        httpStatus: status,
+        contactId: parsed?.contact?.id || null,
+        rawResponse: text.substring(0, 500),
+      });
+    } catch (e: any) {
+      res.json({
+        ghlApiReachable: false,
+        error: e.message,
+      });
+    }
   });
 
   // Load persisted target zips on startup
