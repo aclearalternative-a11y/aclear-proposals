@@ -164,7 +164,7 @@ export function parseSheetsData(rows: any[]): PricingData {
     // Categorize by name pattern
     if (name.includes("Twin Alternating")) {
       condTwin.push(item);
-    } else if (name.match(/^ACA\s+[\d.]+\s+[\d,]+$/) || name.match(/^ACA\s+\.\d+\s+[\d,]+$/)) {
+    } else if (name.startsWith("ACA") && /\d+,\d{3}/.test(name)) {
       // Single conditioners: "ACA .75 24,000", "ACA 1.0 32,000", etc.
       condSingle.push(item);
     } else if (name.includes("Acid Neutralizer")) {
@@ -173,7 +173,7 @@ export function parseSheetsData(rows: any[]): PricingData {
       ironOdor.push(item);
     } else if (name.includes("Carbon Filtration")) {
       carbon.push(item);
-    } else if (name.includes("Reverse Osmosis") || name.includes("Tankless") && name.includes("Gallons Per Day")) {
+    } else if (name.includes("Reverse Osmosis") || (name.includes("Tankless") && name.includes("Gallons Per Day"))) {
       ro.push(item);
     } else if (name.includes("Bladder Tank")) {
       bladder.push(item);
