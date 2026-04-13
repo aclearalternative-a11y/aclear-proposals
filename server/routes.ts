@@ -639,6 +639,27 @@ A Clear Alternative
     }
   });
 
+  // Live pricing from Google Sheets
+  const { startPricingSync, getCachedPricing, refreshPricing } = require("./pricing-sync");
+  startPricingSync();
+
+  app.get("/api/pricing", async (_req: Request, res: Response) => {
+    let data = getCachedPricing();
+    if (!data) {
+      try { data = await refreshPricing(); } catch { return res.status(503).json({ error: "Pricing data not yet available" }); }
+    }
+    res.json(data);
+  });
+
+  app.post("/api/pricing/refresh", async (_req: Request, res: Response) => {
+    try {
+      const data = await refreshPricing();
+      res.json({ success: true, lastUpdated: data.lastUpdated, items: Object.keys(data).length });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // Water quality data lookup by ZIP
   app.get("/api/water-quality/:zip", (req: Request, res: Response) => {
     const { lookupWellWaterData, NJ_CITY_WATER_CONCERNS, NJ_ZIP_MAP, COUNTY_PWTA } = require("./water-quality-data");

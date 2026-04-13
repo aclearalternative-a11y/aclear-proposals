@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import ProposalForm from "@/pages/proposal-form";
 import ProposalView from "@/pages/proposal-view";
+import { PricingProvider } from "@/lib/pricing-context";
 
 function AppRouter() {
   return (
@@ -21,12 +22,14 @@ function AppRouter() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router hook={useHashLocation}>
-          <AppRouter />
-        </Router>
-      </TooltipProvider>
+      <PricingProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router hook={useHashLocation}>
+            <AppRouter />
+          </Router>
+        </TooltipProvider>
+      </PricingProvider>
     </QueryClientProvider>
   );
 }

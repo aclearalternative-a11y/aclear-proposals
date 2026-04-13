@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { REPS, DISCOUNTS, generatePackages, calcTotal, applyDiscount, calcMonthlyInvestment, formatCurrency, getAllEquipmentOptions, getRepPhone } from "@/lib/pricing-data";
+import { usePricing } from "@/lib/pricing-context";
 import type { EquipmentItem, PackageData, WaterTestResults } from "@shared/schema";
 import { Droplets, ChevronUp, ChevronDown, X, Plus, Send, Loader2, CheckCircle2 } from "lucide-react";
 import { nanoid } from "nanoid";
@@ -17,6 +18,7 @@ type Step = "info" | "water" | "packages";
 
 export default function ProposalForm() {
   const { toast } = useToast();
+  const { pricing } = usePricing();
   const [step, setStep] = useState<Step>("info");
   const [sending, setSending] = useState(false);
 
@@ -118,7 +120,7 @@ export default function ProposalForm() {
       h2sCold: h2s ? parseInt(h2sCold) || 0 : undefined,
       h2sHot: h2s ? parseInt(h2sHot) || 0 : undefined,
     };
-    const pkgs = generatePackages(waterSource, waterTest, numPeople || 3, numBathrooms || 2);
+    const pkgs = generatePackages(waterSource, waterTest, numPeople || 3, numBathrooms || 2, pricing);
     setPackages(pkgs);
     setStep("packages");
   }, [pH, iron, hardness, tds, copper, chlorine, h2s, h2sCold, h2sHot, waterSource, numPeople, numBathrooms]);

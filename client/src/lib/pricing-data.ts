@@ -204,15 +204,29 @@ export function generatePackages(
   waterSource: "well" | "city",
   waterTest: WaterTestResults,
   numPeople: number,
-  numBathrooms: number
+  numBathrooms: number,
+  livePricing?: any  // Dynamic pricing from Google Sheets API
 ): PackageData[] {
+  // Use live pricing if available, fall back to hardcoded defaults
+  const _COND_SINGLE = livePricing?.conditionersSingle || CONDITIONERS_SINGLE;
+  const _COND_TWIN = livePricing?.conditionersTwin || CONDITIONERS_TWIN;
+  const _ACID = livePricing?.acidNeutralizers || ACID_NEUTRALIZERS;
+  const _IOB = livePricing?.ironOdorBreakers || IRON_ODOR_BREAKERS;
+  const _CARBON = livePricing?.carbonFiltration || CARBON_FILTRATION;
+  const _RO = livePricing?.roSystems || RO_SYSTEMS;
+  const _BLADDER = livePricing?.bladderTanks || BLADDER_TANKS;
+  const _UV = livePricing?.uvLights || UV_LIGHTS;
+  const _CHEM_INJ = livePricing?.chemicalInjection || CHEMICAL_INJECTION;
+  const _LEAK = livePricing?.leakValve || LEAK_VALVE;
+  const _RUSCO = livePricing?.ruscoFilter || RUSCO_FILTER;
+
   const useTwin = waterTest.iron > 1.5;
   // Only trigger acid neutralizer if pH was actually entered AND is below threshold
   const needsAcidNeutralizer = !!waterTest.pH && waterTest.pH < 6.5;
   const hasH2S = waterTest.hydrogenSulfide;
   const h2sHigh = (waterTest.h2sCold && waterTest.h2sCold > 7) || (waterTest.h2sHot && waterTest.h2sHot > 7);
 
-  const conditioners = useTwin ? CONDITIONERS_TWIN : CONDITIONERS_SINGLE;
+  const conditioners = useTwin ? _COND_TWIN : _COND_SINGLE;
   const conditionerIdx = sizeConditioner(waterTest.hardness, numPeople);
   const acidIdx = needsAcidNeutralizer ? sizeAcidNeutralizer(waterTest.pH, numPeople) : 0;
   const iobIdx = sizeIronOdorBreaker(numPeople);
@@ -226,38 +240,38 @@ export function generatePackages(
       makeEquipment("Water Conditioner", conditioners, conditionerIdx),
     ];
     if (needsAcidNeutralizer) {
-      goodEquip.push(makeEquipment("Acid Neutralizer", ACID_NEUTRALIZERS, acidIdx));
+      goodEquip.push(makeEquipment("Acid Neutralizer", _ACID, acidIdx));
     }
-    goodEquip.push(makeFixedEquipment("Leak Shut Off Valve", LEAK_VALVE));
+    goodEquip.push(makeFixedEquipment("Leak Shut Off Valve", _LEAK));
 
     // BETTER: Water conditioner + acid neutralizer (if needed) + RO + leak valve
     const betterEquip: EquipmentItem[] = [
       makeEquipment("Water Conditioner", conditioners, conditionerIdx),
     ];
     if (needsAcidNeutralizer) {
-      betterEquip.push(makeEquipment("Acid Neutralizer", ACID_NEUTRALIZERS, acidIdx));
+      betterEquip.push(makeEquipment("Acid Neutralizer", _ACID, acidIdx));
     }
-    betterEquip.push(makeEquipment("Reverse Osmosis", RO_SYSTEMS, roIdx));
-    betterEquip.push(makeFixedEquipment("Leak Shut Off Valve", LEAK_VALVE));
+    betterEquip.push(makeEquipment("Reverse Osmosis", _RO, roIdx));
+    betterEquip.push(makeFixedEquipment("Leak Shut Off Valve", _LEAK));
 
     // BEST: conditioner + acid neutralizer (if needed) + iron odor breaker (if H2S) + RO + UV + bladder tank + Rusco + leak valve
     const bestEquip: EquipmentItem[] = [
       makeEquipment("Water Conditioner", conditioners, conditionerIdx),
     ];
     if (needsAcidNeutralizer) {
-      bestEquip.push(makeEquipment("Acid Neutralizer", ACID_NEUTRALIZERS, acidIdx));
+      bestEquip.push(makeEquipment("Acid Neutralizer", _ACID, acidIdx));
     }
     if (hasH2S) {
       if (h2sHigh) {
-        bestEquip.push(makeFixedEquipment("Chemical Injection", CHEMICAL_INJECTION));
+        bestEquip.push(makeFixedEquipment("Chemical Injection", _CHEM_INJ));
       }
-      bestEquip.push(makeEquipment("Iron Odor Breaker", IRON_ODOR_BREAKERS, iobIdx));
+      bestEquip.push(makeEquipment("Iron Odor Breaker", _IOB, iobIdx));
     }
-    bestEquip.push(makeEquipment("Reverse Osmosis", RO_SYSTEMS, roIdx));
-    bestEquip.push(makeEquipment("UV Light", UV_LIGHTS, uvIdx));
-    bestEquip.push(makeEquipment("Bladder Tank", BLADDER_TANKS, 0)); // Default WR120
-    bestEquip.push(makeFixedEquipment("Rusco Filter", RUSCO_FILTER));
-    bestEquip.push(makeFixedEquipment("Leak Shut Off Valve", LEAK_VALVE));
+    bestEquip.push(makeEquipment("Reverse Osmosis", _RO, roIdx));
+    bestEquip.push(makeEquipment("UV Light", _UV, uvIdx));
+    bestEquip.push(makeEquipment("Bladder Tank", _BLADDER, 0)); // Default WR120
+    bestEquip.push(makeFixedEquipment("Rusco Filter", _RUSCO));
+    bestEquip.push(makeFixedEquipment("Leak Shut Off Valve", _LEAK));
 
     return [
       { tier: "good", label: "Good", equipment: goodEquip, totalPrice: calcTotal(goodEquip), installationIncluded: true },
@@ -271,33 +285,33 @@ export function generatePackages(
       makeEquipment("Water Conditioner", conditioners, conditionerIdx),
     ];
     if (needsAcidNeutralizer) {
-      goodEquip.push(makeEquipment("Acid Neutralizer", ACID_NEUTRALIZERS, acidIdx));
+      goodEquip.push(makeEquipment("Acid Neutralizer", _ACID, acidIdx));
     }
-    goodEquip.push(makeEquipment("Carbon Filtration", CARBON_FILTRATION, carbonIdx));
-    goodEquip.push(makeFixedEquipment("Leak Shut Off Valve", LEAK_VALVE));
+    goodEquip.push(makeEquipment("Carbon Filtration", _CARBON, carbonIdx));
+    goodEquip.push(makeFixedEquipment("Leak Shut Off Valve", _LEAK));
 
     // BETTER: conditioner + acid neutralizer (if needed) + carbon + RO + leak valve
     const betterEquip: EquipmentItem[] = [
       makeEquipment("Water Conditioner", conditioners, conditionerIdx),
     ];
     if (needsAcidNeutralizer) {
-      betterEquip.push(makeEquipment("Acid Neutralizer", ACID_NEUTRALIZERS, acidIdx));
+      betterEquip.push(makeEquipment("Acid Neutralizer", _ACID, acidIdx));
     }
-    betterEquip.push(makeEquipment("Carbon Filtration", CARBON_FILTRATION, carbonIdx));
-    betterEquip.push(makeEquipment("Reverse Osmosis", RO_SYSTEMS, roIdx));
-    betterEquip.push(makeFixedEquipment("Leak Shut Off Valve", LEAK_VALVE));
+    betterEquip.push(makeEquipment("Carbon Filtration", _CARBON, carbonIdx));
+    betterEquip.push(makeEquipment("Reverse Osmosis", _RO, roIdx));
+    betterEquip.push(makeFixedEquipment("Leak Shut Off Valve", _LEAK));
 
     // BEST: conditioner + acid neutralizer (if needed) + carbon + RO + UV + leak valve
     const bestEquip: EquipmentItem[] = [
       makeEquipment("Water Conditioner", conditioners, conditionerIdx),
     ];
     if (needsAcidNeutralizer) {
-      bestEquip.push(makeEquipment("Acid Neutralizer", ACID_NEUTRALIZERS, acidIdx));
+      bestEquip.push(makeEquipment("Acid Neutralizer", _ACID, acidIdx));
     }
-    bestEquip.push(makeEquipment("Carbon Filtration", CARBON_FILTRATION, carbonIdx));
-    bestEquip.push(makeEquipment("Reverse Osmosis", RO_SYSTEMS, roIdx));
-    bestEquip.push(makeEquipment("UV Light", UV_LIGHTS, uvIdx));
-    bestEquip.push(makeFixedEquipment("Leak Shut Off Valve", LEAK_VALVE));
+    bestEquip.push(makeEquipment("Carbon Filtration", _CARBON, carbonIdx));
+    bestEquip.push(makeEquipment("Reverse Osmosis", _RO, roIdx));
+    bestEquip.push(makeEquipment("UV Light", _UV, uvIdx));
+    bestEquip.push(makeFixedEquipment("Leak Shut Off Valve", _LEAK));
 
     return [
       { tier: "good", label: "Good", equipment: goodEquip, totalPrice: calcTotal(goodEquip), installationIncluded: true },
