@@ -45,7 +45,7 @@ function fetchUrl(url: string): Promise<string> {
     const get = (u: string, depth = 0) => {
       if (depth > 5) return reject(new Error("Too many redirects"));
       https.get(u, { headers: { "User-Agent": "AClear-Proposals/1.0" } }, (res) => {
-        if ((res.statusCode === 301 || res.statusCode === 302) && res.headers.location) {
+        if ((res.statusCode === 301 || res.statusCode === 302 || res.statusCode === 307) && res.headers.location) {
           return get(res.headers.location, depth + 1);
         }
         let data = "";
