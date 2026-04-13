@@ -97,26 +97,28 @@ const WATER_HEATERS = [
   { name: "50 Gallon GAS Bradford White Hot Water Heater", size: "50G Gas", price: 2753 },
   { name: "50 Gallon GAS POWER VENT Bradford White Hot Water Heater", size: "50G Gas PV", price: 4220 },
   { name: "50 Gallon ELECTRIC Bradford White Hot Water Heater", size: "50G Elec", price: 2172 },
-  { name: "199,000 Tankless Water Heater - Unlimited Supply", size: "Tankless", price: 5895 },
+  { name: "199,000 Tankless Water Heater - Unlimited Supply", size: "Tankless", price: 5995 },
+  { name: "Navien 240 Combi Water Heater and Boiler", size: "240 Combi", price: 6495 },
 ];
 
 // All equipment available for the add dropdown
-export function getAllEquipmentOptions(): { category: string; items: { name: string; size: string; price: number; rentalPrice?: number; rentalInstallPrice?: number; brochureUrl?: string }[] }[] {
+export function getAllEquipmentOptions(livePricing?: any): { category: string; items: { name: string; size: string; price: number; rentalPrice?: number; rentalInstallPrice?: number; brochureUrl?: string }[] }[] {
+  const lp = livePricing;
   return [
-    { category: "Water Conditioners (Single)", items: CONDITIONERS_SINGLE },
-    { category: "Water Conditioners (Twin Alternating)", items: CONDITIONERS_TWIN },
-    { category: "Acid Neutralizers", items: ACID_NEUTRALIZERS },
-    { category: "Iron Odor Breakers", items: IRON_ODOR_BREAKERS },
-    { category: "Carbon Filtration", items: CARBON_FILTRATION },
-    { category: "Reverse Osmosis", items: RO_SYSTEMS },
-    { category: "Bladder Tanks", items: BLADDER_TANKS },
-    { category: "UV Lights", items: UV_LIGHTS },
-    { category: "Chemical Injection", items: [CHEMICAL_INJECTION] },
-    { category: "Leak Shut Off Valve", items: [LEAK_VALVE] },
-    { category: "Rusco Filter", items: [RUSCO_FILTER] },
-    { category: "Ozone Air Purifier", items: [OZONE_PURIFIER] },
-    { category: "Pressure Boosting System", items: [PRESSURE_BOOSTER] },
-    { category: "Water Heaters", items: WATER_HEATERS },
+    { category: "Water Conditioners (Single)", items: lp?.conditionersSingle?.length ? lp.conditionersSingle : CONDITIONERS_SINGLE },
+    { category: "Water Conditioners (Twin Alternating)", items: lp?.conditionersTwin?.length ? lp.conditionersTwin : CONDITIONERS_TWIN },
+    { category: "Acid Neutralizers", items: lp?.acidNeutralizers?.length ? lp.acidNeutralizers : ACID_NEUTRALIZERS },
+    { category: "Iron Odor Breakers", items: lp?.ironOdorBreakers?.length ? lp.ironOdorBreakers : IRON_ODOR_BREAKERS },
+    { category: "Carbon Filtration", items: lp?.carbonFiltration?.length ? lp.carbonFiltration : CARBON_FILTRATION },
+    { category: "Reverse Osmosis", items: lp?.roSystems?.length ? lp.roSystems : RO_SYSTEMS },
+    { category: "Bladder Tanks", items: lp?.bladderTanks?.length ? lp.bladderTanks : BLADDER_TANKS },
+    { category: "UV Lights", items: lp?.uvLights?.length ? lp.uvLights : UV_LIGHTS },
+    { category: "Chemical Injection", items: [lp?.chemicalInjection?.price ? lp.chemicalInjection : CHEMICAL_INJECTION] },
+    { category: "Leak Shut Off Valve", items: [lp?.leakValve?.price ? lp.leakValve : LEAK_VALVE] },
+    { category: "Rusco Filter", items: [lp?.ruscoFilter?.price ? lp.ruscoFilter : RUSCO_FILTER] },
+    { category: "Ozone Air Purifier", items: [lp?.ozonePurifier?.price ? lp.ozonePurifier : OZONE_PURIFIER] },
+    { category: "Pressure Boosting System", items: [lp?.pressureBooster?.price ? lp.pressureBooster : PRESSURE_BOOSTER] },
+    { category: "Water Heaters", items: lp?.waterHeaters?.length ? lp.waterHeaters : WATER_HEATERS },
   ];
 }
 
