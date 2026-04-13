@@ -207,18 +207,19 @@ export function generatePackages(
   numBathrooms: number,
   livePricing?: any  // Dynamic pricing from Google Sheets API
 ): PackageData[] {
-  // Use live pricing if available, fall back to hardcoded defaults
-  const _COND_SINGLE = livePricing?.conditionersSingle || CONDITIONERS_SINGLE;
-  const _COND_TWIN = livePricing?.conditionersTwin || CONDITIONERS_TWIN;
-  const _ACID = livePricing?.acidNeutralizers || ACID_NEUTRALIZERS;
-  const _IOB = livePricing?.ironOdorBreakers || IRON_ODOR_BREAKERS;
-  const _CARBON = livePricing?.carbonFiltration || CARBON_FILTRATION;
-  const _RO = livePricing?.roSystems || RO_SYSTEMS;
-  const _BLADDER = livePricing?.bladderTanks || BLADDER_TANKS;
-  const _UV = livePricing?.uvLights || UV_LIGHTS;
-  const _CHEM_INJ = livePricing?.chemicalInjection || CHEMICAL_INJECTION;
-  const _LEAK = livePricing?.leakValve || LEAK_VALVE;
-  const _RUSCO = livePricing?.ruscoFilter || RUSCO_FILTER;
+  // Use live pricing if available AND non-empty, fall back to hardcoded defaults
+  const lp = livePricing;
+  const _COND_SINGLE = lp?.conditionersSingle?.length ? lp.conditionersSingle : CONDITIONERS_SINGLE;
+  const _COND_TWIN = lp?.conditionersTwin?.length ? lp.conditionersTwin : CONDITIONERS_TWIN;
+  const _ACID = lp?.acidNeutralizers?.length ? lp.acidNeutralizers : ACID_NEUTRALIZERS;
+  const _IOB = lp?.ironOdorBreakers?.length ? lp.ironOdorBreakers : IRON_ODOR_BREAKERS;
+  const _CARBON = lp?.carbonFiltration?.length ? lp.carbonFiltration : CARBON_FILTRATION;
+  const _RO = lp?.roSystems?.length ? lp.roSystems : RO_SYSTEMS;
+  const _BLADDER = lp?.bladderTanks?.length ? lp.bladderTanks : BLADDER_TANKS;
+  const _UV = lp?.uvLights?.length ? lp.uvLights : UV_LIGHTS;
+  const _CHEM_INJ = lp?.chemicalInjection?.price ? lp.chemicalInjection : CHEMICAL_INJECTION;
+  const _LEAK = lp?.leakValve?.price ? lp.leakValve : LEAK_VALVE;
+  const _RUSCO = lp?.ruscoFilter?.price ? lp.ruscoFilter : RUSCO_FILTER;
 
   const useTwin = waterTest.iron > 1.5;
   // Only trigger acid neutralizer if pH was actually entered AND is below threshold
