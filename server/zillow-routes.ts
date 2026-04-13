@@ -53,21 +53,23 @@ interface ZillowListing {
 // Normalize listing data from various API formats (Apify, RapidAPI, etc.)
 // ---------------------------------------------------------------------------
 function normalizeListing(raw: any): ZillowListing {
+  // Also check nested hdpData.homeInfo (Apify maxcopell/zillow-scraper format)
+  const hd = raw.hdpData?.homeInfo || {};
   return {
-    zpid: String(raw.zpid || raw.id || raw.propertyId || raw.listing_id || ""),
-    address: raw.address || raw.streetAddress || raw.addr || raw.full_address || "",
-    city: raw.city || raw.addressCity || "",
-    state: raw.state || raw.addressState || "NJ",
-    zipcode: String(raw.zipcode || raw.zip || raw.addressZipcode || raw.postalCode || ""),
-    price: raw.price || raw.listPrice || raw.soldPrice || raw.sold_price || 0,
-    bedrooms: raw.bedrooms || raw.beds || 0,
-    bathrooms: raw.bathrooms || raw.baths || 0,
-    livingArea: raw.livingArea || raw.sqft || raw.living_area || raw.area || 0,
-    homeType: raw.homeType || raw.propertyType || raw.home_type || "SINGLE_FAMILY",
-    homeStatus: raw.homeStatus || raw.listingStatus || raw.status || raw.home_status || "FOR_SALE",
-    daysOnZillow: raw.daysOnZillow || raw.days_on_market || raw.dom || 0,
-    zestimate: raw.zestimate || raw.zEstimate || 0,
-    url: raw.url || raw.detailUrl || (raw.zpid ? `https://www.zillow.com/homedetails/${raw.zpid}_zpid/` : ""),
+    zpid: String(raw.zpid || hd.zpid || raw.id || raw.propertyId || raw.listing_id || ""),
+    address: raw.addressStreet || raw.address || raw.streetAddress || hd.streetAddress || raw.addr || raw.full_address || "",
+    city: raw.addressCity || raw.city || hd.city || "",
+    state: raw.addressState || raw.state || hd.state || "NJ",
+    zipcode: String(raw.addressZipcode || raw.zipcode || raw.zip || hd.zipcode || raw.postalCode || ""),
+    price: raw.unformattedPrice || raw.price || hd.price || raw.listPrice || raw.soldPrice || raw.sold_price || 0,
+    bedrooms: raw.beds || raw.bedrooms || hd.bedrooms || 0,
+    bathrooms: raw.baths || raw.bathrooms || hd.bathrooms || 0,
+    livingArea: raw.area || raw.livingArea || hd.livingArea || raw.sqft || raw.living_area || 0,
+    homeType: raw.homeType || hd.homeType || raw.propertyType || raw.home_type || "SINGLE_FAMILY",
+    homeStatus: raw.statusType || raw.homeStatus || hd.homeStatus || raw.listingStatus || raw.status || raw.home_status || "FOR_SALE",
+    daysOnZillow: raw.daysOnZillow || hd.daysOnZillow || raw.days_on_market || raw.dom || 0,
+    zestimate: raw.zestimate || hd.zestimate || raw.zEstimate || 0,
+    url: raw.detailUrl || raw.url || (raw.zpid ? `https://www.zillow.com/homedetails/${raw.zpid}_zpid/` : ""),
   };
 }
 
