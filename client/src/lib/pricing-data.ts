@@ -43,6 +43,7 @@ const CONDITIONERS_TWIN = [
 ];
 
 const ACID_NEUTRALIZERS = [
+  { name: "ACA Acid Neutralizer 1.0", size: "1.0", price: 1590, people: "1-2", phRange: "6.0-6.5", brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd" },
   { name: "ACA Acid Neutralizer 1.5", size: "1.5", price: 1790, people: "1-3", phRange: "6.0-6.5", brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd" },
   { name: "ACA Acid Neutralizer 2.0", size: "2.0", price: 2290, people: "2-4", phRange: "5.5-6.0", brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd" },
   { name: "ACA Acid Neutralizer 2.5", size: "2.5", price: 2790, people: "3-6", phRange: "5.0-5.5", brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd" },
@@ -50,10 +51,10 @@ const ACID_NEUTRALIZERS = [
 ];
 
 const IRON_ODOR_BREAKERS = [
-  { name: "ACA Iron Odor Breaker 1.5", size: "1.5", price: 2290, people: "1-3", brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5" },
-  { name: "ACA Iron Odor Breaker 2.0", size: "2.0", price: 2790, people: "2-4", brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5" },
-  { name: "ACA Iron Odor Breaker 2.5", size: "2.5", price: 3290, people: "3-6", brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5" },
-  { name: "ACA Iron Odor Breaker 3.0", size: "3.0", price: 3790, people: "4-8", brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5" },
+  { name: "ACA Iron Odor Breaker 1.5", size: "1.5", price: 2590, people: "1-3", brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5" },
+  { name: "ACA Iron Odor Breaker 2.0", size: "2.0", price: 2990, people: "2-4", brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5" },
+  { name: "ACA Iron Odor Breaker 2.5", size: "2.5", price: 3490, people: "3-6", brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5" },
+  { name: "ACA Iron Odor Breaker 3.0", size: "3.0", price: 3990, people: "4-8", brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5" },
 ];
 
 const CARBON_FILTRATION = [
@@ -66,7 +67,7 @@ const CARBON_FILTRATION = [
 const RO_SYSTEMS = [
   { name: "ACA Reverse Osmosis 25 GPD", size: "25 GPD", price: 1190, people: "1-2" },
   { name: "ACA Reverse Osmosis 50 GPD", size: "50 GPD", price: 1290, people: "3-4" },
-  { name: "ACA Tankless 800 GPD", size: "800 GPD", price: 1790, people: "4+" },
+  { name: "ACA Tankless 800 GPD", size: "800 GPD", price: 1590, people: "4+" },
 ];
 
 const BLADDER_TANKS = [
@@ -83,7 +84,7 @@ const UV_LIGHTS = [
 ];
 
 const CHEMICAL_INJECTION = { name: "Chemical Injection Package", size: "", price: 3890 };
-const LEAK_VALVE = { name: '1" Emergency Leak Shut Off Valve', size: "", price: 1490, brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:02daeba4-c657-41de-9318-29ba0899d91d" };
+const LEAK_VALVE = { name: '1" Emergency Leak Shut Off Valve', size: "", price: 1590, brochureUrl: "https://acrobat.adobe.com/id/urn:aaid:sc:US:02daeba4-c657-41de-9318-29ba0899d91d" };
 const RUSCO_FILTER = { name: 'Rusco Sand/Sediment Filter 1"', size: "", price: 225 };
 const OZONE_PURIFIER = { name: "ACA Whole House Ozone Air Purifier", size: "", price: 2290 };
 const PRESSURE_BOOSTER = { name: '1" SS Pressure Boosting System up to 80 PSI', size: "", price: 2995 };
@@ -132,10 +133,12 @@ function sizeConditioner(hardness: number, numPeople: number): number {
 }
 
 function sizeAcidNeutralizer(pH: number, numPeople: number): number {
-  if (pH >= 6.0) return 0; // 1.5
-  if (pH >= 5.5 && numPeople <= 4) return 1; // 2.0
-  if (pH >= 5.0 && numPeople <= 6) return 2; // 2.5
-  return 3; // 3.0
+  // Array: [1.0, 1.5, 2.0, 2.5, 3.0]
+  if (pH >= 6.0 && numPeople <= 2) return 0; // 1.0
+  if (pH >= 6.0) return 1; // 1.5
+  if (pH >= 5.5 && numPeople <= 4) return 2; // 2.0
+  if (pH >= 5.0 && numPeople <= 6) return 3; // 2.5
+  return 4; // 3.0
 }
 
 function sizeIronOdorBreaker(numPeople: number): number {
@@ -320,7 +323,7 @@ export function applyDiscount(
     return { discountedTotal: total, discountAmount: 0, discountPercent: 0 };
   }
 
-  const MAX_TOTAL_DISCOUNT = 5;
+  const MAX_TOTAL_DISCOUNT = 6;
   const alreadyAppliedPercent = Math.round(alreadyAppliedRate * 100);
 
   if (discountType === "custom_dollar") {
@@ -336,7 +339,7 @@ export function applyDiscount(
     return { discountedTotal: total - amt, discountAmount: amt, discountPercent: customValue };
   }
 
-  // Veteran / Fire-EMS — capped at 5% combined with multi-package
+  // Veteran / Fire-EMS — capped at 6% combined with multi-package
   const discount = DISCOUNTS.find(d => d.value === discountType);
   const rawPercent = discount?.percent || 0;
   const effectivePercent = Math.min(rawPercent, Math.max(0, MAX_TOTAL_DISCOUNT - alreadyAppliedPercent));

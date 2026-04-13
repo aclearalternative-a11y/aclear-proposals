@@ -28,7 +28,8 @@ function getBrochureUrl(name: string): string {
   if (name.includes("Acid Neutralizer")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd";
   if (name.includes("Iron Odor Breaker")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5";
   if (name.includes("Carbon Filtration")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd";
-  if (name.includes("Reverse Osmosis")) return "https://drive.google.com/file/d/1iGKB0F8mIIbORK8OFnkImyZTgudFkxa6/view";
+  if (name.includes("Reverse Osmosis") && name.includes("25")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:2c36639f-f003-444f-b8ad-e75123c60ee5";
+  if (name.includes("Reverse Osmosis")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:b1fe4fc4-e725-4ccb-8cdd-a7cdb66ce816";
   // Single water conditioners: "ACA .75 24,000", "ACA 1.0 32,000", "ACA 1.5 48,000", etc.
   // These names start with "ACA" and contain a grain-size pattern like "24,000"
   if (name.startsWith("ACA") && /\d+,\d{3}/.test(name)) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:b85f25e9-cbdf-421a-8f9e-2dffa9936a91";

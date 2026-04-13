@@ -104,7 +104,8 @@ function getBrochureUrl(equipName: string): string {
   if (equipName.includes("Acid Neutralizer")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd";
   if (equipName.includes("Iron Odor Breaker")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:d04f7189-fc0e-4352-9cc0-7e3a70b70ca5";
   if (equipName.includes("Carbon Filtration")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:c1ea3954-e1f4-4691-892a-868a5f1dafbd";
-  if (equipName.includes("Reverse Osmosis")) return "https://drive.google.com/file/d/1iGKB0F8mIIbORK8OFnkImyZTgudFkxa6/view";
+  if (equipName.includes("Reverse Osmosis") && equipName.includes("25")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:2c36639f-f003-444f-b8ad-e75123c60ee5";
+  if (equipName.includes("Reverse Osmosis")) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:b1fe4fc4-e725-4ccb-8cdd-a7cdb66ce816";
   // Single water conditioners: "ACA .75 24,000", "ACA 1.0 32,000", "ACA 1.5 48,000", etc.
   // The grain-size pattern (e.g. "24,000") uniquely identifies single conditioners
   if (equipName.startsWith("ACA") && /\d+,\d{3}/.test(equipName)) return "https://acrobat.adobe.com/id/urn:aaid:sc:US:b85f25e9-cbdf-421a-8f9e-2dffa9936a91";
@@ -119,7 +120,7 @@ function calcPkgDiscount(proposal: any, pkg: any) {
   const customVal = proposal.customDiscountValue || 0;
   const multiPkgRate = (pkg as any).discountRate || 0;
   const multiPkgPct = Math.round(multiPkgRate * 100);
-  const MAX = 5;
+  const MAX = 6;
 
   // Water heaters are NEVER discounted
   const waterHeaterTotal = (pkg.equipment || []).filter((e: any) =>
@@ -144,12 +145,12 @@ function calcPkgDiscount(proposal: any, pkg: any) {
     discountPercent = discountableBase > 0 ? Math.round((discountAmt / discountableBase) * 100) : 0;
     discountLabel = `Discount (-$${discountAmt})`;
   } else if (discountType === "veteran") {
-    // Veteran 5% — capped at 5% combined with multi-package
+    // Veteran 5% — capped at 6% combined with multi-package
     discountPercent = Math.min(5, Math.max(0, MAX - multiPkgPct));
     discountAmt = Math.round(discountableBase * discountPercent / 100);
     discountLabel = `Veteran Discount (${discountPercent}%)`;
   } else if (discountType === "fire_ems") {
-    // Fire/EMS 3% — capped at 5% combined with multi-package
+    // Fire/EMS 3% — capped at 6% combined with multi-package
     discountPercent = Math.min(3, Math.max(0, MAX - multiPkgPct));
     discountAmt = Math.round(discountableBase * discountPercent / 100);
     discountLabel = `Fire/EMS Discount (${discountPercent}%)`;
