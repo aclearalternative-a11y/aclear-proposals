@@ -4,7 +4,7 @@
 // stages in Google Sheets, and syncs to GoHighLevel CRM.
 // =============================================================================
 import type { Express, Request, Response } from "express";
-import { execSync } from "child_process";
+// execSync removed — using native fetch for Render compatibility
 
 const GHL_API_KEY = process.env.GHL_API_KEY || "pit-8acdc061-acf4-40a8-a1f8-5f91e3f3430c";
 const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
@@ -134,13 +134,8 @@ async function appendToSheet(listing: ZillowListing): Promise<boolean> {
 // ---------------------------------------------------------------------------
 async function createGhlPropertyContact(listing: ZillowListing): Promise<string | null> {
   try {
-    const priceFormatted = listing.price
-      ? Number(listing.price).toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 })
-      : "N/A";
-
     const contactPayload = {
       locationId: GHL_LOCATION_ID,
-      // Use the property address as the "contact" name for easy pipeline tracking
       firstName: listing.address || "Property",
       lastName: `${listing.city || ""} ${listing.state || "NJ"} ${listing.zipcode || ""}`.trim(),
       email: "",
@@ -165,16 +160,18 @@ async function createGhlPropertyContact(listing: ZillowListing): Promise<string 
       ],
     };
 
-    const res = execSync(
-      `curl -s -X POST "https://services.leadconnectorhq.com/contacts/upsert" \
-        -H "Authorization: Bearer ${GHL_API_KEY}" \
-        -H "Version: 2021-07-28" \
-        -H "Content-Type: application/json" \
-        -d '${JSON.stringify(contactPayload).replace(/'/g, "'\\''")}'`,
-      { timeout: 15000 }
-    ).toString();
+    // Use fetch instead of execSync/curl for Render compatibility
+    const contactRes = await fetch("https://services.leadconnectorhq.com/contacts/upsert", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${GHL_API_KEY}`,
+        "Version": "2021-07-28",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(contactPayload),
+    });
 
-    const data = JSON.parse(res);
+    const data = await contactRes.json() as any;
     const contactId = data?.contact?.id || data?.id || null;
 
     if (contactId) {
@@ -198,25 +195,28 @@ async function createGhlPropertyContact(listing: ZillowListing): Promise<string 
           source: "Zillow Property Feed",
         };
 
-        const oppRes = execSync(
-          `curl -s -X POST "https://services.leadconnectorhq.com/opportunities/" \
-            -H "Authorization: Bearer ${GHL_API_KEY}" \
-            -H "Version: 2021-07-28" \
-            -H "Content-Type: application/json" \
-            -d '${JSON.stringify(oppPayload).replace(/'/g, "'\\\\''")}'`,
-          { timeout: 15000 }
-        ).toString();
+        const oppRes = await fetch("https://services.leadconnectorhq.com/opportunities/", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${GHL_API_KEY}`,
+            "Version": "2021-07-28",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(oppPayload),
+        });
 
-        const oppData = JSON.parse(oppRes);
+        const oppData = await oppRes.json() as any;
         const oppId = oppData?.opportunity?.id || null;
         if (oppId) {
           console.log(`[Zillow] Opportunity created: ${oppId} — stage: ${stageId === ZILLOW_STAGES.HOME_SOLD ? "Home Sold" : "New Listing For Sale"}`);
+        } else {
+          console.warn(`[Zillow] Opportunity creation response:`, JSON.stringify(oppData).substring(0, 200));
         }
       } catch (oppErr: any) {
         console.error("[Zillow] Opportunity creation error:", oppErr.message);
       }
     } else {
-      console.warn(`[Zillow] GHL upsert returned no ID:`, res.substring(0, 200));
+      console.warn(`[Zillow] GHL upsert returned no ID:`, JSON.stringify(data).substring(0, 200));
     }
 
     return contactId;
@@ -438,10 +438,13 @@ export function registerZillowRoutes(app: Express) {
 
       console.log(`[Zillow] Apify callback received — dataset: ${datasetId}`);
 
-      // Fetch results from Apify dataset
+      // Fetch results from Apify dataset using fetch for Render compatibility
       const datasetUrl = `https://api.apify.com/v2/datasets/${datasetId}/items?format=json${apifyToken ? `&token=${apifyToken}` : ""}`;
-      const datasetRes = execSync(`curl -s "${datasetUrl}"`, { timeout: 30000 }).toString();
-      const items = JSON.parse(datasetRes);
+      const datasetFetch = await fetch(datasetUrl);
+      if (!datasetFetch.ok) {
+        throw new Error(`Apify dataset fetch failed: ${datasetFetch.status} ${datasetFetch.statusText}`);
+      }
+      const items = await datasetFetch.json() as any[];
 
       console.log(`[Zillow] Fetched ${items.length} items from Apify dataset`);
 
