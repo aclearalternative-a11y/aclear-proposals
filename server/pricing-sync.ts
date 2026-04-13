@@ -189,7 +189,7 @@ export function parseSheetsData(rows: any[]): PricingData {
       ozone = item;
     } else if (name.includes("Pressure") && name.includes("boosting")) {
       booster = item;
-    } else if (name.includes("Bradford White") || name.includes("Tankless Water Heater")) {
+    } else if (name.includes("Bradford White") || name.includes("Water Heater") || name.includes("Combi")) {
       heaters.push(item);
     }
   }
