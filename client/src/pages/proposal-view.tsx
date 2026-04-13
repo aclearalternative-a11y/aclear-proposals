@@ -366,7 +366,7 @@ export default function ProposalView() {
                     const pkgMonthly = calcMonthlyInvestment(pkgDiscount.discountedTotal, proposal.deposit || 0);
                     const multiAmt = (pkg as any).originalPrice ? (pkg as any).originalPrice - pkg.totalPrice : 0;
                     const hasAnyDiscount = multiAmt > 0 || pkgDiscount.discountAmount > 0;
-                    if (!hasAnyDiscount && !proposal.deposit) return null;
+                    // Always show monthly investment, even with no discount
                     return (
                       <div className="mt-2 pt-2 border-t border-dashed text-xs space-y-1 text-muted-foreground">
                         {multiAmt > 0 && (

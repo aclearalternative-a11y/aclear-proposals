@@ -807,12 +807,11 @@ function PackageCard({
             <span>Total:</span>
             <span>{formatCurrency(pkg.totalPrice)}</span>
           </div>
-          {discountType && discountType !== "none" && (() => {
+          {(() => {
             const whTotal = (pkg.equipment || []).filter((e: any) => e.name?.includes('Water Heater') || e.name?.includes('Bradford White') || e.name?.includes('Tankless Water Heater')).reduce((s: number, e: any) => s + (e.price || 0), 0);
             const d = applyDiscount(pkg.totalPrice, discountType, (pkg as any).discountRate || 0, customDiscountValue, whTotal);
             const monthly = calcMonthlyInvestment(d.discountedTotal, depositNum);
             const multiAmt = (pkg as any).originalPrice ? (pkg as any).originalPrice - pkg.totalPrice : 0;
-            if (d.discountAmount === 0 && multiAmt === 0) return null;
             return (
               <div className="text-xs space-y-0.5 text-muted-foreground border-t border-dashed pt-1">
                 {multiAmt > 0 && (
