@@ -136,12 +136,11 @@ async function appendToSheet(listing: ZillowListing): Promise<boolean> {
 // ---------------------------------------------------------------------------
 async function createGhlPropertyContact(listing: ZillowListing): Promise<string | null> {
   try {
-    const contactPayload = {
+    // Build payload — omit empty email/phone (GHL rejects empty strings for these)
+    const contactPayload: Record<string, any> = {
       locationId: GHL_LOCATION_ID,
       firstName: listing.address || "Property",
       lastName: `${listing.city || ""} ${listing.state || "NJ"} ${listing.zipcode || ""}`.trim(),
-      email: "",
-      phone: "",
       address1: listing.address || "",
       city: listing.city || "",
       state: listing.state || "NJ",
@@ -161,6 +160,10 @@ async function createGhlPropertyContact(listing: ZillowListing): Promise<string 
         { key: "zillow_zpid", field_value: listing.zpid || "" },
       ],
     };
+    // Only include email/phone if they have actual values
+    // GHL returns 422 if email is an empty string
+    if (listing.email) contactPayload.email = listing.email;
+    if (listing.phone) contactPayload.phone = listing.phone;
 
     // Use fetch instead of execSync/curl for Render compatibility
     const contactRes = await fetch("https://services.leadconnectorhq.com/contacts/upsert", {
