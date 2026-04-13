@@ -24,7 +24,7 @@ const ZILLOW_STAGES = {
 };
 
 // Target zip codes — updated via /api/zillow/update-zips or env var
-let TARGET_ZIPS: string[] = (process.env.ZILLOW_TARGET_ZIPS || "").split(",").map(z => z.trim()).filter(Boolean);
+let TARGET_ZIPS: string[] = (process.env.ZILLOW_TARGET_ZIPS || "08088,08015,08064").split(",").map(z => z.trim()).filter(Boolean);
 
 // ---------------------------------------------------------------------------
 // Interfaces
@@ -418,6 +418,87 @@ export function registerZillowRoutes(app: Express) {
 
     console.log(`[Zillow] Target zips updated: ${TARGET_ZIPS.join(", ")}`);
     res.json({ success: true, targetZips: TARGET_ZIPS });
+  });
+
+  // -----------------------------------------------------------------------
+  // POST /api/zillow/apify-callback
+  // Apify calls this webhook when a scraper run finishes.
+  // It fetches the dataset results and processes them through the pipeline.
+  // -----------------------------------------------------------------------
+  app.post("/api/zillow/apify-callback", async (req: Request, res: Response) => {
+    try {
+      const apifyToken = process.env.APIFY_TOKEN || "";
+      const { resource } = req.body || {};
+
+      // Apify sends the run info in resource
+      const datasetId = resource?.defaultDatasetId;
+      if (!datasetId) {
+        return res.status(400).json({ error: "No datasetId found in Apify callback payload." });
+      }
+
+      console.log(`[Zillow] Apify callback received — dataset: ${datasetId}`);
+
+      // Fetch results from Apify dataset
+      const datasetUrl = `https://api.apify.com/v2/datasets/${datasetId}/items?format=json${apifyToken ? `&token=${apifyToken}` : ""}`;
+      const datasetRes = execSync(`curl -s "${datasetUrl}"`, { timeout: 30000 }).toString();
+      const items = JSON.parse(datasetRes);
+
+      console.log(`[Zillow] Fetched ${items.length} items from Apify dataset`);
+
+      // Normalize Apify output — handle multiple actor formats
+      const rawListings = items.map((item: any) => {
+        const prop = item.rawData?.property || item.hdpData?.homeInfo || item;
+        return {
+          zpid: String(prop.zpid || item.zpid || item.id || ""),
+          address: prop.address?.streetAddress || item.addressStreet || item.address || "",
+          city: prop.address?.city || item.addressCity || "",
+          state: prop.address?.state || item.addressState || "NJ",
+          zipcode: prop.address?.zipcode || item.addressZipcode || item.zipcode || "",
+          price: prop.price?.value || item.unformattedPrice || item.price || 0,
+          bedrooms: prop.bedrooms || item.beds || 0,
+          bathrooms: prop.bathrooms || item.baths || 0,
+          livingArea: prop.livingArea || item.area || item.sqft || 0,
+          homeType: prop.homeType || item.homeType || "SINGLE_FAMILY",
+          homeStatus: prop.listing?.listingStatus || item.homeStatus || item.statusType || "FOR_SALE",
+          daysOnZillow: prop.daysOnZillow || item.daysOnZillow || 0,
+          zestimate: prop.estimates?.zestimate || item.zestimate || 0,
+          url: item.detailUrl || (prop.zpid ? `https://www.zillow.com/homedetails/${prop.zpid}_zpid/` : ""),
+        };
+      });
+
+      const normalized = rawListings.map(normalizeListing);
+      const filtered = TARGET_ZIPS.length > 0
+        ? normalized.filter((l: ZillowListing) => TARGET_ZIPS.includes(l.zipcode || ""))
+        : normalized;
+
+      let stagedCount = 0;
+      let ghlCount = 0;
+      const newListings: ZillowListing[] = [];
+
+      for (const listing of filtered) {
+        const staged = await appendToSheet(listing);
+        if (staged) stagedCount++;
+        const contactId = await createGhlPropertyContact(listing);
+        if (contactId) { ghlCount++; newListings.push(listing); }
+      }
+
+      if (newListings.length > 0) {
+        await sendListingNotification(newListings);
+      }
+
+      console.log(`[Zillow] Apify callback processed: ${filtered.length} matched, ${ghlCount} synced to GHL`);
+      res.json({
+        success: true,
+        datasetId,
+        totalItems: items.length,
+        matchedZipFilter: filtered.length,
+        syncedToGhl: ghlCount,
+      });
+
+    } catch (e: any) {
+      console.error("[Zillow] Apify callback error:", e.message);
+      res.status(500).json({ error: e.message });
+    }
   });
 
   // -----------------------------------------------------------------------
