@@ -357,38 +357,38 @@ export default function ProposalView() {
                       <span>Included</span>
                     </div>
                   </div>
-                  <div className="mt-3 pt-3 border-t flex justify-between font-semibold">
-                    <span>Total:</span>
-                    <span>{formatCurrency(pkg.totalPrice)}</span>
-                  </div>
-                  {/* Per-package discount + monthly investment breakdown */}
+                  {/* Pricing breakdown: original total → discounts → after discount → monthly */}
                   {(() => {
+                    const originalTotal = (pkg as any).originalPrice || pkg.totalPrice;
+                    const multiAmt = (pkg as any).originalPrice ? (pkg as any).originalPrice - pkg.totalPrice : 0;
                     const pkgDiscount = applyDiscount(pkg.totalPrice, proposal.discountType || "none", (pkg as any).discountRate || 0, customVal, getWaterHeaterTotal(pkg));
                     const pkgMonthly = calcMonthlyInvestment(pkgDiscount.discountedTotal, proposal.deposit || 0);
-                    const multiAmt = (pkg as any).originalPrice ? (pkg as any).originalPrice - pkg.totalPrice : 0;
                     const hasAnyDiscount = multiAmt > 0 || pkgDiscount.discountAmount > 0;
-                    // Always show monthly investment, even with no discount
                     return (
-                      <div className="mt-2 pt-2 border-t border-dashed text-xs space-y-1 text-muted-foreground">
+                      <div className="mt-3 pt-3 border-t text-sm space-y-1">
+                        <div className="flex justify-between font-semibold">
+                          <span>Total:</span>
+                          <span>{formatCurrency(originalTotal)}</span>
+                        </div>
                         {multiAmt > 0 && (
-                          <div className="flex justify-between"><span>Multi-package savings</span><span className="text-green-600">-{formatCurrency(multiAmt)}</span></div>
+                          <div className="flex justify-between text-xs text-muted-foreground"><span>Multi-package savings</span><span className="text-green-600">-{formatCurrency(multiAmt)}</span></div>
                         )}
                         {pkgDiscount.discountAmount > 0 && (
-                          <div className="flex justify-between">
+                          <div className="flex justify-between text-xs text-muted-foreground">
                             <span>{proposal.discountType === 'veteran' ? 'Veteran Discount' : proposal.discountType === 'fire_ems' ? 'Fire/EMS Discount' : 'Discount'} ({pkgDiscount.discountPercent}%)</span>
                             <span className="text-green-600">-{formatCurrency(pkgDiscount.discountAmount)}</span>
                           </div>
                         )}
-                        {(multiAmt > 0 || pkgDiscount.discountAmount > 0) && (
-                          <div className="flex justify-between font-semibold text-foreground pt-1 border-t border-dotted">
+                        {hasAnyDiscount && (
+                          <div className="flex justify-between font-semibold pt-1 border-t border-dotted">
                             <span>After Discount:</span>
                             <span>{formatCurrency(pkgDiscount.discountedTotal)}</span>
                           </div>
                         )}
                         {(proposal.deposit || 0) > 0 && (
-                          <div className="flex justify-between"><span>Deposit</span><span>-{formatCurrency(proposal.deposit)}</span></div>
+                          <div className="flex justify-between text-xs text-muted-foreground"><span>Deposit</span><span>-{formatCurrency(proposal.deposit)}</span></div>
                         )}
-                        <div className="flex justify-between font-semibold text-sm text-foreground pt-1">
+                        <div className="flex justify-between font-semibold text-foreground pt-1">
                           <span>Monthly Investment:</span>
                           <span className="text-primary">{formatCurrency(pkgMonthly)}/mo</span>
                         </div>
