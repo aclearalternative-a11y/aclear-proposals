@@ -335,8 +335,8 @@ export function applyDiscount(
 export function calcMonthlyInvestment(totalAfterDiscount: number, deposit: number): number {
   const balance = totalAfterDiscount - deposit;
   if (balance <= 0) return 0;
-  // 120 month term
-  return Math.round(balance / 120);
+  // 1.49% of balance after discounts and deposit
+  return Math.round(balance * 0.0149);
 }
 
 export function formatCurrency(amount: number): string {

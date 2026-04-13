@@ -157,7 +157,7 @@ function calcPkgDiscount(proposal: any, pkg: any) {
 
   const finalPrice = pkg.totalPrice - discountAmt;
   const deposit = proposal.deposit || 0;
-  const monthlyAmt = deposit >= finalPrice ? 0 : Math.round((finalPrice - deposit) / 120);
+  const monthlyAmt = deposit >= finalPrice ? 0 : Math.round((finalPrice - deposit) * 0.0149);
   return { discountPercent, discountAmt, finalPrice, deposit, monthlyAmt, discountLabel };
 }
 
