@@ -136,7 +136,12 @@ async function appendToSheet(listing: ZillowListing): Promise<boolean> {
 // ---------------------------------------------------------------------------
 async function createGhlPropertyContact(listing: ZillowListing): Promise<string | null> {
   try {
-    // Build payload — omit empty email/phone (GHL rejects empty strings for these)
+    // Build payload — use /contacts/ (create) since properties have no email/phone
+    // (upsert requires email or phone as unique identifier)
+    const priceFormatted = listing.price
+      ? `$${Number(listing.price).toLocaleString()}`
+      : "";
+
     const contactPayload: Record<string, any> = {
       locationId: GHL_LOCATION_ID,
       firstName: listing.address || "Property",
@@ -148,25 +153,24 @@ async function createGhlPropertyContact(listing: ZillowListing): Promise<string 
       tags: ["Zillow Feed", listing.homeStatus || "FOR_SALE", "Single Family"],
       source: "Zillow Property Feed",
       customFields: [
-        { key: "zillow_listing_price", field_value: String(listing.price || "") },
-        { key: "zillow_url", field_value: listing.url || "" },
-        { key: "zillow_bedrooms", field_value: String(listing.bedrooms || "") },
-        { key: "zillow_bathrooms", field_value: String(listing.bathrooms || "") },
-        { key: "zillow_sqft", field_value: String(listing.livingArea || "") },
-        { key: "zillow_zestimate", field_value: String(listing.zestimate || "") },
-        { key: "zillow_days_on_market", field_value: String(listing.daysOnZillow || "") },
-        { key: "zillow_listing_status", field_value: listing.homeStatus || "" },
-        { key: "zillow_property_type", field_value: listing.homeType || "" },
-        { key: "zillow_zpid", field_value: listing.zpid || "" },
+        { id: "cuxeIJimRTfPeM17b0ab", field_value: priceFormatted },
+        { id: "Lq63Wkaf4uSigpMkwBBx", field_value: listing.url || "" },
+        { id: "S8v6vYuIf9EotjsxOP2a", field_value: String(listing.bedrooms || "") },
+        { id: "cmtQpCFSRzm1Ju51HHR7", field_value: String(listing.bathrooms || "") },
+        { id: "vwW93Tvhq4AwOl1NJHmU", field_value: String(listing.livingArea || "") },
+        { id: "tpvmo7NcNa4AO7rYhYBD", field_value: listing.zestimate ? `$${Number(listing.zestimate).toLocaleString()}` : "" },
+        { id: "SyYR9BMylQ1og8cpIuG7", field_value: String(listing.daysOnZillow || "") },
+        { id: "Wlx0JZ3H7E9vzFFt2Ix6", field_value: listing.homeStatus || "" },
+        { id: "ybJG8AAkgJvQTKwqshfY", field_value: listing.homeType || "" },
+        { id: "nmrwWXtXRjlFfBdv7wBO", field_value: listing.zpid || "" },
       ],
     };
     // Only include email/phone if they have actual values
-    // GHL returns 422 if email is an empty string
     if (listing.email) contactPayload.email = listing.email;
     if (listing.phone) contactPayload.phone = listing.phone;
 
-    // Use fetch instead of execSync/curl for Render compatibility
-    const contactRes = await fetch("https://services.leadconnectorhq.com/contacts/upsert", {
+    // Use create endpoint (not upsert) since properties lack email/phone identifiers
+    const contactRes = await fetch("https://services.leadconnectorhq.com/contacts/", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${GHL_API_KEY}`,
