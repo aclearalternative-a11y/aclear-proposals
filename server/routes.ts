@@ -679,6 +679,71 @@ A Clear Alternative
     }
   });
 
+  // Schedule install date for a signed proposal
+  app.patch("/api/proposals/:id/schedule-install", async (req: Request, res: Response) => {
+    try {
+      const { installDate, installNotes } = req.body;
+      const id = parseInt(req.params.id);
+      await tursoExecute(
+        "UPDATE proposals SET install_date = ?, install_notes = ? WHERE id = ?",
+        [installDate || null, installNotes || null, id]
+      );
+      const proposal = await storage.getProposal(id);
+      if (!proposal) return res.status(404).json({ error: "Not found" });
+
+      // Update GHL opportunity with install date
+      try {
+        const GHL_API_KEY = process.env.GHL_API_KEY || "pit-d7eddf87-065e-4031-a399-3b3fc4a8af97";
+        const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
+        const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
+        const selectedPkg = JSON.parse(proposal.packages || "[]").find((p: any) => p.tier === proposal.selectedPackage);
+        const pkgLabel = selectedPkg?.label || "Better";
+
+        // Find contact
+        const searchResp = execSync(
+          `curl -s "https://services.leadconnectorhq.com/contacts/search/duplicate?locationId=${GHL_LOCATION_ID}&email=${encodeURIComponent(proposal.customerEmail)}" -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28"`,
+          { timeout: 15000 }
+        ).toString();
+        const contactId = JSON.parse(searchResp)?.contact?.id;
+
+        if (contactId) {
+          // Find opportunity
+          const oppResp = execSync(
+            `curl -s "https://services.leadconnectorhq.com/opportunities/search?location_id=${GHL_LOCATION_ID}&pipeline_id=gyFJalG38xXKkAlmUHBo&contact_id=${contactId}" -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28"`,
+            { timeout: 15000 }
+          ).toString();
+          const opps = JSON.parse(oppResp)?.opportunities || [];
+          if (opps.length > 0) {
+            const oppId = opps[0].id;
+            const installStr = installDate ? new Date(installDate).toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "2-digit", hour: "numeric", minute: "2-digit" }) : "TBD";
+            execSync(
+              `curl -s -X PUT "https://services.leadconnectorhq.com/opportunities/${oppId}" -H "Authorization: Bearer ${GHL_API_KEY}" -H "Content-Type: application/json" -H "Version: 2021-07-28" -d '{"name":"${customerName} — ${pkgLabel} Package — Install ${installStr}"}'`,
+              { timeout: 15000 }
+            );
+          }
+        }
+      } catch (ghlErr: any) {
+        console.error("GHL install date update failed:", ghlErr.message);
+      }
+
+      // Send install confirmation email
+      const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
+      const dateStr = installDate ? new Date(installDate).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }) : "TBD";
+      const timeStr = installDate ? new Date(installDate).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : "";
+
+      await sendProposalEmail({
+        to: proposal.customerEmail,
+        subject: `Installation Scheduled — A Clear Alternative (${customerName})`,
+        body: `Dear ${customerName},\n\nGreat news! Your water treatment installation has been scheduled:\n\nDate: ${dateStr}\nTime: ${timeStr}\n${installNotes ? `Notes: ${installNotes}\n` : ''}\nOur installation team will arrive at:\n${proposal.street}, ${proposal.city}, ${proposal.state} ${proposal.zip}\n\nPlease ensure someone 18 or older is home during the installation. The process typically takes 2-4 hours.\n\nIf you need to reschedule, please call us at (856) 663-8088.\n\nThank you for choosing A Clear Alternative.\n\n${proposal.repName}\nA Clear Alternative\n(856) 663-8088  |  info@aclear.com  |  www.aclear.com`,
+        bcc: ["aclearalternative@gmail.com", "asmith@aclear.com", "liz@aclear.com", REP_EMAILS[proposal.repName]].filter(Boolean),
+      });
+
+      res.json({ success: true, installDate, installNotes });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // Water quality data lookup by ZIP
   app.get("/api/water-quality/:zip", (req: Request, res: Response) => {
     const { lookupWellWaterData, NJ_CITY_WATER_CONCERNS, NJ_ZIP_MAP, COUNTY_PWTA } = require("./water-quality-data");

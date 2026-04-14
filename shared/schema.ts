@@ -32,6 +32,9 @@ export const proposals = sqliteTable("proposals", {
   deposit: integer("deposit").default(0),
   // Rental mode
   rentalMode: integer("rental_mode", { mode: "boolean" }).default(false),
+  // Install scheduling
+  installDate: text("install_date"),
+  installNotes: text("install_notes"),
   // Signatures stored as base64 data URLs
   customerSignature1: text("customer_signature_1"),
   customerSignature2: text("customer_signature_2"),
