@@ -569,7 +569,7 @@ export async function registerRoutes(
   // Sends reminder emails to unsigned proposals older than 3 days
   // ---------------------------------------------------------------
   app.post("/api/followup/run", async (req: Request, res: Response) => {
-    const GHL_API_KEY = process.env.GHL_API_KEY || "pit-24e8e4ec-6172-44e0-b0d7-6a621b9b4bc7";
+    const GHL_API_KEY = process.env.GHL_API_KEY || "pit-d7eddf87-065e-4031-a399-3b3fc4a8af97";
     const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
     const results: any[] = [];
 
@@ -738,7 +738,7 @@ A Clear Alternative
       if (proposal.status === "sent") {
         setImmediate(async () => {
           try {
-            const GHL_API_KEY = process.env.GHL_API_KEY || "pit-24e8e4ec-6172-44e0-b0d7-6a621b9b4bc7";
+            const GHL_API_KEY = process.env.GHL_API_KEY || "pit-d7eddf87-065e-4031-a399-3b3fc4a8af97";
             const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
             const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
             const repPhone = REPS[proposal.repName];
@@ -935,7 +935,7 @@ A Clear Alternative
       // Fire all post-sign actions async (don’t block the response)
       setImmediate(async () => {
         try {
-          const GHL_API_KEY = process.env.GHL_API_KEY || "pit-24e8e4ec-6172-44e0-b0d7-6a621b9b4bc7";
+          const GHL_API_KEY = process.env.GHL_API_KEY || "pit-d7eddf87-065e-4031-a399-3b3fc4a8af97";
           const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
           const customerName = `${proposal.customerFirstName1} ${proposal.customerLastName1}`;
           const repPhone = REPS[proposal.repName] || "(856) 663-8088";
@@ -1196,7 +1196,7 @@ A Clear Alternative
 
       // Create/update contact in GoHighLevel CRM via direct API (non-fatal)
       try {
-        const GHL_API_KEY = process.env.GHL_API_KEY || "pit-24e8e4ec-6172-44e0-b0d7-6a621b9b4bc7";
+        const GHL_API_KEY = process.env.GHL_API_KEY || "pit-d7eddf87-065e-4031-a399-3b3fc4a8af97";
         const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
         const ghlContact = {
           locationId: GHL_LOCATION_ID,
