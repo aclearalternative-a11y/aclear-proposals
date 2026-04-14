@@ -94,10 +94,10 @@ const REPS: Record<string, string> = {
 };
 
 const REP_EMAILS: Record<string, string> = {
-  "Gerald DiPietropolo": "aclearalternative@gmail.com",
+  "Gerald DiPietropolo": "water325@aol.com",
   "John DiPietropolo": "aclearalternative@gmail.com",
-  "Nicholas DiPietropolo": "aclearalternative@gmail.com",
-  "Eric Fusco": "aclearalternative@gmail.com",
+  "Nicholas DiPietropolo": "DiPietropolonicholas@gmail.com",
+  "Eric Fusco": "Fusco003@gmail.com",
 };
 
 function getBrochureUrl(equipName: string): string {
