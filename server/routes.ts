@@ -13,6 +13,18 @@ import { Resend } from "resend";
 // Email transport — nodemailer (Gmail SMTP) when env vars are set,
 // falls back to external-tool CLI when running inside Perplexity sandbox
 // ---------------------------------------------------------------------------
+// Convert plain text email body to HTML with clickable links
+function textToHtml(text: string): string {
+  // Escape HTML entities
+  let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // Convert URLs to clickable links (including hash routes)
+  html = html.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color:#1d8fc4;text-decoration:underline;">$1</a>');
+  // Convert newlines to <br>
+  html = html.replace(/\n/g, '<br>');
+  // Wrap in basic HTML
+  return `<div style="font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#333;">${html}</div>`;
+}
+
 async function sendProposalEmail(opts: {
   to: string;
   subject: string;
@@ -22,9 +34,9 @@ async function sendProposalEmail(opts: {
   const resendKey = process.env.RESEND_API_KEY;
   const gmailUser = process.env.GMAIL_USER || "aclearalternative@gmail.com";
   const gmailPass = process.env.GMAIL_APP_PASSWORD || "kcjswmfawaaugwqo";
+  const htmlBody = textToHtml(opts.body);
 
   if (resendKey) {
-    // Production path: Resend API (HTTPS-based, works on Render free tier)
     const resend = new Resend(resendKey);
     await resend.emails.send({
       from: "A Clear Alternative <proposals@aclear.com>",
@@ -32,9 +44,9 @@ async function sendProposalEmail(opts: {
       bcc: opts.bcc,
       subject: opts.subject,
       text: opts.body,
+      html: htmlBody,
     });
   } else if (process.env.NODE_ENV === "production") {
-    // Render without Resend key: fall back to Gmail SMTP with IPv4
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
@@ -48,9 +60,9 @@ async function sendProposalEmail(opts: {
       bcc: opts.bcc.join(","),
       subject: opts.subject,
       text: opts.body,
+      html: htmlBody,
     });
   } else {
-    // Local dev/sandbox: use Perplexity external-tool CLI
     const params = JSON.stringify({
       source_id: "gcal",
       tool_name: "send_email",
@@ -61,7 +73,7 @@ async function sendProposalEmail(opts: {
           cc: [],
           bcc: opts.bcc,
           subject: opts.subject,
-          body: opts.body,
+          body: htmlBody,
         },
       },
     });
