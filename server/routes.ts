@@ -684,10 +684,7 @@ A Clear Alternative
     try {
       const { installDate, installNotes } = req.body;
       const id = parseInt(req.params.id);
-      await tursoExecute(
-        "UPDATE proposals SET install_date = ?, install_notes = ? WHERE id = ?",
-        [installDate || null, installNotes || null, id]
-      );
+      await storage.updateProposal(id, { installDate: installDate || null, installNotes: installNotes || null } as any);
       const proposal = await storage.getProposal(id);
       if (!proposal) return res.status(404).json({ error: "Not found" });
 

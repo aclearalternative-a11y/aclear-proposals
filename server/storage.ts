@@ -207,6 +207,8 @@ export class DatabaseStorage implements IStorage {
       customerSignature2: "customer_signature_2",
       repSignature: "rep_signature",
       selectedPackage: "selected_package",
+      installDate: "install_date",
+      installNotes: "install_notes",
     };
     const sets: string[] = [];
     const vals: any[] = [];
