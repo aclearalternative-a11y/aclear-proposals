@@ -219,17 +219,25 @@ async function createPoolLead(params: {
     source: "AI Phone — Ali",
   };
 
-  const contactRes = execSync(
-    `curl -s -X POST "https://services.leadconnectorhq.com/contacts/upsert" \
-      -H "Authorization: Bearer ${GHL_API_KEY}" \
-      -H "Version: 2021-07-28" \
-      -H "Content-Type: application/json" \
-      -d '${JSON.stringify(contactPayload).replace(/'/g, "'\\''")}'`,
-    { timeout: 10000 }
-  ).toString();
+  let contactRes: string;
+  try {
+    contactRes = execSync(
+      `curl -s -X POST "https://services.leadconnectorhq.com/contacts/upsert" \
+        -H "Authorization: Bearer ${GHL_API_KEY}" \
+        -H "Version: 2021-07-28" \
+        -H "Content-Type: application/json" \
+        -d '${JSON.stringify(contactPayload).replace(/'/g, "'\\''")}'`,
+      { timeout: 10000 }
+    ).toString();
+  } catch (curlErr: any) {
+    console.error("GHL upsert curl error:", curlErr.message);
+    contactRes = '{}';
+  }
 
+  console.log("GHL upsert raw response:", contactRes.substring(0, 500));
   const contactData = JSON.parse(contactRes);
   const contactId = contactData?.contact?.id || contactData?.id || null;
+  console.log("GHL parsed contactId:", contactId, "token starts with:", GHL_API_KEY.substring(0, 12));
   let opportunityId: string | null = null;
 
   if (contactId) {
