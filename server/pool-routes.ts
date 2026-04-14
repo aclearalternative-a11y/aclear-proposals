@@ -464,14 +464,5 @@ export function registerPoolRoutes(app: Express) {
     }
   });
 
-  // Debug: check which GHL token is active (remove after debugging)
-  app.get("/api/pool/debug-token", (_req: Request, res: Response) => {
-    const token = process.env.GHL_API_KEY || "fallback";
-    const source = process.env.GHL_API_KEY ? "env" : "code-fallback";
-    res.json({
-      source,
-      tokenPrefix: (process.env.GHL_API_KEY || "pit-d7eddf87-065e-4031-a399-3b3fc4a8af97").substring(0, 16) + "...",
-    });
-  });
 
 }
