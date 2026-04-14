@@ -7,7 +7,8 @@ import * as fs from "fs";
 import nodemailer from "nodemailer";
 import { POOL_ZIP_DATA } from "./pool_zip_data";
 
-const GHL_API_KEY = process.env.GHL_API_KEY || "pit-d7eddf87-065e-4031-a399-3b3fc4a8af97";
+// Hardcoded until Render env var is updated (env has stale expired token)
+const GHL_API_KEY = "pit-d7eddf87-065e-4031-a399-3b3fc4a8af97";
 const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
 const POOL_PIPELINE_ID = "xNaG2uwpPxq6BePj7zR8";
 const POOL_STAGE_NEW_LEAD = "8c4c4efa-a7d9-4020-9c88-d181cd0ba6b3";
