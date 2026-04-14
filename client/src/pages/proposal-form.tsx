@@ -50,6 +50,7 @@ export default function ProposalForm() {
     }
   };
   const [customerEmail, setCustomerEmail] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
   const [repName, setRepName] = useState("");
   const [numPeople, setNumPeople] = useState<number | "">("");
   const [numBathrooms, setNumBathrooms] = useState<number | "">("");
@@ -215,6 +216,7 @@ export default function ProposalForm() {
         state,
         zip,
         customerEmail,
+        customerPhone: customerPhone || null,
         repName,
         waterSource,
         waterTestResults: JSON.stringify(waterTest),
@@ -340,6 +342,10 @@ export default function ProposalForm() {
               <div>
                 <Label>Customer Email *</Label>
                 <Input data-testid="input-email" type="email" value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} placeholder="email@example.com" />
+              </div>
+              <div>
+                <Label>Customer Phone</Label>
+                <Input data-testid="input-phone" type="tel" value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="(856) 555-1234" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>

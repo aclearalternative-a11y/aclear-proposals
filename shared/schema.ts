@@ -14,6 +14,7 @@ export const proposals = sqliteTable("proposals", {
   state: text("state").notNull().default("NJ"),
   zip: text("zip").notNull(),
   customerEmail: text("customer_email").notNull(),
+  customerPhone: text("customer_phone"),
   repName: text("rep_name").notNull(),
   waterSource: text("water_source").notNull(),
   // Water test results stored as JSON

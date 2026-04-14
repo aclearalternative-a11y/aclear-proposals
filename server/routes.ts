@@ -93,6 +93,13 @@ const REPS: Record<string, string> = {
   "Eric Fusco": "856-649-5467",
 };
 
+const REP_EMAILS: Record<string, string> = {
+  "Gerald DiPietropolo": "aclearalternative@gmail.com",
+  "John DiPietropolo": "aclearalternative@gmail.com",
+  "Nicholas DiPietropolo": "aclearalternative@gmail.com",
+  "Eric Fusco": "aclearalternative@gmail.com",
+};
+
 function getBrochureUrl(equipName: string): string {
   // Water heaters — most specific first (POWER VENT before Bradford White catch-all)
   if (equipName.includes("POWER VENT")) return "https://docs.bradfordwhite.com/Spec_Sheets/1117_Current.pdf";
@@ -591,7 +598,7 @@ A Clear Alternative
             to: proposal.customerEmail,
             subject: `Following Up — Your Water Treatment Proposal (${customerName})`,
             body: followUpBody,
-            bcc: [] // TESTING MODE — BCCs disabled,
+            bcc: ["aclearalternative@gmail.com", REP_EMAILS[proposal.repName]].filter(Boolean),
           });
 
           // Move GHL opportunity to "Contacted" stage (follow-up)
@@ -959,7 +966,7 @@ A Clear Alternative
             to: proposal.customerEmail,
             subject: `Welcome to A Clear Alternative! — ${customerName}`,
             body: welcomeBody,
-            bcc: [] // TESTING MODE — BCCs disabled,
+            bcc: ["aclearalternative@gmail.com", "asmith@aclear.com", "liz@aclear.com"],
           });
           console.log(`Welcome email sent to ${customerName}`);
 
@@ -973,7 +980,7 @@ A Clear Alternative
 Customer: ${customerName}
 Address: ${proposal.street}, ${proposal.city}, ${proposal.state} ${proposal.zip}
 Email: ${proposal.customerEmail}
-Phone: (on file)
+Phone: ${proposal.customerPhone || '(not provided)'}
 
 Rep: ${proposal.repName} — ${repPhone}
 Signed: ${new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
@@ -987,6 +994,7 @@ Monthly Investment: $${monthlyAmt}/mo
 Deposit: $${deposit.toLocaleString()}
 
 Proposal Link: ${proposalLink}
+View Proposal: https://proposals.aclear.com/#/proposal/${proposal.shareId}
 
 Please contact ${customerName} within 24 hours to schedule installation.`;
 
@@ -994,7 +1002,7 @@ Please contact ${customerName} within 24 hours to schedule installation.`;
             to: "aclearalternative@gmail.com",
             subject: `✅ Install Needed — ${customerName} — ${selectedLabel} Package`,
             body: installBody,
-            bcc: [] // TESTING MODE — BCCs disabled,
+            bcc: ["asmith@aclear.com", "liz@aclear.com"],
           });
           console.log(`Install scheduling email sent for ${customerName}`);
 
@@ -1153,7 +1161,7 @@ A Clear Alternative
         to: proposal.customerEmail,
         subject: `Your Water Treatment Proposal — A Clear Alternative (${customerName})`,
         body: emailBody,
-        bcc: [] // TESTING MODE — BCCs disabled,
+        bcc: ["aclearalternative@gmail.com", REP_EMAILS[proposal.repName]].filter(Boolean),
       });
 
       // Log to pipeline Google Sheet (non-fatal)

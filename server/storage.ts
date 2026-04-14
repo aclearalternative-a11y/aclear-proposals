@@ -157,7 +157,7 @@ export class DatabaseStorage implements IStorage {
   async createProposal(p: InsertProposal): Promise<Proposal> {
     const cols = [
       "share_id","status","customer_first_name_1","customer_last_name_1",
-      "customer_first_name_2","customer_last_name_2","customer_email",
+      "customer_first_name_2","customer_last_name_2","customer_email","customer_phone",
       "street","city","state","zip","rep_name","water_source",
       "water_test_results","num_people","num_bathrooms","packages",
       "selected_package","discount_type","custom_discount_value","deposit","rental_mode","sent_date"
@@ -166,7 +166,7 @@ export class DatabaseStorage implements IStorage {
       p.shareId, p.status || "draft",
       p.customerFirstName1, p.customerLastName1,
       p.customerFirstName2 || null, p.customerLastName2 || null,
-      p.customerEmail, p.street, p.city, p.state || "NJ", p.zip,
+      p.customerEmail, p.customerPhone || null, p.street, p.city, p.state || "NJ", p.zip,
       p.repName, p.waterSource, p.waterTestResults || "{}",
       p.numPeople || 3, p.numBathrooms || 2, p.packages || "[]",
       p.selectedPackage || null, p.discountType || "none",
