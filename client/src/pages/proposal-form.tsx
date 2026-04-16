@@ -744,14 +744,16 @@ function PackageCard({
               {item.sizeOptions && item.sizeOptions.length > 1 && (
                 <>
                   <button
-                    onClick={() => onSizeChange(ei, "down")}
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSizeChange(ei, "down"); }}
                     className="p-0.5 rounded hover:bg-muted"
                     data-testid={`button-size-down-${pkg.tier}-${ei}`}
                   >
                     <ChevronDown className="h-3.5 w-3.5" />
                   </button>
                   <button
-                    onClick={() => onSizeChange(ei, "up")}
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSizeChange(ei, "up"); }}
                     className="p-0.5 rounded hover:bg-muted"
                     data-testid={`button-size-up-${pkg.tier}-${ei}`}
                   >
@@ -760,7 +762,8 @@ function PackageCard({
                 </>
               )}
               <button
-                onClick={() => onRemove(ei)}
+                type="button"
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onRemove(ei); }}
                 className="p-0.5 rounded hover:bg-destructive/10 text-destructive"
                 data-testid={`button-remove-${pkg.tier}-${ei}`}
               >
@@ -781,10 +784,11 @@ function PackageCard({
         {/* Add equipment */}
         <div className="relative">
           <Button
+            type="button"
             variant="outline"
             size="sm"
             className="w-full text-xs"
-            onClick={() => setAddOpen(!addOpen)}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setAddOpen(!addOpen); }}
             data-testid={`button-add-equipment-${pkg.tier}`}
           >
             <Plus className="h-3 w-3 mr-1" /> Add Equipment
@@ -796,8 +800,9 @@ function PackageCard({
                   <div className="px-3 py-1 text-xs font-semibold text-muted-foreground bg-muted/50 sticky top-0">{cat.category}</div>
                   {cat.items.map((item, idx) => (
                     <button
+                      type="button"
                       key={idx}
-                      onClick={() => { onAdd(cat.category, idx); setAddOpen(false); }}
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); onAdd(cat.category, idx); setAddOpen(false); }}
                       className="w-full text-left px-3 py-1.5 hover:bg-accent text-sm flex justify-between"
                     >
                       <span className="truncate">{item.name}</span>
