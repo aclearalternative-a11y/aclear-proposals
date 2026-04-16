@@ -568,6 +568,7 @@ export default function ProposalForm() {
                   discountType={discountType}
                   customDiscountValue={customNum}
                   depositNum={depositNum}
+                  livePricing={pricing}
                   onSelect={() => {
                     if (!includedTiers[pkg.tier as keyof typeof includedTiers]) return;
                     setSelectedTier(pkg.tier);
@@ -695,6 +696,7 @@ function PackageCard({
   discountType,
   customDiscountValue,
   depositNum,
+  livePricing,
   onSelect,
   onSizeChange,
   onRemove,
@@ -795,7 +797,7 @@ function PackageCard({
           </Button>
           {addOpen && (
             <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-popover border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-              {getAllEquipmentOptions(pricing).map(cat => (
+              {getAllEquipmentOptions(livePricing).map(cat => (
                 <div key={cat.category}>
                   <div className="px-3 py-1 text-xs font-semibold text-muted-foreground bg-muted/50 sticky top-0">{cat.category}</div>
                   {cat.items.map((item, idx) => (
