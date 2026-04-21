@@ -924,6 +924,29 @@ export function registerPoolRoutes(app: Express) {
   // -----------------------------------------------------------------------
   // GET /quote/:id  — signable one-page quote (public URL)
   // -----------------------------------------------------------------------
+  // Diagnostic: list quote files (secured via same refresh secret)
+  app.get("/api/pool/_debug-quotes", (req: Request, res: Response) => {
+    if (req.query.s !== (process.env.REFRESH_SECRET || "aclear2026")) {
+      return res.status(401).json({ error: "unauthorized" });
+    }
+    try {
+      const dirExists = fs.existsSync(QUOTES_DIR);
+      let files: string[] = [];
+      if (dirExists) files = fs.readdirSync(QUOTES_DIR).sort().slice(-20);
+      // Also probe write
+      let writeOk = false; let writeErr = "";
+      try {
+        const testPath = `${QUOTES_DIR}/.probe-${Date.now()}`;
+        fs.writeFileSync(testPath, "ok", "utf8");
+        writeOk = fs.existsSync(testPath);
+        if (writeOk) fs.unlinkSync(testPath);
+      } catch (e: any) { writeErr = e.message; }
+      res.json({ dir: QUOTES_DIR, dirExists, writeOk, writeErr, files, count: files.length });
+    } catch (e: any) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
   app.get("/quote/:id", (req: Request, res: Response) => {
     const id = String(req.params.id || "").replace(/[^a-zA-Z0-9_-]/g, "");
     const q = loadQuote(id);
