@@ -730,6 +730,9 @@ async function sendPoolLeadEmails(params: {
   return { quoteId, quoteUrl, total, loads };
 }
 
+// Rolling in-memory log of recent webhook requests (for debugging Voice AI)
+const recentWebhookRequests: any[] = [];
+
 export function registerPoolRoutes(app: Express) {
 
   // -----------------------------------------------------------------------
@@ -765,8 +768,25 @@ export function registerPoolRoutes(app: Express) {
   // action = "estimate_gallons" → computes gallons from dimensions
   // action = "save_lead"        → GHL contact/opportunity + quote email
   // -----------------------------------------------------------------------
+  // Debug: see the last ~30 webhook requests
+  app.get("/api/pool/_debug-webhook", (req: Request, res: Response) => {
+    if (req.query.s !== (process.env.REFRESH_SECRET || "aclear2026")) {
+      return res.status(401).json({ error: "unauthorized" });
+    }
+    res.json({ count: recentWebhookRequests.length, requests: recentWebhookRequests });
+  });
+
   app.post("/api/pool/ali-webhook", async (req: Request, res: Response) => {
-    console.log(`[ali-webhook] headers=${JSON.stringify(req.headers)} body=${JSON.stringify(req.body)}`);
+    const logEntry = {
+      at: new Date().toISOString(),
+      headers: req.headers,
+      body: req.body,
+      query: req.query,
+      contentType: req.headers['content-type'],
+    };
+    recentWebhookRequests.push(logEntry);
+    if (recentWebhookRequests.length > 30) recentWebhookRequests.shift();
+    console.log(`[ali-webhook] body=${JSON.stringify(req.body)} ct=${req.headers['content-type']}`);
     const { action, zip, phone, email, address, city, state } = req.body;
     // Voice AI sends snake_case params; accept both formats
     const firstName = req.body.firstName || req.body.first_name;
