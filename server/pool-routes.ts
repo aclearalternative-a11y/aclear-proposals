@@ -63,8 +63,25 @@ function computeQuoteTotal(basePrice?: string, gallons?: number, poolType?: stri
 // ---------------------------------------------------------------------------
 // Quote persistence (file-backed, survives Render restart via /data volume)
 // ---------------------------------------------------------------------------
-const QUOTES_DIR = "/data/quotes";
-try { fs.mkdirSync(QUOTES_DIR, { recursive: true }); } catch {}
+// Try /data (Render persistent disk), fall back to app-local ./data if /data is unavailable.
+function pickQuotesDir(): string {
+  const candidates = ["/data/quotes", path.join(process.cwd(), "data", "quotes"), "/tmp/aclear-quotes"];
+  for (const dir of candidates) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+      const probe = path.join(dir, `.probe-${Date.now()}`);
+      fs.writeFileSync(probe, "ok", "utf8");
+      fs.unlinkSync(probe);
+      console.log(`[quotes] using dir: ${dir}`);
+      return dir;
+    } catch (e: any) {
+      console.warn(`[quotes] ${dir} not writable: ${e.message}`);
+    }
+  }
+  // Last resort — return /tmp path even if not verified
+  return "/tmp/aclear-quotes";
+}
+const QUOTES_DIR = pickQuotesDir();
 
 export interface StoredQuote {
   id: string;
@@ -98,9 +115,14 @@ export interface StoredQuote {
 }
 
 function saveQuote(q: StoredQuote): void {
+  try { fs.mkdirSync(QUOTES_DIR, { recursive: true }); } catch {}
+  const filePath = `${QUOTES_DIR}/${q.id}.json`;
   try {
-    fs.writeFileSync(`${QUOTES_DIR}/${q.id}.json`, JSON.stringify(q, null, 2), "utf8");
-  } catch (e: any) { console.error("saveQuote error:", e.message); }
+    fs.writeFileSync(filePath, JSON.stringify(q, null, 2), "utf8");
+    console.log(`[quotes] wrote ${filePath}`);
+  } catch (e: any) {
+    console.error(`[quotes] saveQuote FAILED ${filePath}:`, e.message);
+  }
 }
 
 function loadQuote(id: string): StoredQuote | null {
