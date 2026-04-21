@@ -168,9 +168,8 @@ const GHL_API_KEY = "pit-d7eddf87-065e-4031-a399-3b3fc4a8af97";
 const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
 const POOL_PIPELINE_ID = "xNaG2uwpPxq6BePj7zR8";
 const POOL_STAGE_NEW_LEAD = "8c4c4efa-a7d9-4020-9c88-d181cd0ba6b3";
-// Stage to move contact to when the quote is signed (Proposal Sent → Scheduled-equivalent).
-// Using existing 'Proposal Sent' stage until a 'Scheduled' stage is added in GHL.
-const POOL_STAGE_SCHEDULED = "efff108b-0abb-4ec4-afd1-31c65a429560";
+// Stage to move opportunity to when the customer signs the quote.
+const POOL_STAGE_SCHEDULED = "6dbbf306-7b0e-4962-8aa6-4d098bbd7058"; // 'scheduled'
 const POOL_SHEET_ID = "1yJEFzqwntC0DYlJRv9mHILctsFZSnt5Ij4yS-m3i8qY";
 const DATA_PATH = "/data/pool_zip_data.json";
 
