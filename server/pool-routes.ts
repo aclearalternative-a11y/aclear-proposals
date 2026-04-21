@@ -589,43 +589,49 @@ export function registerPoolRoutes(app: Express) {
     }
 
     // — Save lead (end of call) —
+    // IMPORTANT: Voice AI has a ~2s timeout. Respond immediately, do heavy work in background.
     if (action === "save_lead") {
-      try {
-        const cleanZip = normalizeZip(zip);
-        console.log(`[save_lead] zip raw=${JSON.stringify(zip)} normalized=${cleanZip}`);
-        const entry = cleanZip ? zipData[cleanZip] : undefined;
+      const cleanZip = normalizeZip(zip);
+      console.log(`[save_lead] zip raw=${JSON.stringify(zip)} normalized=${cleanZip} email=${email}`);
 
-        // Auto-estimate if caller gave dimensions but no gallons
-        let finalGallons = gallons;
-        if (!finalGallons && (length || width || diameter)) {
-          const est = estimateGallons({ poolType, shape, length, width, diameter, avgDepth });
-          if (est.gallons) finalGallons = est.gallons;
+      // Respond IMMEDIATELY so Jessica can continue naturally
+      res.json({ success: true, message: "Lead saved. Quote being emailed." });
+
+      // Do the real work in background — do not await
+      (async () => {
+        try {
+          const entry = cleanZip ? zipData[cleanZip] : undefined;
+          let finalGallons = gallons;
+          if (!finalGallons && (length || width || diameter)) {
+            const est = estimateGallons({ poolType, shape, length, width, diameter, avgDepth });
+            if (est.gallons) finalGallons = est.gallons;
+          }
+
+          const { contactId, opportunityId } = await createPoolLead({
+            firstName, lastName, address, city, state, zip: cleanZip, phone, email,
+            price: entry?.price, town: entry?.town,
+            poolType, poolSurface, installType,
+            gallons: finalGallons, deliveryDate, deliveryTime,
+          });
+          console.log(`[save_lead] GHL contact=${contactId} opp=${opportunityId}`);
+
+          await sendPoolLeadEmails({
+            firstName, lastName,
+            address: address || "",
+            city: city || entry?.town || "",
+            state: state || "NJ",
+            zip: cleanZip,
+            phone, email, entry,
+            contactId, opportunityId,
+            poolType, poolSurface, installType,
+            gallons: finalGallons, deliveryDate, deliveryTime,
+          });
+          console.log(`[save_lead] emails sent to ${email}`);
+        } catch (e: any) {
+          console.error("[save_lead] background error:", e.message, e.stack);
         }
-
-        const { contactId, opportunityId } = await createPoolLead({
-          firstName, lastName, address, city, state, zip: cleanZip, phone, email,
-          price: entry?.price, town: entry?.town,
-          poolType, poolSurface, installType,
-          gallons: finalGallons, deliveryDate, deliveryTime,
-        });
-
-        await sendPoolLeadEmails({
-          firstName, lastName,
-          address: address || "",
-          city: city || entry?.town || "",
-          state: state || "NJ",
-          zip: cleanZip,
-          phone, email, entry,
-          contactId, opportunityId,
-          poolType, poolSurface, installType,
-          gallons: finalGallons, deliveryDate, deliveryTime,
-        });
-
-        return res.json({ success: true, contactId, opportunityId });
-      } catch (e: any) {
-        console.error("Pool save_lead error:", e.message);
-        return res.status(500).json({ error: e.message });
-      }
+      })();
+      return;
     }
 
     res.status(400).json({ error: "Unknown action. Use check_zip, check_pool_type, estimate_gallons, or save_lead." });
