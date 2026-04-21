@@ -49,6 +49,55 @@ function getMailer() {
 }
 
 // ---------------------------------------------------------------------------
+// Gallon estimator — used when caller doesn't know gallons needed
+// ---------------------------------------------------------------------------
+export function estimateGallons(params: {
+  poolType?: string;   // inground | above_ground | hot_tub
+  shape?: string;      // rectangle | oval | round | kidney
+  length?: number;     // feet
+  width?: number;      // feet
+  diameter?: number;   // feet (for round)
+  avgDepth?: number;   // feet
+}): { gallons: number | null; formula: string } {
+  const { poolType, shape = "rectangle", length = 0, width = 0, diameter = 0, avgDepth = 5 } = params;
+  // Hot tubs — typical sizes
+  if (poolType === "hot_tub") return { gallons: 400, formula: "Standard hot tub estimate (~400 gal)" };
+  const d = avgDepth || 5;
+  const s = (shape || "rectangle").toLowerCase();
+  // Rectangle / square: L × W × D × 7.48
+  if (s.includes("rect") || s.includes("square")) {
+    if (length > 0 && width > 0) {
+      const g = Math.round(length * width * d * 7.48);
+      return { gallons: g, formula: `${length}ft × ${width}ft × ${d}ft × 7.48` };
+    }
+  }
+  // Round: π × r² × D × 7.48
+  if (s.includes("round") || s.includes("circle")) {
+    const diam = diameter || length;
+    if (diam > 0) {
+      const r = diam / 2;
+      const g = Math.round(Math.PI * r * r * d * 7.48);
+      return { gallons: g, formula: `π × (${diam}/2)² × ${d}ft × 7.48` };
+    }
+  }
+  // Oval: L × W × D × 5.9
+  if (s.includes("oval")) {
+    if (length > 0 && width > 0) {
+      const g = Math.round(length * width * d * 5.9);
+      return { gallons: g, formula: `${length}ft × ${width}ft × ${d}ft × 5.9 (oval)` };
+    }
+  }
+  // Kidney: L × W × D × 7.0
+  if (s.includes("kidney")) {
+    if (length > 0 && width > 0) {
+      const g = Math.round(length * width * d * 7.0);
+      return { gallons: g, formula: `${length}ft × ${width}ft × ${d}ft × 7.0 (kidney)` };
+    }
+  }
+  return { gallons: null, formula: "Insufficient dimensions — please provide length, width, and approximate depth." };
+}
+
+// ---------------------------------------------------------------------------
 // Professional pool water quote email — sent TO the customer
 // ---------------------------------------------------------------------------
 function buildPoolQuoteEmail(params: {
@@ -56,8 +105,11 @@ function buildPoolQuoteEmail(params: {
   address: string; city: string; state: string; zip: string;
   phone?: string; email: string;
   price: string; town: string; county: string;
+  poolType?: string; poolSurface?: string; installType?: string;
+  gallons?: number; deliveryDate?: string; deliveryTime?: string;
 }): string {
-  const { firstName, lastName, address, city, state, zip, price, town, county } = params;
+  const { firstName, lastName, address, city, state, zip, price, town, county,
+          poolType, poolSurface, installType, gallons, deliveryDate, deliveryTime } = params;
   const fullName = `${firstName} ${lastName}`;
   const priceNum = parseFloat(price);
   const priceFormatted = priceNum.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 });
@@ -150,6 +202,9 @@ function buildPoolQuoteEmail(params: {
           <span class="label">Delivery Location</span>
           <span class="value">${town}, NJ ${zip}</span>
         </div>
+        ${poolType ? `<div class="quote-row"><span class="label">Pool Type</span><span class="value">${formatPoolType(poolType, poolSurface, installType)}</span></div>` : ""}
+        ${gallons ? `<div class="quote-row"><span class="label">Estimated Gallons</span><span class="value">${gallons.toLocaleString()} gal</span></div>` : ""}
+        ${deliveryDate ? `<div class="quote-row"><span class="label">Requested Delivery</span><span class="value">${deliveryDate}${deliveryTime ? ` — ${deliveryTime}` : ""}</span></div>` : ""}
         <div class="quote-row total-row">
           <span class="label">Your Price</span>
           <span class="value">${priceFormatted}</span>
@@ -203,9 +258,22 @@ async function createPoolLead(params: {
   firstName: string; lastName: string;
   address?: string; city?: string; state?: string; zip?: string;
   phone?: string; email?: string; price?: string; town?: string;
+  poolType?: string; poolSurface?: string; installType?: string;
+  gallons?: number; deliveryDate?: string; deliveryTime?: string;
 }): Promise<{ contactId: string | null; opportunityId: string | null }> {
-  const { firstName, lastName, address, city, state, zip, phone, email, price, town } = params;
+  const { firstName, lastName, address, city, state, zip, phone, email, price, town,
+          poolType, poolSurface, installType, gallons, deliveryDate, deliveryTime } = params;
   const priceNum = price ? parseFloat(price) : 0;
+
+  // Build pool-detail note that gets saved as contact note + opportunity description
+  const poolNote = [
+    poolType ? `Pool Type: ${formatPoolType(poolType, poolSurface, installType)}` : null,
+    gallons ? `Gallons Needed: ${gallons.toLocaleString()}` : null,
+    deliveryDate ? `Requested Delivery: ${deliveryDate}${deliveryTime ? ` @ ${deliveryTime}` : ""}` : null,
+  ].filter(Boolean).join("\n");
+
+  const tags = ["Pool Water Lead", "Ali AI Call"];
+  if (poolType) tags.push(`Pool: ${formatPoolType(poolType, poolSurface, installType)}`);
 
   const contactPayload = {
     locationId: GHL_LOCATION_ID,
@@ -216,8 +284,16 @@ async function createPoolLead(params: {
     city: city || town || "",
     state: state || "NJ",
     postalCode: zip || "",
-    tags: ["Pool Water Lead", "Ali AI Call"],
-    source: "AI Phone — Ali",
+    tags,
+    source: "AI Phone — Jessica",
+    customFields: [
+      poolType      ? { key: "pool_type",       field_value: formatPoolType(poolType, poolSurface, installType) } : null,
+      poolSurface   ? { key: "pool_surface",    field_value: poolSurface } : null,
+      installType   ? { key: "pool_install",    field_value: installType } : null,
+      gallons       ? { key: "gallons_needed",  field_value: String(gallons) } : null,
+      deliveryDate  ? { key: "delivery_date",   field_value: deliveryDate } : null,
+      deliveryTime  ? { key: "delivery_time",   field_value: deliveryTime } : null,
+    ].filter(Boolean),
   };
 
   let contactRes: string;
@@ -242,15 +318,19 @@ async function createPoolLead(params: {
   let opportunityId: string | null = null;
 
   if (contactId) {
+    const oppName = poolType
+      ? `${firstName} ${lastName} — ${formatPoolType(poolType, poolSurface, installType)} (${zip || ""})`
+      : `${firstName} ${lastName} — Pool Water (${zip || ""})`;
     const oppPayload = {
       pipelineId: POOL_PIPELINE_ID,
       locationId: GHL_LOCATION_ID,
-      name: `${firstName} ${lastName} — Pool Water (${zip || ""})`,
+      name: oppName,
       pipelineStageId: POOL_STAGE_NEW_LEAD,
       contactId,
       status: "open",
       monetaryValue: priceNum,
-      source: "Ali AI Phone Agent",
+      source: "Jessica AI Phone Agent",
+      ...(poolNote ? { notes: poolNote } : {}),
     };
 
     const oppRes = execSync(
@@ -263,9 +343,39 @@ async function createPoolLead(params: {
     ).toString();
 
     opportunityId = JSON.parse(oppRes)?.opportunity?.id || null;
+
+    // Also write pool-detail note on contact itself (easier for reps to see)
+    if (poolNote) {
+      try {
+        execSync(
+          `curl -s -X POST "https://services.leadconnectorhq.com/contacts/${contactId}/notes" \
+            -H "Authorization: Bearer ${GHL_API_KEY}" \
+            -H "Version: 2021-07-28" \
+            -H "Content-Type: application/json" \
+            -d '${JSON.stringify({ body: `Pool Water Lead — Details from Jessica call:\n\n${poolNote}` }).replace(/'/g, "'\\''")}'`,
+          { timeout: 8000 }
+        );
+      } catch (noteErr: any) {
+        console.warn("Contact note write failed:", noteErr.message);
+      }
+    }
   }
 
   return { contactId, opportunityId };
+}
+
+function formatPoolType(poolType?: string, poolSurface?: string, installType?: string): string {
+  if (!poolType) return "";
+  const t = poolType.toLowerCase();
+  if (t.includes("hot")) return "Hot Tub";
+  if (t.includes("above")) return `Above Ground${installType ? ` (${installType})` : ""}`;
+  if (t.includes("in")) {
+    const parts: string[] = ["Inground"];
+    if (poolSurface) parts.push(poolSurface);
+    if (installType) parts.push(installType);
+    return parts.join(" — ");
+  }
+  return poolType;
 }
 
 // ---------------------------------------------------------------------------
@@ -277,8 +387,11 @@ async function sendPoolLeadEmails(params: {
   phone?: string; email?: string;
   entry?: ZipEntry;
   contactId?: string | null; opportunityId?: string | null;
+  poolType?: string; poolSurface?: string; installType?: string;
+  gallons?: number; deliveryDate?: string; deliveryTime?: string;
 }): Promise<void> {
-  const { firstName, lastName, address, city, state, zip, phone, email, entry, contactId, opportunityId } = params;
+  const { firstName, lastName, address, city, state, zip, phone, email, entry, contactId, opportunityId,
+          poolType, poolSurface, installType, gallons, deliveryDate, deliveryTime } = params;
   const fullName = `${firstName} ${lastName}`;
   const mailer = getMailer();
 
@@ -290,6 +403,7 @@ async function sendPoolLeadEmails(params: {
       price: entry?.price || "0",
       town: entry?.town || city,
       county: entry?.county || "",
+      poolType, poolSurface, installType, gallons, deliveryDate, deliveryTime,
     });
 
     await mailer.sendMail({
@@ -304,12 +418,17 @@ async function sendPoolLeadEmails(params: {
 
   // 2. Internal notification email (always sent)
   const priceNote = entry ? `\nQuoted: $${entry.price} (${entry.town}, ${entry.county} County)` : "\n(zip not in delivery zone — needs manual review)";
+  const poolDetails = [
+    poolType ? `Pool Type: ${formatPoolType(poolType, poolSurface, installType)}` : null,
+    gallons ? `Gallons Needed: ${gallons.toLocaleString()}` : null,
+    deliveryDate ? `Requested Delivery: ${deliveryDate}${deliveryTime ? ` @ ${deliveryTime}` : ""}` : null,
+  ].filter(Boolean).join("\n");
+
   await mailer.sendMail({
-    from: `"A Clear Alternative — Ali" <aclearalternative@gmail.com>`,
+    from: `"A Clear Alternative — Jessica" <aclearalternative@gmail.com>`,
     to: "aclearalternative@gmail.com",
-    // bcc removed per John's request — only aclearalternative@gmail.com for now
     subject: `🏊 New Pool Water Lead — ${fullName} (${zip || "??"})`,
-    text: `New pool water inquiry via Ali (AI Phone Agent):\n\nName: ${fullName}\nAddress: ${address}, ${city}, ${state} ${zip}\nPhone: ${phone || "not provided"}\nEmail: ${email || "not provided"}${priceNote}\n\nAdded to GHL → Swimming Pool Water → New Lead\nContact ID: ${contactId || "n/a"}\nOpportunity ID: ${opportunityId || "n/a"}\n\n${email ? "✅ Quote email sent to customer." : "⚠️  No email address — quote NOT sent. Follow up by phone."}\n\n— Ali, A Clear Alternative AI`,
+    text: `New pool water inquiry via Jessica (AI Phone Agent):\n\nName: ${fullName}\nAddress: ${address}, ${city}, ${state} ${zip}\nPhone: ${phone || "not provided"}\nEmail: ${email || "not provided"}${priceNote}${poolDetails ? "\n\n— Pool Details —\n" + poolDetails : ""}\n\nAdded to GHL → Swimming Pool Water → New Lead\nContact ID: ${contactId || "n/a"}\nOpportunity ID: ${opportunityId || "n/a"}\n\n${email ? "✅ Quote email sent to customer." : "⚠️  No email address — quote NOT sent. Follow up by phone."}\n\n— Jessica, A Clear Alternative AI`,
   });
 }
 
@@ -343,14 +462,29 @@ export function registerPoolRoutes(app: Express) {
 
   // -----------------------------------------------------------------------
   // POST /api/pool/ali-webhook
-  // action = "check_zip" → delivery confirmation, no price spoken
-  // action = "save_lead" → GHL contact/opportunity + quote email to customer
+  // action = "check_zip"        → delivery confirmation, no price spoken
+  // action = "check_pool_type"  → validates pool type (rejects DIY pools)
+  // action = "estimate_gallons" → computes gallons from dimensions
+  // action = "save_lead"        → GHL contact/opportunity + quote email
   // -----------------------------------------------------------------------
   app.post("/api/pool/ali-webhook", async (req: Request, res: Response) => {
     const { action, zip, phone, email, address, city, state } = req.body;
     // Voice AI sends snake_case params; accept both formats
     const firstName = req.body.firstName || req.body.first_name;
     const lastName  = req.body.lastName  || req.body.last_name;
+    const poolType    = req.body.poolType    || req.body.pool_type;    // inground | above_ground | hot_tub
+    const poolSurface = req.body.poolSurface || req.body.pool_surface; // plaster | liner
+    const installType = req.body.installType || req.body.install_type; // new | existing | diy | professional
+    const gallons     = req.body.gallons ? parseInt(String(req.body.gallons).replace(/\D/g, "")) || undefined : undefined;
+    const deliveryDate = req.body.deliveryDate || req.body.delivery_date;
+    const deliveryTime = req.body.deliveryTime || req.body.delivery_time;
+    const shape     = req.body.shape;
+    const length    = req.body.length    ? parseFloat(req.body.length)    : undefined;
+    const width     = req.body.width     ? parseFloat(req.body.width)     : undefined;
+    const diameter  = req.body.diameter  ? parseFloat(req.body.diameter)  : undefined;
+    const avgDepth  = req.body.avg_depth || req.body.avgDepth || req.body.depth
+                        ? parseFloat(req.body.avg_depth || req.body.avgDepth || req.body.depth)
+                        : undefined;
 
     // — Zip check (mid-call) —
     if (action === "check_zip") {
@@ -359,12 +493,47 @@ export function registerPoolRoutes(app: Express) {
       if (entry) {
         return res.json({
           delivers: true, zip: cleanZip, town: entry.town,
-          message: `Great news! We deliver to ${entry.town}. We'll send a professional quote to your email right after this call.`,
+          message: `Great news! We deliver to ${entry.town}. After you supply me with all of your information I can get you an accurate quote.`,
         });
       }
       return res.json({
         delivers: false, zip: cleanZip,
-        message: `We don't currently deliver to zip code ${cleanZip}.`,
+        message: `Unfortunately we do not cover that area.`,
+      });
+    }
+
+    // — Pool-type / install validation —
+    if (action === "check_pool_type") {
+      const t = (poolType || "").toLowerCase();
+      const inst = (installType || "").toLowerCase();
+      // DIY above-ground pools (Intex, Coleman, etc.) are NOT fillable
+      if (t.includes("above") && (inst.includes("diy") || inst.includes("self") || inst.includes("intex") || inst.includes("coleman"))) {
+        return res.json({
+          eligible: false,
+          reason: "diy_above_ground",
+          message: "I'm sorry — we cannot fill do-it-yourself above ground pools such as Intex or Coleman. Thank you for calling A Clear Alternative.",
+        });
+      }
+      return res.json({
+        eligible: true,
+        poolType: formatPoolType(poolType, poolSurface, installType),
+        message: "Got it, that type of pool we can fill.",
+      });
+    }
+
+    // — Gallon estimator —
+    if (action === "estimate_gallons") {
+      const est = estimateGallons({ poolType, shape, length, width, diameter, avgDepth });
+      if (est.gallons) {
+        return res.json({
+          gallons: est.gallons,
+          formula: est.formula,
+          message: `Based on those dimensions, I estimate approximately ${est.gallons.toLocaleString()} gallons.`,
+        });
+      }
+      return res.json({
+        gallons: null,
+        message: "I need a length, width, and approximate depth to estimate gallons. Could you provide those?",
       });
     }
 
@@ -374,9 +543,18 @@ export function registerPoolRoutes(app: Express) {
         const cleanZip = (zip || "").toString().trim();
         const entry = cleanZip ? zipData[cleanZip] : undefined;
 
+        // Auto-estimate if caller gave dimensions but no gallons
+        let finalGallons = gallons;
+        if (!finalGallons && (length || width || diameter)) {
+          const est = estimateGallons({ poolType, shape, length, width, diameter, avgDepth });
+          if (est.gallons) finalGallons = est.gallons;
+        }
+
         const { contactId, opportunityId } = await createPoolLead({
           firstName, lastName, address, city, state, zip: cleanZip, phone, email,
           price: entry?.price, town: entry?.town,
+          poolType, poolSurface, installType,
+          gallons: finalGallons, deliveryDate, deliveryTime,
         });
 
         await sendPoolLeadEmails({
@@ -387,6 +565,8 @@ export function registerPoolRoutes(app: Express) {
           zip: cleanZip,
           phone, email, entry,
           contactId, opportunityId,
+          poolType, poolSurface, installType,
+          gallons: finalGallons, deliveryDate, deliveryTime,
         });
 
         return res.json({ success: true, contactId, opportunityId });
@@ -396,7 +576,7 @@ export function registerPoolRoutes(app: Express) {
       }
     }
 
-    res.status(400).json({ error: "Unknown action. Use check_zip or save_lead." });
+    res.status(400).json({ error: "Unknown action. Use check_zip, check_pool_type, estimate_gallons, or save_lead." });
   });
 
   // -----------------------------------------------------------------------
