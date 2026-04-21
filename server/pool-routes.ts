@@ -4,7 +4,34 @@
 import type { Express, Request, Response } from "express";
 import { execSync } from "child_process";
 import * as fs from "fs";
+import * as path from "path";
 import nodemailer from "nodemailer";
+
+// ---------------------------------------------------------------------------
+// Brochure attachment — bundled at server/assets/pool-water-brochure.pdf
+// Attached to every customer quote email.
+// ---------------------------------------------------------------------------
+function getBrochureAttachment() {
+  const candidates = [
+    path.join(process.cwd(), "server/assets/pool-water-brochure.pdf"),
+    path.join(process.cwd(), "dist/assets/pool-water-brochure.pdf"),
+    path.join(__dirname, "assets/pool-water-brochure.pdf"),
+    path.join(__dirname, "../server/assets/pool-water-brochure.pdf"),
+  ];
+  for (const p of candidates) {
+    try {
+      if (fs.existsSync(p)) {
+        return {
+          filename: "Pool-and-Hot-Tub-Water-Delivery-Brochure.pdf",
+          content: fs.readFileSync(p),
+          contentType: "application/pdf",
+        };
+      }
+    } catch {}
+  }
+  console.warn("Brochure PDF not found — quote email will be sent without attachment.");
+  return null;
+}
 import { POOL_ZIP_DATA } from "./pool_zip_data";
 
 // Hardcoded until Render env var is updated (env has stale expired token)
@@ -407,13 +434,15 @@ async function sendPoolLeadEmails(params: {
       poolType, poolSurface, installType, gallons, deliveryDate, deliveryTime,
     });
 
+    const brochure = getBrochureAttachment();
     await mailer.sendMail({
       from: `"A Clear Alternative" <aclearalternative@gmail.com>`,
       to: email,
       // bcc removed per John's request — only aclearalternative@gmail.com for now
       subject: `Your Pool Water Delivery Quote — A Clear Alternative`,
       html: quoteHtml,
-      text: `Dear ${firstName},\n\nThank you for contacting A Clear Alternative!\n\nWe're pleased to provide your pool water delivery quote for ${entry?.town || city}, NJ.\n\nYour Price: ${entry ? `$${entry.price}` : "See attached"}\n\nTo schedule your delivery, call us at (856) 663-8088 or reply to this email.\n\nA Clear Alternative\n9230 Collins Ave, Pennsauken, NJ 08110\n(856) 663-8088 | info@aclear.com`,
+      text: `Dear ${firstName},\n\nThank you for contacting A Clear Alternative!\n\nWe're pleased to provide your pool water delivery quote for ${entry?.town || city}, NJ.\n\nYour Price: ${entry ? `$${entry.price}` : "See attached"}\n\nAttached: Pool and Hot Tub Water Delivery brochure — why professional water hauling is faster, safer, and better than filling with a hose or well.\n\nTo schedule your delivery, call us at (856) 663-8088 or reply to this email.\n\nA Clear Alternative\n9230 Collins Ave, Pennsauken, NJ 08110\n1-888-577-8088 | info@aclear.com`,
+      attachments: brochure ? [brochure] : [],
     });
   }
 
