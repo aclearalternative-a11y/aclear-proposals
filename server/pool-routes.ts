@@ -766,6 +766,7 @@ export function registerPoolRoutes(app: Express) {
   // action = "save_lead"        → GHL contact/opportunity + quote email
   // -----------------------------------------------------------------------
   app.post("/api/pool/ali-webhook", async (req: Request, res: Response) => {
+    console.log(`[ali-webhook] headers=${JSON.stringify(req.headers)} body=${JSON.stringify(req.body)}`);
     const { action, zip, phone, email, address, city, state } = req.body;
     // Voice AI sends snake_case params; accept both formats
     const firstName = req.body.firstName || req.body.first_name;
@@ -790,14 +791,23 @@ export function registerPoolRoutes(app: Express) {
       console.log(`[check_zip] raw=${JSON.stringify(zip)} normalized=${cleanZip}`);
       const entry = zipData[cleanZip];
       if (entry) {
+        const msg = `Great news! We deliver to ${entry.town}. After you supply me with all of your information I can get you an accurate quote.`;
         return res.json({
-          delivers: true, zip: cleanZip, town: entry.town,
-          message: `Great news! We deliver to ${entry.town}. After you supply me with all of your information I can get you an accurate quote.`,
+          delivers: true,
+          zip: cleanZip,
+          town: entry.town,
+          message: msg,
+          result: msg,
+          status: "success",
         });
       }
+      const msg = `Unfortunately we do not cover zip code ${cleanZip}.`;
       return res.json({
-        delivers: false, zip: cleanZip,
-        message: `Unfortunately we do not cover that area.`,
+        delivers: false,
+        zip: cleanZip,
+        message: msg,
+        result: msg,
+        status: "success",
       });
     }
 
