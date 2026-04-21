@@ -855,27 +855,33 @@ export function registerPoolRoutes(app: Express) {
   // -----------------------------------------------------------------------
   app.post("/api/pool/leads", async (req: Request, res: Response) => {
     try {
-      const { firstName, lastName, address, city, state, zip, phone, email } = req.body;
+      const { firstName, lastName, address, city, state, zip, phone, email,
+              poolType, poolSurface, installType, deliveryDate, deliveryTime } = req.body;
       if (!firstName || !lastName) return res.status(400).json({ error: "First and last name are required." });
 
-      const cleanZip = (zip || "").toString().trim();
+      const cleanZip = normalizeZip(zip);
       const entry = cleanZip ? zipData[cleanZip] : undefined;
+      const gallons = req.body.gallons
+        ? parseInt(String(req.body.gallons).replace(/\D/g, "")) || undefined
+        : undefined;
 
       const { contactId, opportunityId } = await createPoolLead({
         firstName, lastName, address, city, state, zip: cleanZip, phone, email,
         price: entry?.price, town: entry?.town,
+        poolType, poolSurface, installType, gallons, deliveryDate, deliveryTime,
       });
 
-      await sendPoolLeadEmails({
+      const result = await sendPoolLeadEmails({
         firstName, lastName,
         address: address || "",
         city: city || entry?.town || "",
         state: state || "NJ",
         zip: cleanZip, phone, email, entry,
         contactId, opportunityId,
+        poolType, poolSurface, installType, gallons, deliveryDate, deliveryTime,
       });
 
-      res.json({ success: true, contactId, opportunityId });
+      res.json({ success: true, contactId, opportunityId, ...result });
     } catch (err: any) {
       console.error("Pool lead error:", err.message);
       res.status(500).json({ error: err.message });
