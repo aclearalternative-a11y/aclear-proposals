@@ -42,14 +42,14 @@ const SMALL_TANKER_GAL = 2000;     // small truck for hot tubs
 
 function computeLoads(gallons?: number, poolType?: string): { loads: number; perLoadGal: number; tankerLabel: string } {
   const isHotTub = (poolType || "").toLowerCase().includes("hot");
-  // Hot tubs: 1 small tanker unless they need more than one tank
+  // NOTE: Round DOWN to nearest whole load (min 1). Ex: 19,000 gal ÷ 6,200 = 3.06 → 3 loads.
   if (isHotTub) {
     const g = gallons || SMALL_TANKER_GAL;
-    const loads = Math.max(1, Math.ceil(g / SMALL_TANKER_GAL));
+    const loads = Math.max(1, Math.floor(g / SMALL_TANKER_GAL));
     return { loads, perLoadGal: SMALL_TANKER_GAL, tankerLabel: "2,000 gallon small tanker" };
   }
   const g = gallons || TANKER_GAL;
-  const loads = Math.max(1, Math.ceil(g / TANKER_GAL));
+  const loads = Math.max(1, Math.floor(g / TANKER_GAL));
   return { loads, perLoadGal: TANKER_GAL, tankerLabel: "6,200 gallon standard tanker" };
 }
 
