@@ -168,6 +168,9 @@ const GHL_API_KEY = "pit-d7eddf87-065e-4031-a399-3b3fc4a8af97";
 const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
 const POOL_PIPELINE_ID = "xNaG2uwpPxq6BePj7zR8";
 const POOL_STAGE_NEW_LEAD = "8c4c4efa-a7d9-4020-9c88-d181cd0ba6b3";
+// Stage to move contact to when the quote is signed (Proposal Sent → Scheduled-equivalent).
+// Using existing 'Proposal Sent' stage until a 'Scheduled' stage is added in GHL.
+const POOL_STAGE_SCHEDULED = "efff108b-0abb-4ec4-afd1-31c65a429560";
 const POOL_SHEET_ID = "1yJEFzqwntC0DYlJRv9mHILctsFZSnt5Ij4yS-m3i8qY";
 const DATA_PATH = "/data/pool_zip_data.json";
 
@@ -285,9 +288,12 @@ function buildPoolQuoteEmail(params: {
           <a href="${quoteUrl}" style="background:#d4a73b;color:#0f3e63;text-decoration:none;padding:16px 36px;border-radius:6px;font-weight:800;font-size:17px;display:inline-block;letter-spacing:.3px">View &amp; Sign My Quote</a>
         </div>
         <p style="margin:20px 0 8px 0;font-size:14px;color:#666;line-height:1.6;text-align:center">Or paste this link into your browser:<br><a href="${quoteUrl}" style="color:#1d8fc4;word-break:break-all">${quoteUrl}</a></p>
+        <div style="text-align:center;margin:22px 0 4px 0">
+          <a href="https://proposals.aclear.com/brochure/pool-water.pdf" style="display:inline-block;background:#d32f2f;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:6px;font-weight:800;font-size:15px;letter-spacing:.3px;box-shadow:0 2px 6px rgba(211,47,47,.35)">⬇ Download Pool &amp; Hot Tub Brochure (PDF)</a>
+        </div>
         <p style="margin:26px 0 4px 0;font-size:15px;color:#555;line-height:1.6">Questions? Call us at <a href="tel:+18566638088" style="color:#1d8fc4;text-decoration:none">(856) 663-8088</a> or reply to this email.</p>
       </td></tr>
-      <tr><td style="padding:20px 32px 28px 32px;font-size:13px;color:#666;line-height:1.6">Attached: our Pool &amp; Hot Tub Water Delivery brochure.</td></tr>
+      <tr><td style="padding:20px 32px 28px 32px;font-size:13px;color:#666;line-height:1.6">Brochure also attached to this email.</td></tr>
       <tr><td style="background:#0f3e63;padding:22px 32px;color:#ffffff;font-size:14px;line-height:1.7">
         <div><strong style="font-size:15px">A Clear Alternative</strong> &middot; Since 1991</div>
         9230 Collins Ave, Pennsauken, NJ 08110<br>
@@ -427,6 +433,14 @@ function buildSignablePoolQuotePage(q: StoredQuote): string {
         <li>Friendly, experienced delivery team</li>
       </ul>
     </div>
+
+    <div style="text-align:center;margin:18px 0 6px 0">
+      <a href="/brochure/pool-water.pdf" target="_blank" rel="noopener"
+         style="display:inline-block;background:#d32f2f;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:6px;font-weight:800;font-size:15px;letter-spacing:.3px;box-shadow:0 2px 6px rgba(211,47,47,.35)">
+        ⬇ Download Pool &amp; Hot Tub Water Delivery Brochure (PDF)
+      </a>
+    </div>
+    <p style="text-align:center;font-size:11px;color:#777;margin:4px 0 6px 0">Learn why professional water hauling beats a hose or well — 5 quick reasons.</p>
   </div>
 
   <div class="terms">
@@ -969,6 +983,29 @@ export function registerPoolRoutes(app: Express) {
     }
   });
 
+  // -----------------------------------------------------------------------
+  // GET /brochure/pool-water  — public brochure PDF (inline viewable)
+  // -----------------------------------------------------------------------
+  app.get(["/brochure/pool-water", "/brochure/pool-water.pdf"], (_req: Request, res: Response) => {
+    const candidates = [
+      path.join(process.cwd(), "server/assets/pool-water-brochure.pdf"),
+      path.join(process.cwd(), "dist/assets/pool-water-brochure.pdf"),
+      path.join(__dirname, "assets/pool-water-brochure.pdf"),
+      path.join(__dirname, "../server/assets/pool-water-brochure.pdf"),
+    ];
+    for (const p of candidates) {
+      try {
+        if (fs.existsSync(p)) {
+          res.setHeader("Content-Type", "application/pdf");
+          res.setHeader("Content-Disposition", `inline; filename="Pool-and-Hot-Tub-Water-Delivery-Brochure.pdf"`);
+          fs.createReadStream(p).pipe(res);
+          return;
+        }
+      } catch {}
+    }
+    res.status(404).send("Brochure not found.");
+  });
+
   app.get("/quote/:id", (req: Request, res: Response) => {
     const id = String(req.params.id || "").replace(/[^a-zA-Z0-9_-]/g, "");
     const q = loadQuote(id);
@@ -1012,6 +1049,23 @@ export function registerPoolRoutes(app: Express) {
         });
       } catch (mailErr: any) {
         console.warn("sign-quote internal email failed:", mailErr.message);
+      }
+
+      // Move opportunity to 'Scheduled' (Proposal Sent) stage
+      if (q.opportunityId) {
+        try {
+          execSync(
+            `curl -s -X PUT "https://services.leadconnectorhq.com/opportunities/${q.opportunityId}" \
+              -H "Authorization: Bearer ${GHL_API_KEY}" \
+              -H "Version: 2021-07-28" \
+              -H "Content-Type: application/json" \
+              -d '${JSON.stringify({ pipelineId: POOL_PIPELINE_ID, pipelineStageId: POOL_STAGE_SCHEDULED, status: "open" }).replace(/'/g, "'\\''")}'`,
+            { timeout: 8000 }
+          );
+          console.log(`[sign-quote] moved opp ${q.opportunityId} → Scheduled stage`);
+        } catch (stageErr: any) {
+          console.warn("Opp stage move failed:", stageErr.message);
+        }
       }
 
       // Tag contact in GHL as "Quote Signed"
