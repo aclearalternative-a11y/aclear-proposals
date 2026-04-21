@@ -266,30 +266,30 @@ function buildPoolQuoteEmail(params: {
   const { firstName, town, total, loads, tankerLabel, quoteUrl } = params;
   const totalFmt = total.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 });
   return `<!DOCTYPE html><html><body style="margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:#f4f4f4;color:#222">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:28px 0"><tr><td align="center">
-    <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.08)">
-      <tr><td style="background:#0f3e63;padding:22px 28px">
-        <div style="color:#ffffff;font-size:22px;font-weight:800;letter-spacing:.2px">A Clear Alternative</div>
-        <div style="color:#cbe3f2;font-size:12px;margin-top:2px">Pool &amp; Hot Tub Water Delivery — Since 1991</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:30px 0"><tr><td align="center">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.08)">
+      <tr><td style="background:#0f3e63;padding:26px 32px">
+        <div style="color:#ffffff;font-size:26px;font-weight:800;letter-spacing:.2px">A Clear Alternative</div>
+        <div style="color:#cbe3f2;font-size:14px;margin-top:4px">Pool &amp; Hot Tub Water Delivery — Since 1991</div>
       </td></tr>
-      <tr><td style="padding:26px 28px 6px 28px">
-        <p style="margin:0 0 14px 0;font-size:15px;line-height:1.6;color:#222">Dear ${firstName},</p>
-        <p style="margin:0 0 14px 0;font-size:15px;line-height:1.6;color:#333">Thank you for calling us. Your personalized water delivery quote for <strong>${town}</strong> is ready.</p>
-        <div style="background:#eaf5fb;border-left:4px solid #1d8fc4;padding:14px 18px;margin:16px 0;border-radius:0 4px 4px 0">
-          <div style="font-size:12px;color:#1d8fc4;font-weight:700;letter-spacing:1px;text-transform:uppercase">Quote Total</div>
-          <div style="font-size:28px;font-weight:800;color:#0f3e63;margin-top:4px">${totalFmt}</div>
-          <div style="font-size:12px;color:#555;margin-top:4px">${loads} load${loads>1?"s":""} × ${tankerLabel}</div>
+      <tr><td style="padding:30px 32px 8px 32px">
+        <p style="margin:0 0 16px 0;font-size:18px;line-height:1.6;color:#222">Dear ${firstName},</p>
+        <p style="margin:0 0 16px 0;font-size:17px;line-height:1.6;color:#333">Thank you for calling us. Your personalized water delivery quote for <strong>${town}</strong> is ready.</p>
+        <div style="background:#eaf5fb;border-left:5px solid #1d8fc4;padding:18px 22px;margin:20px 0;border-radius:0 4px 4px 0">
+          <div style="font-size:14px;color:#1d8fc4;font-weight:700;letter-spacing:1px;text-transform:uppercase">Quote Total</div>
+          <div style="font-size:34px;font-weight:800;color:#0f3e63;margin-top:6px">${totalFmt}</div>
+          <div style="font-size:14px;color:#555;margin-top:6px">${loads} load${loads>1?"s":""} × ${tankerLabel}</div>
         </div>
-        <p style="margin:18px 0 12px 0;font-size:14px;color:#333;line-height:1.6">Review your full quote, and sign online to schedule your delivery:</p>
-        <div style="text-align:center;margin:18px 0 10px 0">
-          <a href="${quoteUrl}" style="background:#d4a73b;color:#0f3e63;text-decoration:none;padding:14px 30px;border-radius:6px;font-weight:800;font-size:15px;display:inline-block;letter-spacing:.3px">View &amp; Sign My Quote</a>
+        <p style="margin:22px 0 14px 0;font-size:16px;color:#333;line-height:1.6">Review your full quote, and sign online to schedule your delivery:</p>
+        <div style="text-align:center;margin:22px 0 12px 0">
+          <a href="${quoteUrl}" style="background:#d4a73b;color:#0f3e63;text-decoration:none;padding:16px 36px;border-radius:6px;font-weight:800;font-size:17px;display:inline-block;letter-spacing:.3px">View &amp; Sign My Quote</a>
         </div>
-        <p style="margin:18px 0 6px 0;font-size:12px;color:#666;line-height:1.6;text-align:center">Or paste this link into your browser:<br><a href="${quoteUrl}" style="color:#1d8fc4;word-break:break-all">${quoteUrl}</a></p>
-        <p style="margin:22px 0 4px 0;font-size:13px;color:#555;line-height:1.6">Questions? Call us at <a href="tel:+18566638088" style="color:#1d8fc4;text-decoration:none">(856) 663-8088</a> or reply to this email.</p>
+        <p style="margin:20px 0 8px 0;font-size:14px;color:#666;line-height:1.6;text-align:center">Or paste this link into your browser:<br><a href="${quoteUrl}" style="color:#1d8fc4;word-break:break-all">${quoteUrl}</a></p>
+        <p style="margin:26px 0 4px 0;font-size:15px;color:#555;line-height:1.6">Questions? Call us at <a href="tel:+18566638088" style="color:#1d8fc4;text-decoration:none">(856) 663-8088</a> or reply to this email.</p>
       </td></tr>
-      <tr><td style="padding:18px 28px 24px 28px;font-size:11px;color:#666;line-height:1.6">Attached: our Pool &amp; Hot Tub Water Delivery brochure.</td></tr>
-      <tr><td style="background:#0f3e63;padding:18px 28px;color:#ffffff;font-size:12px;line-height:1.7">
-        <div><strong>A Clear Alternative</strong> &middot; Since 1991</div>
+      <tr><td style="padding:20px 32px 28px 32px;font-size:13px;color:#666;line-height:1.6">Attached: our Pool &amp; Hot Tub Water Delivery brochure.</td></tr>
+      <tr><td style="background:#0f3e63;padding:22px 32px;color:#ffffff;font-size:14px;line-height:1.7">
+        <div><strong style="font-size:15px">A Clear Alternative</strong> &middot; Since 1991</div>
         9230 Collins Ave, Pennsauken, NJ 08110<br>
         1-888-577-8088 &middot; (856) 663-8088 &middot; info@aclear.com &middot; www.aclear.com
       </td></tr>
