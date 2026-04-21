@@ -34,6 +34,26 @@ function getBrochureAttachment() {
 }
 import { POOL_ZIP_DATA } from "./pool_zip_data";
 
+// Normalize a zip code from Jessica's speech-to-text.
+// Handles: '08204', '8204', 'O8204', '0 8 2 0 4', '08204.', 'zero eight two oh four', etc.
+function normalizeZip(raw: unknown): string {
+  let s = (raw == null ? "" : String(raw)).toLowerCase().trim();
+  // Map spoken digit words to digits
+  const wordMap: Record<string, string> = {
+    "zero": "0", "oh": "0", "o": "0",
+    "one": "1", "two": "2", "three": "3", "four": "4",
+    "five": "5", "six": "6", "seven": "7", "eight": "8", "nine": "9",
+  };
+  // Replace whole words first, then fall back to digit-stripping
+  s = s.replace(/\b[a-z]+\b/g, (w) => wordMap[w] ?? w);
+  // Strip anything non-digit
+  let digits = s.replace(/\D/g, "");
+  // Trim to 5 digits — prefer last 5 if too long (e.g. '208204' → '08204'), pad if short
+  if (digits.length > 5) digits = digits.slice(-5);
+  if (digits.length > 0 && digits.length < 5) digits = digits.padStart(5, "0");
+  return digits;
+}
+
 // Hardcoded until Render env var is updated (env has stale expired token)
 const GHL_API_KEY = "pit-d7eddf87-065e-4031-a399-3b3fc4a8af97";
 const GHL_LOCATION_ID = "3iegkvSPwHli58Bn2vZE";
@@ -470,10 +490,7 @@ export function registerPoolRoutes(app: Express) {
   // Price is NOT included in the spoken message — quote is sent via email.
   // -----------------------------------------------------------------------
   app.get("/api/pool/check-zip", (req: Request, res: Response) => {
-    // Zero-pad to 5 digits (handles cases where Jessica's STT strips leading zeros, e.g. '8204' -> '08204')
-    let zip = (req.query.zip as string || "").trim().replace(/\D/g, "");
-    if (zip.length > 0 && zip.length < 5) zip = zip.padStart(5, "0");
-    if (zip.length > 5) zip = zip.slice(-5);
+    const zip = normalizeZip(req.query.zip);
     if (!zip || zip.length !== 5) {
       return res.status(400).json({ delivers: false, message: "Please provide a valid 5-digit zip code." });
     }
@@ -521,10 +538,8 @@ export function registerPoolRoutes(app: Express) {
 
     // — Zip check (mid-call) —
     if (action === "check_zip") {
-      // Zero-pad to 5 digits - Jessica's STT sometimes strips leading zeros ("08204" becomes "8204" or "O8204")
-      let cleanZip = (zip || "").toString().trim().replace(/\D/g, "");
-      if (cleanZip.length > 0 && cleanZip.length < 5) cleanZip = cleanZip.padStart(5, "0");
-      if (cleanZip.length > 5) cleanZip = cleanZip.slice(-5);
+      const cleanZip = normalizeZip(zip);
+      console.log(`[check_zip] raw=${JSON.stringify(zip)} normalized=${cleanZip}`);
       const entry = zipData[cleanZip];
       if (entry) {
         return res.json({
@@ -576,10 +591,8 @@ export function registerPoolRoutes(app: Express) {
     // — Save lead (end of call) —
     if (action === "save_lead") {
       try {
-        // Zero-pad to 5 digits
-        let cleanZip = (zip || "").toString().trim().replace(/\D/g, "");
-        if (cleanZip.length > 0 && cleanZip.length < 5) cleanZip = cleanZip.padStart(5, "0");
-        if (cleanZip.length > 5) cleanZip = cleanZip.slice(-5);
+        const cleanZip = normalizeZip(zip);
+        console.log(`[save_lead] zip raw=${JSON.stringify(zip)} normalized=${cleanZip}`);
         const entry = cleanZip ? zipData[cleanZip] : undefined;
 
         // Auto-estimate if caller gave dimensions but no gallons
