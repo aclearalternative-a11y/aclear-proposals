@@ -330,7 +330,8 @@ async function createPoolLead(params: {
       status: "open",
       monetaryValue: priceNum,
       source: "Jessica AI Phone Agent",
-      ...(poolNote ? { notes: poolNote } : {}),
+      // NOTE: GHL opportunities API does NOT accept a `notes` field.
+      // Pool detail notes are written separately via the contact /notes endpoint below.
     };
 
     const oppRes = execSync(
