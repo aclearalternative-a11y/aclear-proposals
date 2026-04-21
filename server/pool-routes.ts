@@ -470,7 +470,10 @@ export function registerPoolRoutes(app: Express) {
   // Price is NOT included in the spoken message — quote is sent via email.
   // -----------------------------------------------------------------------
   app.get("/api/pool/check-zip", (req: Request, res: Response) => {
-    const zip = (req.query.zip as string || "").trim().replace(/\D/g, "");
+    // Zero-pad to 5 digits (handles cases where Jessica's STT strips leading zeros, e.g. '8204' -> '08204')
+    let zip = (req.query.zip as string || "").trim().replace(/\D/g, "");
+    if (zip.length > 0 && zip.length < 5) zip = zip.padStart(5, "0");
+    if (zip.length > 5) zip = zip.slice(-5);
     if (!zip || zip.length !== 5) {
       return res.status(400).json({ delivers: false, message: "Please provide a valid 5-digit zip code." });
     }
@@ -518,7 +521,10 @@ export function registerPoolRoutes(app: Express) {
 
     // — Zip check (mid-call) —
     if (action === "check_zip") {
-      const cleanZip = (zip || "").toString().trim().replace(/\D/g, "");
+      // Zero-pad to 5 digits - Jessica's STT sometimes strips leading zeros ("08204" becomes "8204" or "O8204")
+      let cleanZip = (zip || "").toString().trim().replace(/\D/g, "");
+      if (cleanZip.length > 0 && cleanZip.length < 5) cleanZip = cleanZip.padStart(5, "0");
+      if (cleanZip.length > 5) cleanZip = cleanZip.slice(-5);
       const entry = zipData[cleanZip];
       if (entry) {
         return res.json({
@@ -570,7 +576,10 @@ export function registerPoolRoutes(app: Express) {
     // — Save lead (end of call) —
     if (action === "save_lead") {
       try {
-        const cleanZip = (zip || "").toString().trim();
+        // Zero-pad to 5 digits
+        let cleanZip = (zip || "").toString().trim().replace(/\D/g, "");
+        if (cleanZip.length > 0 && cleanZip.length < 5) cleanZip = cleanZip.padStart(5, "0");
+        if (cleanZip.length > 5) cleanZip = cleanZip.slice(-5);
         const entry = cleanZip ? zipData[cleanZip] : undefined;
 
         // Auto-estimate if caller gave dimensions but no gallons
