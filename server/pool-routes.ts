@@ -686,6 +686,36 @@ async function sendPoolLeadEmails(params: {
     saveQuote(stored);
     quoteUrl = `${getPublicBaseUrl()}/quote/${quoteId}`;
     console.log(`[quote] saved id=${quoteId} total=$${total} loads=${loads}`);
+
+    // Write quote URL + details to contact's GHL custom fields so it's 1-click
+    // accessible from the customer record.
+    if (contactId) {
+      try {
+        const updatePayload = {
+          customFields: [
+            { key: "quote_url",   field_value: quoteUrl },
+            { key: "quote_total", field_value: String(total) },
+            poolType     ? { key: "pool_type",     field_value: formatPoolType(poolType, poolSurface, installType) } : null,
+            poolSurface  ? { key: "pool_surface",  field_value: poolSurface } : null,
+            installType  ? { key: "pool_install",  field_value: installType } : null,
+            gallons      ? { key: "gallons_needed", field_value: String(gallons) } : null,
+            deliveryDate ? { key: "requested_delivery_date", field_value: deliveryDate } : null,
+            deliveryTime ? { key: "requested_delivery_time", field_value: deliveryTime } : null,
+          ].filter(Boolean),
+        };
+        execSync(
+          `curl -s -X PUT "https://services.leadconnectorhq.com/contacts/${contactId}" \
+            -H "Authorization: Bearer ${GHL_API_KEY}" \
+            -H "Version: 2021-07-28" \
+            -H "Content-Type: application/json" \
+            -d '${JSON.stringify(updatePayload).replace(/'/g, "'\\''")}'`,
+          { timeout: 10000 }
+        );
+        console.log(`[ghl] wrote quote_url to contact ${contactId}`);
+      } catch (err: any) {
+        console.error("GHL custom-field update error:", err.message);
+      }
+    }
   }
 
   // 1. Short teaser email TO CUSTOMER (only if email + valid quote)
