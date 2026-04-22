@@ -1067,10 +1067,14 @@ export function registerPoolRoutes(app: Express) {
             const est = estimateGallons({ poolType, shape, length, width, diameter, avgDepth });
             if (est.gallons) finalGallons = est.gallons;
           }
+          // Pass the FULL quote total (pricePerLoad × loads) as the opp
+          // monetary value — not the per-load rate. This is what the customer
+          // owes for the job.
+          const { total: computedTotal } = computeQuoteTotal(entry?.price, finalGallons, poolType);
 
           const { contactId, opportunityId } = await createPoolLead({
             firstName, lastName, address, city, state, zip: cleanZip, phone, email,
-            price: entry?.price, town: entry?.town,
+            price: String(computedTotal || entry?.price || 0), town: entry?.town,
             poolType, poolSurface, installType,
             gallons: finalGallons, deliveryDate, deliveryTime,
             separateAccount, businessName,
