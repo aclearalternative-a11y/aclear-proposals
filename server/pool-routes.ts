@@ -110,6 +110,7 @@ export interface StoredQuote {
   contactId?: string | null;
   opportunityId?: string | null;
   signedBy?: string;
+  paymentMethod?: string;
   signedAt?: string;
   signerIp?: string;
 }
@@ -322,14 +323,16 @@ function buildSignablePoolQuotePage(q: StoredQuote): string {
 <style>
   * { box-sizing:border-box; margin:0; padding:0; }
   html,body { background:#eef2f6; color:#1a1a1a; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif; -webkit-font-smoothing:antialiased; }
-  body { padding:20px 12px 60px 12px; }
-  .page { max-width:820px; margin:0 auto; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 2px 14px rgba(0,0,0,.08); }
-  .hdr { background:linear-gradient(135deg,#0f3e63 0%,#1d8fc4 100%); color:#fff; padding:24px 32px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; }
+  body { padding:32px 24px 80px 24px; }
+  @media(max-width:640px){ body { padding:16px 10px 60px 10px; } }
+  .page { max-width:780px; margin:0 auto; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 2px 14px rgba(0,0,0,.08); }
+  .hdr { background:linear-gradient(135deg,#0f3e63 0%,#1d8fc4 100%); color:#fff; padding:28px 44px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; }
   .hdr .brand h1 { font-size:24px; font-weight:800; letter-spacing:.2px; }
   .hdr .brand p { font-size:12px; opacity:.85; margin-top:3px; }
   .hdr .meta { font-size:11px; color:#cbe3f2; text-align:right; line-height:1.7; }
   .hdr .meta strong { color:#fff; }
-  .body { padding:26px 32px 18px 32px; }
+  .body { padding:28px 44px 22px 44px; }
+  @media(max-width:640px){ .body { padding:22px 22px 18px 22px; } .hdr { padding:22px 22px; } }
   .greet { font-size:14px; line-height:1.6; color:#333; margin-bottom:18px; }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px; }
   @media(max-width:640px){ .grid { grid-template-columns:1fr; } }
@@ -351,8 +354,15 @@ function buildSignablePoolQuotePage(q: StoredQuote): string {
   .incl ul { list-style:none; margin:0; padding:0; }
   .incl li { padding:2px 0; }
   .incl li:before { content:"✓ "; color:#1d8fc4; font-weight:700; }
-  .terms { font-size:11px; color:#666; line-height:1.6; background:#fafbfc; border-top:1px solid #eef2f6; border-bottom:1px solid #eef2f6; padding:16px 32px; margin:0 -32px; }
-  .sign-wrap { padding:24px 32px; background:#fff; border-top:2px solid #f0f4f8; }
+  .terms { font-size:11px; color:#666; line-height:1.6; background:#fafbfc; border-top:1px solid #eef2f6; border-bottom:1px solid #eef2f6; padding:18px 44px; margin:0 -44px; }
+  @media(max-width:640px){ .terms { padding:16px 22px; margin:0 -22px; } }
+  .sign-wrap { padding:26px 44px; background:#fff; border-top:2px solid #f0f4f8; }
+  @media(max-width:640px){ .sign-wrap { padding:22px 22px; } }
+  .pay-box { background:#fffaf0; border:1px solid #f0d894; border-radius:6px; padding:14px 18px; margin:14px 0 4px 0; }
+  .pay-box h4 { font-size:11px; font-weight:700; color:#8a6d1a; text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px; }
+  .pay-box label { display:flex; align-items:flex-start; gap:8px; font-size:13px; color:#333; margin:6px 0; cursor:pointer; line-height:1.45; }
+  .pay-box label input { margin-top:3px; flex-shrink:0; }
+  .pay-box .fee-note { font-size:11px; color:#666; margin-left:24px; }
   .sign-wrap h3 { font-size:14px; color:#0f3e63; margin-bottom:6px; font-weight:700; }
   .sign-wrap p.lead { font-size:12px; color:#555; margin-bottom:14px; line-height:1.55; }
   .sign-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
@@ -370,7 +380,8 @@ function buildSignablePoolQuotePage(q: StoredQuote): string {
   .signed-ok p { font-size:13px; color:#333; }
   .signed-line { display:flex; align-items:center; gap:10px; padding:12px 16px; background:#f7fafc; border-left:3px solid #1e9c52; margin-top:12px; }
   .signed-line .sigtxt { font-family:'Brush Script MT','Segoe Script','Lucida Handwriting',cursive; font-size:22px; color:#0f3e63; }
-  .footer { background:#0f3e63; color:#cbe3f2; padding:18px 32px; font-size:11px; line-height:1.7; text-align:center; }
+  .footer { background:#0f3e63; color:#cbe3f2; padding:22px 44px; font-size:11px; line-height:1.7; text-align:center; }
+  @media(max-width:640px){ .footer { padding:18px 22px; } }
   .footer strong { color:#fff; }
   .err { color:#c0392b; font-size:12px; margin-top:8px; }
 </style>
@@ -418,6 +429,7 @@ function buildSignablePoolQuotePage(q: StoredQuote): string {
       <table>
         <tr><td>Price per load (${q.perLoadGal.toLocaleString()} gal tanker)</td><td>${perFmt}</td></tr>
         <tr><td>Number of loads</td><td>× ${q.loads}</td></tr>
+        <tr><td>Up to 300' of hose included in price</td><td>Included</td></tr>
         ${q.loads > 1 ? `<tr><td>Subtotal</td><td>${totalFmt}</td></tr>` : ""}
         <tr class="total"><td>Total</td><td>${totalFmt}</td></tr>
       </table>
@@ -429,8 +441,16 @@ function buildSignablePoolQuotePage(q: StoredQuote): string {
         <li>Full truckload of potable-grade bulk water</li>
         <li>Delivery to your address in ${q.town || q.city}</li>
         <li>Professional, on-time service</li>
-        <li>Friendly, experienced delivery team</li>
+        <li><b>Up to 300 feet of hose included</b> &mdash; each additional 50' of hose is $50.00</li>
       </ul>
+    </div>
+
+    <div class="pay-box">
+      <h4>How will you be paying?</h4>
+      <label><input type="radio" name="payment" value="check"><span>Check on day of delivery</span></label>
+      <label><input type="radio" name="payment" value="cash"><span>Cash on day of delivery</span></label>
+      <label><input type="radio" name="payment" value="credit_card"><span>Credit card (online)</span></label>
+      <div class="fee-note">Note: A 3% processing fee applies to all credit card payments made online.</div>
     </div>
 
     <div style="text-align:center;margin:18px 0 6px 0">
@@ -443,7 +463,7 @@ function buildSignablePoolQuotePage(q: StoredQuote): string {
   </div>
 
   <div class="terms">
-    <strong>Terms:</strong> This quote is valid for 30 days from the date above. Pricing is based on the delivery zip code and the number of 6,200-gallon tanker loads required (hot tubs: 2,000-gallon tanker). Additional charges may apply for difficult access (gates, long distances from truck to pool, overhead obstructions). Final gallons may be verified on-site by the delivery team. By signing below you authorize A Clear Alternative to schedule your delivery and confirm acceptance of the pricing and terms. Payment is due at time of service unless otherwise arranged.
+    <strong>Terms:</strong> This quote is valid for 30 days from the date above. Pricing is based on the delivery zip code and the number of 6,200-gallon tanker loads required (hot tubs: 2,000-gallon tanker). Quote includes up to 300 feet of hose; each additional 50-foot length is $50.00. Additional charges may also apply for difficult access (gates, overhead obstructions, long distances from truck to pool). Final gallons may be verified on-site by the delivery team. Payment is due at time of service unless otherwise arranged; a 3% processing fee applies to all credit card payments made online. By signing below you authorize A Clear Alternative to schedule your delivery and confirm acceptance of the pricing and terms.
   </div>
 
   ${isSigned ? `
@@ -497,7 +517,10 @@ async function submitSig(e) {
   if (!consent) { err.textContent = 'Please check the consent box.'; err.style.display='block'; return false; }
   btn.disabled = true; btn.textContent = 'Signing…';
   try {
-    var r = await fetch('/api/pool/sign-quote', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id: '${q.id}', signedBy: name }) });
+    var payRadios = document.querySelectorAll('input[name=payment]');
+    var pay = ''; for (var i=0;i<payRadios.length;i++){ if(payRadios[i].checked){ pay=payRadios[i].value; break; } }
+    if (!pay) { err.textContent = 'Please select a payment method.'; err.style.display='block'; btn.disabled=false; btn.textContent='Sign & Schedule'; return false; }
+    var r = await fetch('/api/pool/sign-quote', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id: '${q.id}', signedBy: name, paymentMethod: pay }) });
     var j = await r.json();
     if (j && j.success) { location.reload(); return false; }
     err.textContent = (j && j.error) || 'Could not record signature. Please call us to confirm.'; err.style.display='block';
@@ -1082,7 +1105,7 @@ export function registerPoolRoutes(app: Express) {
   // -----------------------------------------------------------------------
   app.post("/api/pool/sign-quote", async (req: Request, res: Response) => {
     try {
-      const { id, signedBy } = req.body || {};
+      const { id, signedBy, paymentMethod } = req.body || {};
       const cleanId = String(id || "").replace(/[^a-zA-Z0-9_-]/g, "");
       const name = String(signedBy || "").trim();
       if (!cleanId) return res.status(400).json({ success: false, error: "Missing quote id." });
@@ -1096,6 +1119,7 @@ export function registerPoolRoutes(app: Express) {
       q.signedBy = name;
       q.signedAt = new Date().toISOString();
       q.signerIp = ip;
+      q.paymentMethod = String(paymentMethod || "").trim() || undefined;
       saveQuote(q);
 
       // Notify internal team
@@ -1106,7 +1130,7 @@ export function registerPoolRoutes(app: Express) {
           from: `"A Clear Alternative — Quote Signed" <aclearalternative@gmail.com>`,
           to: "aclearalternative@gmail.com",
           subject: `✅ Quote SIGNED — ${q.firstName} ${q.lastName} (${totalFmt})`,
-          text: `Good news! A customer just signed their pool water delivery quote.\n\nSigned by: ${name}\nSigned at: ${new Date(q.signedAt).toLocaleString("en-US")} (IP ${ip || "n/a"})\n\nCustomer: ${q.firstName} ${q.lastName}\nAddress: ${q.address}, ${q.city}, ${q.state} ${q.zip}\nPhone: ${q.phone || "—"}\nEmail: ${q.email || "—"}\n\nQuote Total: ${totalFmt}\n${q.loads} load${q.loads > 1 ? "s" : ""} × $${q.pricePerLoad} (${q.tankerLabel})\n\nGHL Contact: ${q.contactId || "n/a"}\nGHL Opportunity: ${q.opportunityId || "n/a"}\nQuote URL: ${getPublicBaseUrl()}/quote/${q.id}\n\n→ Please reach out to the customer to schedule delivery.`,
+          text: `Good news! A customer just signed their pool water delivery quote.\n\nSigned by: ${name}\nSigned at: ${new Date(q.signedAt).toLocaleString("en-US")} (IP ${ip || "n/a"})\nPayment Method: ${q.paymentMethod || "not specified"}${q.paymentMethod === "credit_card" ? " (3% processing fee applies)" : ""}\n\nCustomer: ${q.firstName} ${q.lastName}\nAddress: ${q.address}, ${q.city}, ${q.state} ${q.zip}\nPhone: ${q.phone || "—"}\nEmail: ${q.email || "—"}\n\nQuote Total: ${totalFmt}\n${q.loads} load${q.loads > 1 ? "s" : ""} × $${q.pricePerLoad} (${q.tankerLabel})\n\nGHL Contact: ${q.contactId || "n/a"}\nGHL Opportunity: ${q.opportunityId || "n/a"}\nQuote URL: ${getPublicBaseUrl()}/quote/${q.id}\n\n→ Please reach out to the customer to schedule delivery.`,
         });
       } catch (mailErr: any) {
         console.warn("sign-quote internal email failed:", mailErr.message);
