@@ -63,9 +63,18 @@ function computeQuoteTotal(basePrice?: string, gallons?: number, poolType?: stri
 // ---------------------------------------------------------------------------
 // Quote persistence (file-backed, survives Render restart via /data volume)
 // ---------------------------------------------------------------------------
-// Try /data (Render persistent disk), fall back to app-local ./data if /data is unavailable.
+// Try /data (Render persistent disk) first, THEN fall back to app-local directories.
+// IMPORTANT: /data is the only path that survives Render redeploys. If /data is not
+// writable (disk not yet attached), we still save to app-local and also push a backup
+// to GHL so the quote can be rehydrated on next boot.
 function pickQuotesDir(): string {
-  const candidates = ["/data/quotes", path.join(process.cwd(), "data", "quotes"), "/tmp/aclear-quotes"];
+  const forced = process.env.QUOTES_DIR;
+  const candidates = [
+    forced,
+    "/data/quotes",
+    path.join(process.cwd(), "data", "quotes"),
+    "/tmp/aclear-quotes",
+  ].filter(Boolean) as string[];
   for (const dir of candidates) {
     try {
       fs.mkdirSync(dir, { recursive: true });
@@ -124,14 +133,70 @@ function saveQuote(q: StoredQuote): void {
   } catch (e: any) {
     console.error(`[quotes] saveQuote FAILED ${filePath}:`, e.message);
   }
+  // Belt-and-suspenders backup: write quote JSON as a GHL contact note, tagged
+  // with a parseable header. If the local file is wiped on redeploy, loadQuote()
+  // can rehydrate from GHL. Fire-and-forget — don't block the response.
+  if (q.contactId) {
+    try {
+      const body = `QUOTE_DATA:${q.id}\n${JSON.stringify(q)}`;
+      execSync(
+        `curl -s -X POST "https://services.leadconnectorhq.com/contacts/${q.contactId}/notes" \
+          -H "Authorization: Bearer ${GHL_API_KEY}" \
+          -H "Version: 2021-07-28" \
+          -H "Content-Type: application/json" \
+          -d '${JSON.stringify({ body }).replace(/'/g, "'\\''")}'`,
+        { timeout: 8000 }
+      );
+    } catch (e: any) {
+      console.warn(`[quotes] GHL backup note failed for ${q.id}:`, e.message);
+    }
+  }
 }
 
 function loadQuote(id: string): StoredQuote | null {
+  const cleanId = id.replace(/[^a-zA-Z0-9_-]/g, "");
+  // Primary: local file
   try {
-    const p = `${QUOTES_DIR}/${id.replace(/[^a-zA-Z0-9_-]/g, "")}.json`;
-    if (!fs.existsSync(p)) return null;
-    return JSON.parse(fs.readFileSync(p, "utf8"));
-  } catch { return null; }
+    const p = `${QUOTES_DIR}/${cleanId}.json`;
+    if (fs.existsSync(p)) return JSON.parse(fs.readFileSync(p, "utf8"));
+  } catch {}
+  // Fallback: rehydrate from GHL backup note. Searches the location for any
+  // contact whose notes contain QUOTE_DATA:<id> and parses the JSON body.
+  try {
+    const searchRes = execSync(
+      `curl -s "https://services.leadconnectorhq.com/contacts/search?locationId=${GHL_LOCATION_ID}&query=${cleanId}&limit=5" \
+        -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28"`,
+      { timeout: 8000 }
+    ).toString();
+    const searchData = JSON.parse(searchRes);
+    const contacts = searchData?.contacts || [];
+    for (const c of contacts) {
+      if (!c.id) continue;
+      const notesRes = execSync(
+        `curl -s "https://services.leadconnectorhq.com/contacts/${c.id}/notes" \
+          -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28"`,
+        { timeout: 8000 }
+      ).toString();
+      const notesData = JSON.parse(notesRes);
+      for (const note of (notesData?.notes || [])) {
+        const body = note.body || "";
+        if (body.startsWith(`QUOTE_DATA:${cleanId}`)) {
+          const jsonStart = body.indexOf("\n") + 1;
+          const parsed = JSON.parse(body.slice(jsonStart));
+          // Cache locally so we only hit GHL once
+          try {
+            fs.mkdirSync(QUOTES_DIR, { recursive: true });
+            fs.writeFileSync(`${QUOTES_DIR}/${cleanId}.json`, JSON.stringify(parsed, null, 2), "utf8");
+          } catch {}
+          console.log(`[quotes] rehydrated ${cleanId} from GHL contact ${c.id}`);
+          return parsed;
+        }
+      }
+    }
+  } catch (e: any) {
+    console.warn(`[quotes] GHL rehydrate failed for ${cleanId}:`, e.message);
+  }
+  return null;
 }
 
 function generateQuoteId(): string {
@@ -544,9 +609,12 @@ async function createPoolLead(params: {
   phone?: string; email?: string; price?: string; town?: string;
   poolType?: string; poolSurface?: string; installType?: string;
   gallons?: number; deliveryDate?: string; deliveryTime?: string;
+  separateAccount?: boolean; // When true, force-create a new contact even if phone/email collide
+  businessName?: string;     // Optional — populated for commercial callers
 }): Promise<{ contactId: string | null; opportunityId: string | null }> {
   const { firstName, lastName, address, city, state, zip, phone, email, price, town,
-          poolType, poolSurface, installType, gallons, deliveryDate, deliveryTime } = params;
+          poolType, poolSurface, installType, gallons, deliveryDate, deliveryTime,
+          separateAccount, businessName } = params;
   const priceNum = price ? parseFloat(price) : 0;
 
   // Build pool-detail note that gets saved as contact note + opportunity description
@@ -559,17 +627,27 @@ async function createPoolLead(params: {
   const tags = ["Pool Water Lead", "Ali AI Call"];
   if (poolType) tags.push(`Pool: ${formatPoolType(poolType, poolSurface, installType)}`);
 
-  const contactPayload = {
+  // When separateAccount=true (e.g. commercial caller with multiple properties, or
+  // explicit "separate account" override), we suppress the natural dedupe keys so
+  // GHL creates a fresh contact record instead of overwriting an existing one.
+  const dedupeEmail = separateAccount ? "" : (email || "");
+  const dedupePhone = separateAccount ? "" : (phone || "");
+  const tagsFinal = [...tags];
+  if (separateAccount) tagsFinal.push("Separate Account — Do Not Merge");
+  if (businessName) tagsFinal.push("Commercial");
+
+  const contactPayload: any = {
     locationId: GHL_LOCATION_ID,
     firstName, lastName,
-    phone: phone || "",
-    email: email || "",
+    phone: dedupePhone,
+    email: dedupeEmail,
     address1: address || "",
     city: city || town || "",
     state: state || "NJ",
     postalCode: zip || "",
-    tags,
+    tags: tagsFinal,
     source: "AI Phone — Jessica",
+    ...(businessName ? { companyName: businessName } : {}),
     customFields: [
       poolType      ? { key: "pool_type",       field_value: formatPoolType(poolType, poolSurface, installType) } : null,
       poolSurface   ? { key: "pool_surface",    field_value: poolSurface } : null,
@@ -602,9 +680,15 @@ async function createPoolLead(params: {
   let opportunityId: string | null = null;
 
   if (contactId) {
+    // Tag each call's opportunity with a short date suffix so repeat callers get
+    // distinguishable cards in the pipeline (e.g. "— 4/22"). A new opportunity is
+    // ALWAYS created per save_lead — even for existing contacts — so every call
+    // generates a trackable pipeline card.
+    const d = new Date();
+    const dateSuffix = `${d.getMonth() + 1}/${d.getDate()}`;
     const oppName = poolType
-      ? `${firstName} ${lastName} — ${formatPoolType(poolType, poolSurface, installType)} (${zip || ""})`
-      : `${firstName} ${lastName} — Pool Water (${zip || ""})`;
+      ? `${firstName} ${lastName} — ${formatPoolType(poolType, poolSurface, installType)} (${zip || ""}) — ${dateSuffix}`
+      : `${firstName} ${lastName} — Pool Water (${zip || ""}) — ${dateSuffix}`;
     const oppPayload = {
       pipelineId: POOL_PIPELINE_ID,
       locationId: GHL_LOCATION_ID,
@@ -628,6 +712,7 @@ async function createPoolLead(params: {
     ).toString();
 
     opportunityId = JSON.parse(oppRes)?.opportunity?.id || null;
+    console.log(`[createPoolLead] new opp id=${opportunityId} name="${oppName}"`);
 
     // Also write pool-detail note on contact itself (easier for reps to see)
     if (poolNote) {
@@ -852,6 +937,12 @@ export function registerPoolRoutes(app: Express) {
     const gallons     = src.gallons ? parseInt(String(src.gallons).replace(/\D/g, "")) || undefined : undefined;
     const deliveryDate = src.deliveryDate || src.delivery_date;
     const deliveryTime = src.deliveryTime || src.delivery_time;
+    // Commercial / multi-property override. When the caller indicates this is a
+    // separate account from an existing record (different property, different
+    // business), Jessica passes separate_account="true" so we create a new contact
+    // instead of upserting over the existing one.
+    const separateAccount = String(src.separate_account || src.separateAccount || "").toLowerCase() === "true";
+    const businessName    = src.business_name || src.businessName || src.company || undefined;
     const shape     = src.shape;
     const length    = src.length    ? parseFloat(String(src.length))    : undefined;
     const width     = src.width     ? parseFloat(String(src.width))     : undefined;
@@ -945,6 +1036,7 @@ export function registerPoolRoutes(app: Express) {
             price: entry?.price, town: entry?.town,
             poolType, poolSurface, installType,
             gallons: finalGallons, deliveryDate, deliveryTime,
+            separateAccount, businessName,
           });
           console.log(`[save_lead] GHL contact=${contactId} opp=${opportunityId}`);
 
