@@ -711,8 +711,45 @@ async function createPoolLead(params: {
       { timeout: 10000 }
     ).toString();
 
-    opportunityId = JSON.parse(oppRes)?.opportunity?.id || null;
-    console.log(`[createPoolLead] new opp id=${opportunityId} name="${oppName}"`);
+    const oppParsed = JSON.parse(oppRes);
+    opportunityId = oppParsed?.opportunity?.id || null;
+
+    // GHL blocks a second OPEN opportunity for the same contact/pipeline. When
+    // that happens, find the existing open opp, refresh it (bump value, move back
+    // to New Lead stage so it reappears at the top), and append a note so the rep
+    // sees the second-call details.
+    if (!opportunityId && /duplicate opportunity/i.test(oppParsed?.message || "")) {
+      try {
+        const searchRes = execSync(
+          `curl -s "https://services.leadconnectorhq.com/opportunities/search?location_id=${GHL_LOCATION_ID}&contact_id=${contactId}&status=open" \
+            -H "Authorization: Bearer ${GHL_API_KEY}" -H "Version: 2021-07-28"`,
+          { timeout: 8000 }
+        ).toString();
+        const existingOpps = JSON.parse(searchRes)?.opportunities || [];
+        const existing = existingOpps.find((o: any) => o.pipelineId === POOL_PIPELINE_ID) || existingOpps[0];
+        if (existing?.id) {
+          opportunityId = existing.id;
+          const updatePayload = {
+            name: oppName,
+            pipelineStageId: POOL_STAGE_NEW_LEAD,
+            monetaryValue: priceNum,
+            status: "open",
+          };
+          execSync(
+            `curl -s -X PUT "https://services.leadconnectorhq.com/opportunities/${existing.id}" \
+              -H "Authorization: Bearer ${GHL_API_KEY}" \
+              -H "Version: 2021-07-28" \
+              -H "Content-Type: application/json" \
+              -d '${JSON.stringify(updatePayload).replace(/'/g, "'\\''")}'`,
+            { timeout: 8000 }
+          );
+          console.log(`[createPoolLead] refreshed existing opp ${existing.id} for repeat caller`);
+        }
+      } catch (refreshErr: any) {
+        console.error("[createPoolLead] refresh existing opp failed:", refreshErr.message);
+      }
+    }
+    console.log(`[createPoolLead] opp id=${opportunityId} name="${oppName}"`);
 
     // Also write pool-detail note on contact itself (easier for reps to see)
     if (poolNote) {
