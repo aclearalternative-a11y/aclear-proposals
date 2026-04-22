@@ -786,23 +786,25 @@ export function registerPoolRoutes(app: Express) {
     };
     recentWebhookRequests.push(logEntry);
     if (recentWebhookRequests.length > 30) recentWebhookRequests.shift();
-    console.log(`[ali-webhook] body=${JSON.stringify(req.body)} ct=${req.headers['content-type']}`);
-    const { action, zip, phone, email, address, city, state } = req.body;
+    console.log(`[ali-webhook] body=${JSON.stringify(req.body)} query=${JSON.stringify(req.query)} ct=${req.headers['content-type']}`);
+    // GHL Voice AI sends all params via query string. Also accept JSON body for curl/testing.
+    const src: any = { ...(req.query || {}), ...(req.body || {}) };
+    const { action, zip, phone, email, address, city, state } = src;
     // Voice AI sends snake_case params; accept both formats
-    const firstName = req.body.firstName || req.body.first_name;
-    const lastName  = req.body.lastName  || req.body.last_name;
-    const poolType    = req.body.poolType    || req.body.pool_type;    // inground | above_ground | hot_tub
-    const poolSurface = req.body.poolSurface || req.body.pool_surface; // plaster | liner
-    const installType = req.body.installType || req.body.install_type; // new | existing | diy | professional
-    const gallons     = req.body.gallons ? parseInt(String(req.body.gallons).replace(/\D/g, "")) || undefined : undefined;
-    const deliveryDate = req.body.deliveryDate || req.body.delivery_date;
-    const deliveryTime = req.body.deliveryTime || req.body.delivery_time;
-    const shape     = req.body.shape;
-    const length    = req.body.length    ? parseFloat(req.body.length)    : undefined;
-    const width     = req.body.width     ? parseFloat(req.body.width)     : undefined;
-    const diameter  = req.body.diameter  ? parseFloat(req.body.diameter)  : undefined;
-    const avgDepth  = req.body.avg_depth || req.body.avgDepth || req.body.depth
-                        ? parseFloat(req.body.avg_depth || req.body.avgDepth || req.body.depth)
+    const firstName = src.firstName || src.first_name;
+    const lastName  = src.lastName  || src.last_name;
+    const poolType    = src.poolType    || src.pool_type;    // inground | above_ground | hot_tub
+    const poolSurface = src.poolSurface || src.pool_surface; // plaster | liner
+    const installType = src.installType || src.install_type; // new | existing | diy | professional
+    const gallons     = src.gallons ? parseInt(String(src.gallons).replace(/\D/g, "")) || undefined : undefined;
+    const deliveryDate = src.deliveryDate || src.delivery_date;
+    const deliveryTime = src.deliveryTime || src.delivery_time;
+    const shape     = src.shape;
+    const length    = src.length    ? parseFloat(String(src.length))    : undefined;
+    const width     = src.width     ? parseFloat(String(src.width))     : undefined;
+    const diameter  = src.diameter  ? parseFloat(String(src.diameter))  : undefined;
+    const avgDepth  = src.avg_depth || src.avgDepth || src.depth
+                        ? parseFloat(String(src.avg_depth || src.avgDepth || src.depth))
                         : undefined;
 
     // — Zip check (mid-call) —
