@@ -463,7 +463,7 @@ function buildSignablePoolQuotePage(q: StoredQuote): string {
   </div>
 
   <div class="terms">
-    <strong>Terms:</strong> This quote is valid for 30 days from the date above. Pricing is based on the delivery zip code and the number of 6,200-gallon tanker loads required (hot tubs: 2,000-gallon tanker). Quote includes up to 300 feet of hose; each additional 50-foot length is $50.00. Additional charges may also apply for difficult access (gates, overhead obstructions, long distances from truck to pool). Final gallons may be verified on-site by the delivery team. Payment is due at time of service unless otherwise arranged; a 3% processing fee applies to all credit card payments made online. By signing below you authorize A Clear Alternative to schedule your delivery and confirm acceptance of the pricing and terms.
+    <strong>Terms:</strong> This quote is valid for 30 days from the date above. Pricing is based on the delivery zip code and the number of 6,200-gallon tanker loads required (hot tubs: 2,000-gallon tanker). Quote includes up to 300 feet of hose; each additional 50-foot length is $50.00. Final gallons may be verified on-site by the delivery team. Payment is due at time of service unless otherwise arranged; a 3% processing fee applies to all credit card payments made online. By signing below you authorize A Clear Alternative to schedule your delivery and confirm acceptance of the pricing and terms.
   </div>
 
   ${isSigned ? `
