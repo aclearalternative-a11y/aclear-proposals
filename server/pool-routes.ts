@@ -6,6 +6,11 @@ import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import nodemailer from "nodemailer";
+import {
+  sendOfflineConversion,
+  CONVERSION_ACTIONS,
+  nowForAdsApi,
+} from "./google-ads-conversion";
 
 // ---------------------------------------------------------------------------
 // Brochure attachment — bundled at server/assets/pool-water-brochure.pdf
@@ -1053,7 +1058,11 @@ export function registerPoolRoutes(app: Express) {
     // IMPORTANT: Voice AI has a ~2s timeout. Respond immediately, do heavy work in background.
     if (action === "save_lead") {
       const cleanZip = normalizeZip(zip);
-      console.log(`[save_lead] zip raw=${JSON.stringify(zip)} normalized=${cleanZip} email=${email}`);
+      // Capture Google Click ID for conversion attribution. Sent by Base44 app
+      // when traffic comes from a Google Ad — preserved across redirects via
+      // ?gclid= URL param. Also accept gbraid/wbraid for iOS/web app users.
+      const gclid = src.gclid || src.GCLID || undefined;
+      console.log(`[save_lead] zip raw=${JSON.stringify(zip)} normalized=${cleanZip} email=${email} gclid=${gclid || "(none)"}`);
 
       // Respond IMMEDIATELY so Jessica can continue naturally
       res.json({ success: true, message: "Lead saved. Quote being emailed." });
@@ -1080,6 +1089,22 @@ export function registerPoolRoutes(app: Express) {
             separateAccount, businessName,
           });
           console.log(`[save_lead] GHL contact=${contactId} opp=${opportunityId}`);
+
+          // Fire Google Ads conversion (offline / server-to-server). This is
+          // what makes Smart Bidding possible later — Google sees that a real
+          // lead was generated. Uses GCLID if present, falls back to enhanced
+          // conversions (hashed email/phone) when GCLID is missing.
+          const conversionValue = computedTotal || (entry?.price ? parseFloat(entry.price) : 1800);
+          sendOfflineConversion({
+            conversionActionResource: CONVERSION_ACTIONS.POOL_QUOTE_FORM,
+            gclid,
+            conversionDateTime: nowForAdsApi(),
+            conversionValue,
+            currencyCode: "USD",
+            orderId: opportunityId || `lead-${Date.now()}`,
+            email,
+            phone,
+          }).catch(e => console.error("[save_lead] conversion fire error:", e?.message));
 
           await sendPoolLeadEmails({
             firstName, lastName,
