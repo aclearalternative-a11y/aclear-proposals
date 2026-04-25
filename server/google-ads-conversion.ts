@@ -16,8 +16,8 @@
 //
 // Conversion Action Resource Names (from Google Ads UI):
 //   Pool Quote Form Submitted: customers/3964373923/conversionActions/7588845837
-//   Website Phone Call:        customers/3964373923/conversionActions/<TBD>
-//   Pool Delivery Booked:      customers/3964373923/conversionActions/<TBD>
+//   Website Phone Call:        customers/3964373923/conversionActions/7588848132
+//   Pool Delivery Booked:      customers/3964373923/conversionActions/7588823188
 // =============================================================================
 
 const ADS_API_VERSION = "v17";
@@ -27,8 +27,8 @@ const LOGIN_CUSTOMER_ID = process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || CUSTOMER_I
 // Conversion action resource names — fill in once Google Ads UI shows IDs
 export const CONVERSION_ACTIONS = {
   POOL_QUOTE_FORM: `customers/${CUSTOMER_ID}/conversionActions/7588845837`,
-  WEBSITE_PHONE_CALL: `customers/${CUSTOMER_ID}/conversionActions/PHONE_CONVERSION_ID_TBD`,
-  POOL_DELIVERY_BOOKED: `customers/${CUSTOMER_ID}/conversionActions/BOOKING_CONVERSION_ID_TBD`,
+  WEBSITE_PHONE_CALL: `customers/${CUSTOMER_ID}/conversionActions/7588848132`,
+  POOL_DELIVERY_BOOKED: `customers/${CUSTOMER_ID}/conversionActions/7588823188`,
 };
 
 // ----------------------------------------------------------------------------
